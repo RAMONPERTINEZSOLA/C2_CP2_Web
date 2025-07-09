@@ -57,5 +57,19 @@
     <div class="description">
         <p><strong>Description:</strong> Add here the contents or purpose of this drawer.</p>
     </div>
+        <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
+
+    <script>
+      fetch("https://parcsafe-my.sharepoint.com/:x:/g/personal/daniel_parker_parcsafe_com_au/EfDE4zWhH61JmmZeOExQEkYBUqylsyyqX8qdBRSLZv5sgQ?e=UMItVi")
+        .then(res => res.text())
+        .then(csv => {
+          const rows = csv.trim().split("\n").slice(1);
+          const data = rows.map(row => row.split(","));
+          const match = data.find(row => row[0] === "C2_CP2_11_I");
+          document.getElementById("stock-display").innerText =
+            match ? "📦 STOCK: " + match[1] : "📦 STOCK: not found";
+        });
+    </script>
+
 </body>
 </html>
