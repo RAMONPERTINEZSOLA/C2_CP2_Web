@@ -43,8 +43,8 @@
   <a href="../index.html" class="button">← Back to index</a>
 
   <h1>Drawer: C2_CP2_11_I</h1>
-  <p><strong>Product Name:</strong> KEYS</p>
-  <p><strong>Product Code:</strong> CP011I001</p>
+  <p id="product-name"><strong>Product Name:</strong> loading...</p>
+  <p id="product-code"><strong>Product Code:</strong> loading...</p>
 
   <div class="images">
     <div>
@@ -58,7 +58,7 @@
   </div>
 
   <div class="description">
-    <p><strong>Description:</strong> Add here the contents or purpose of this drawer.</p>
+    <p><strong>Description:</strong> <span id="description-text">loading...</span></p>
   </div>
 
   <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
@@ -66,31 +66,34 @@
   <script>
     const drawerCode = "C2_CP2_11_I";
 
-    fetch("https://ramonpertinezsola.github.io/C2_CP2_Web/stock.csv") // ✅ CORRECTE
+    fetch("stock.csv")
       .then(res => {
         if (!res.ok) throw new Error("Failed to load CSV file.");
         return res.text();
       })
       .then(csv => {
-        const rows = csv.trim().split("\n").slice(1); // skip header
-        const data = rows.map(row => row.split(","));
+        const rows = csv.trim().split("\n");
+        const headers = rows[0].split(",");
+        const data = rows.slice(1).map(row => {
+          const values = row.split(",");
+          return headers.reduce((obj, header, idx) => {
+            obj[header.trim()] = values[idx] ? values[idx].trim() : "";
+            return obj;
+          }, {});
+        });
 
-        console.log("CSV data:", data); // 🔍 DEBUG output
+        const match = data.find(row => row.drawerCode === drawerCode);
+        if (!match) throw new Error("Drawer not found in CSV.");
 
-        const match = data.find(row => row[0].trim() === drawerCode);
-        const container = document.getElementById("stock-display");
-
-        if (match) {
-          const stockQty = match[1].trim();
-          container.innerText = "📦 STOCK: " + stockQty;
-        } else {
-          container.innerText = "📦 STOCK: not found.";
-        }
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode}`;
+        document.getElementById("description-text").textContent = match.description;
+        document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
       })
       .catch(err => {
-        document.getElementById("stock-display").innerText =
-          "❌ Error loading stock: " + err.message;
+        document.getElementById("stock-display").innerText = "❌ Error loading stock: " + err.message;
       });
   </script>
 </body>
 </html>
+
