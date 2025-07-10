@@ -65,39 +65,25 @@
 
   <script>
     const drawerCode = "C2_CP2_11_I";
-    const csvUrl = "https://ramonpertinezsola.github.io/C2_CP2_Web/docs/stock.csv";
 
-    fetch(csvUrl)
+    fetch("../stock.csv")
       .then(res => {
         if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
         return res.text();
       })
       .then(csv => {
-        console.log("✅ CSV loaded successfully.");
         const rows = csv.trim().split("\n");
         const headers = rows[0].split(",");
-        console.log("Headers:", headers);
-
-        const data = rows.slice(1).map((row, index) => {
+        const data = rows.slice(1).map(row => {
           const values = row.split(",");
-          if (values.length !== headers.length) {
-            console.warn(`⚠️ Row ${index + 2} has ${values.length} values, expected ${headers.length}`);
-          }
           return headers.reduce((obj, header, idx) => {
             obj[header.trim()] = values[idx] ? values[idx].trim() : "";
             return obj;
           }, {});
         });
 
-        console.log("🔍 Parsed drawerCodes:", data.map(row => row.drawerCode));
-
         const match = data.find(row => row.drawerCode === drawerCode);
-
-        if (!match) {
-          throw new Error("Drawer not found in CSV: " + drawerCode);
-        }
-
-        console.log("🎯 Match found:", match);
+        if (!match) throw new Error("❌ Drawer not found in CSV.");
 
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName}`;
         document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode}`;
@@ -105,10 +91,10 @@
         document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
       })
       .catch(err => {
-        console.error("❌ CSV Load Error:", err);
         document.getElementById("stock-display").innerText =
           "❌ Error loading stock: " + err.message;
       });
   </script>
 </body>
 </html>
+
