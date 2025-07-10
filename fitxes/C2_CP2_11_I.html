@@ -66,31 +66,32 @@
 
   <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
 
-  <script>
-    // 🔁 CANVIA AIXÒ: Drawer code used in CSV
-    const drawerCode = "C2_CP2_11_I";
+ <script>
+  const drawerCode = "C2_CP2_11_I";
 
-    fetch("https://ramonpertinez.github.io/C2_CP2_Web/stock.csv")
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to load CSV file.");
-        return res.text();
-      })
-      .then(csv => {
-        const rows = csv.trim().split("\n").slice(1);
-        const data = rows.map(row => row.split(","));
-        const match = data.find(row => row[0] === drawerCode);
-        const container = document.getElementById("stock-display");
+  fetch("https://ramonpertinez.github.io/C2_CP2_Web/stock.csv")
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to load CSV file.");
+      return res.text();
+    })
+    .then(csv => {
+      const rows = csv.trim().split("\n").slice(1); // skip header
+      const data = rows.map(row => row.split(","));
+      const match = data.find(row => row[0].trim() === drawerCode);
 
-        if (match) {
-          const stockQty = match[1]; // second column = stock
-          container.innerText = "📦 STOCK: " + stockQty;
-        } else {
-          container.innerText = "📦 STOCK: not found.";
-        }
-      })
-      .catch(err => {
-        document.getElementById("stock-display").innerText = "❌ Error loading stock: " + err.message;
-      });
-  </script>
+      const container = document.getElementById("stock-display");
+
+      if (match) {
+        const stockQty = match[1].trim();
+        container.innerText = "📦 STOCK: " + stockQty;
+      } else {
+        container.innerText = "📦 STOCK: not found.";
+      }
+    })
+    .catch(err => {
+      document.getElementById("stock-display").innerText = "❌ Error loading stock: " + err.message;
+    });
+</script>
+
 </body>
 </html>
