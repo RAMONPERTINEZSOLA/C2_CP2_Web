@@ -66,7 +66,7 @@
   <script>
     const drawerCode = "C2_CP2_11_I";
 
-    fetch("stock.csv")
+    fetch("https://ramonpertinezsola.github.io/C2_CP2_Web/docs/stock.csv")
       .then(res => {
         if (!res.ok) throw new Error("Failed to load CSV file.");
         return res.text();
