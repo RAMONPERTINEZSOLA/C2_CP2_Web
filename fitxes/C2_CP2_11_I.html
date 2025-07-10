@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title><!-- 🔁 Drawer code --> C2_CP2_11_I</title>
+  <title>C2_CP2_11_I</title>
   <style>
     body {
       font-family: sans-serif;
@@ -42,10 +42,7 @@
 <body>
   <a href="../index.html" class="button">← Back to index</a>
 
-  <!-- 🔁 CANVIA AIXÒ: Drawer code -->
   <h1>Drawer: C2_CP2_11_I</h1>
-
-  <!-- 🔁 CANVIA AIXÒ: Product name + code -->
   <p><strong>Product Name:</strong> KEYS</p>
   <p><strong>Product Code:</strong> CP011I001</p>
 
@@ -66,32 +63,34 @@
 
   <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
 
- <script>
-  const drawerCode = "C2_CP2_11_I";
+  <script>
+    const drawerCode = "C2_CP2_11_I";
 
-  fetch("https://ramonpertinez.github.io/C2_CP2_Web/stock.csv")
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to load CSV file.");
-      return res.text();
-    })
-    .then(csv => {
-      const rows = csv.trim().split("\n").slice(1); // skip header
-      const data = rows.map(row => row.split(","));
-      const match = data.find(row => row[0].trim() === drawerCode);
+    fetch("https://ramonpertinez.github.io/C2_CP2_Web/stock.csv")
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load CSV file.");
+        return res.text();
+      })
+      .then(csv => {
+        const rows = csv.trim().split("\n").slice(1); // skip header
+        const data = rows.map(row => row.split(","));
 
-      const container = document.getElementById("stock-display");
+        console.log("CSV data:", data); // 🔍 DEBUG output
 
-      if (match) {
-        const stockQty = match[1].trim();
-        container.innerText = "📦 STOCK: " + stockQty;
-      } else {
-        container.innerText = "📦 STOCK: not found.";
-      }
-    })
-    .catch(err => {
-      document.getElementById("stock-display").innerText = "❌ Error loading stock: " + err.message;
-    });
-</script>
+        const match = data.find(row => row[0].trim() === drawerCode);
+        const container = document.getElementById("stock-display");
 
+        if (match) {
+          const stockQty = match[1].trim();
+          container.innerText = "📦 STOCK: " + stockQty;
+        } else {
+          container.innerText = "📦 STOCK: not found.";
+        }
+      })
+      .catch(err => {
+        document.getElementById("stock-display").innerText =
+          "❌ Error loading stock: " + err.message;
+      });
+  </script>
 </body>
 </html>
