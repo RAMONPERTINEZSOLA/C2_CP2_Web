@@ -57,48 +57,53 @@
     <div class="description">
         <p><strong>Description:</strong> Add here the contents or purpose of this drawer.</p>
     </div>
-        <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
 
-   <script>
-  const drawerCode = "C2_CP2_11_I";
+    <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
 
-  fetch("https://ramonpertinez.github.io/C2_CP2_Web/stock.csv")
-    .then(res => res.text())
-    .then(csv => {
-      const rows = csv.trim().split("\n").slice(1); // omet la capçalera
-      const data = rows.map(row => row.split(","));
-      const match = data.find(row => row[0] === drawerCode);
+    <script>
+        const drawerCode = "C2_CP2_11_I";
 
-      const container = document.getElementById("stock-display");
+        fetch("https://ramonpertinez.github.io/C2_CP2_Web/stock.csv")
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to load CSV file.");
+                return res.text();
+            })
+            .then(csv => {
+                const rows = csv.trim().split("\n").slice(1);
+                const data = rows.map(row => row.split(","));
+                const match = data.find(row => row[0] === drawerCode);
 
-      if (match) {
-        const [drawer, productCode, productName, ...images] = match;
+                const container = document.getElementById("stock-display");
 
-        let html = `
-          <p><strong>DRAWER:</strong> ${drawer}</p>
-          <p><strong>Product Name:</strong> ${productName}</p>
-          <p><strong>Product Code:</strong> ${productCode}</p>
-          <div class="images">
-        `;
+                if (match) {
+                    const [drawer, productCode, productName, ...images] = match;
 
-        images.forEach(url => {
-          if (url.trim()) {
-            html += `
-              <div>
-                <img src="${url.trim()}" alt="${productName}">
-              </div>
-            `;
-          }
-        });
+                    let html = `
+                        <p><strong>DRAWER:</strong> ${drawer}</p>
+                        <p><strong>Product Name:</strong> ${productName}</p>
+                        <p><strong>Product Code:</strong> ${productCode}</p>
+                        <div class="images">
+                    `;
 
-        html += "</div>";
-        container.innerHTML = html;
-      } else {
-        container.innerText = "📦 STOCK: not found";
-      }
-    });
-</script>
+                    images.forEach(url => {
+                        if (url.trim()) {
+                            html += `
+                                <div>
+                                    <img src="${url.trim()}" alt="${productName}">
+                                </div>
+                            `;
+                        }
+                    });
 
-
+                    html += "</div>";
+                    container.innerHTML = html;
+                } else {
+                    container.innerText = "📦 STOCK: not found.";
+                }
+            })
+            .catch(err => {
+                document.getElementById("stock-display").innerText = "❌ Error loading data: " + err.message;
+            });
+    </script>
 </body>
 </html>
