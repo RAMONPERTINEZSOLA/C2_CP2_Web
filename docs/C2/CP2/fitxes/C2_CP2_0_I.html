@@ -66,7 +66,7 @@
   <script>
     const drawerCode = "C2_CP2_0_I";
 
-    fetch("../stock.csv")
+    fetch('../../../stock.csv')  // ✅ correcte si estàs a 3 nivells de profunditat
       .then(res => {
         if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
         return res.text();
