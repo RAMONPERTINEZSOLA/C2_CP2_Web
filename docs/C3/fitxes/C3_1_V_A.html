@@ -72,7 +72,7 @@
   <script>
     const drawerCode = "C3_1_V_A";
 
-    fetch('/C2_CP2_Web/stock.csv')
+    fetch('../../../stock.csv')
       .then(res => {
         if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
         return res.text();
