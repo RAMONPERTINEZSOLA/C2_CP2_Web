@@ -1,37 +1,22 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>C3_1_I</title>
+  <meta charset="UTF-8">
+  <title>Drawer C3_1_I</title>
   <style>
     body {
       font-family: sans-serif;
-      margin: 40px;
       text-align: center;
+      margin: 40px;
     }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 30px;
+    img {
+      max-width: 90%;
+      height: auto;
     }
-    .drawer-options {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-    }
-    .drawer-options div {
-      border: 1px solid #ddd;
-      padding: 10px;
-      background: #f9f9f9;
-      width: 300px;
-    }
-    .drawer-options img {
-      max-width: 100%;
-    }
-    a.button {
+    .button {
       display: inline-block;
-      margin-top: 10px;
-      padding: 8px 16px;
+      padding: 10px 20px;
+      margin-bottom: 30px;
       background-color: #007bff;
       color: white;
       text-decoration: none;
@@ -40,20 +25,15 @@
   </style>
 </head>
 <body>
-  <h1>Choose Sub-Drawer in C3_1_I</h1>
-  <div class="drawer-options">
-    <div>
-      <h2>A</h2>
-      <img src="C3_1_I_A.jpg" alt="Drawer A">
-      <br>
-      <a class="button" href="C3_1_I_A.html">View A</a>
-    </div>
-    <div>
-      <h2>B</h2>
-      <img src="C3_1_I_B.jpg" alt="Drawer B">
-      <br>
-      <a class="button" href="C3_1_I_B.html">View B</a>
-    </div>
-  </div>
+  <a href="../index.html" class="button">← Back to index</a>
+  <h1>Drawer: C3_1_I</h1>
+  <p>Click on a section to view the detailed product</p>
+
+  <img src="C3_1_I.jpg" alt="Drawer C3_1_I" usemap="#drawer-map">
+
+  <map name="drawer-map">
+    <area shape="rect" coords="0,0,500,500" href="C3_1_I_A.html" alt="C3_1_I_A" title="C3_1_I_A">
+    <area shape="rect" coords="501,0,1000,500" href="C3_1_I_B.html" alt="C3_1_I_B" title="C3_1_I_B">
+  </map>
 </body>
 </html>
