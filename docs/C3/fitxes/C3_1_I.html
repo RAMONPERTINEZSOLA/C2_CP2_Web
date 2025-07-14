@@ -9,10 +9,12 @@
       text-align: center;
       margin: 40px;
     }
+
     img {
       max-width: 100%;
       height: auto;
     }
+
     .button {
       display: inline-block;
       padding: 10px 20px;
@@ -21,6 +23,21 @@
       color: white;
       text-decoration: none;
       border-radius: 5px;
+    }
+
+    #tooltip {
+      display: none;
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+
+    #tooltip img {
+      max-width: 200px;
+      height: auto;
     }
   </style>
 </head>
@@ -31,14 +48,38 @@
   <h1>Drawer: C3_1_I</h1>
   <p>Click on a section of the drawer to view details:</p>
 
-  <!-- Ruta corregida per a la imatge -->
-  <img src="../images/C3_bluedrawer_2R.png" usemap="#image-map" alt="C3_1_I drawer">
+  <div style="position: relative;">
+    <img src="../images/C3_bluedrawer_2R.png" usemap="#image-map" alt="C3_1_I drawer">
+    <map name="image-map">
+      <area shape="rect" coords="792,730,1279,168" href="C3_1_I_A.html" 
+        onmouseover="showTooltip(event, 'C3_1_I_A')" onmouseout="hideTooltip()"
+        alt="C3_1_I_A" title="C3_1_I_A">
+      
+      <area shape="rect" coords="767,731,295,170" href="C3_1_I_B.html"
+        onmouseover="showTooltip(event, 'C3_1_I_B')" onmouseout="hideTooltip()"
+        alt="C3_1_I_B" title="C3_1_I_B">
+    </map>
 
-  <map name="image-map">
-    <!-- Assumim que els fitxers A i B estan a la mateixa carpeta que aquest HTML -->
-    <area target="" alt="C3_1_I_A" title="C3_1_I_A" href="C3_1_I_A.html" coords="792,730,1279,168" shape="rect">
-    <area target="" alt="C3_1_I_B" title="C3_1_I_B" href="C3_1_I_B.html" coords="767,731,295,170" shape="rect">
-  </map>
+    <div id="tooltip">
+      <img id="tooltip-img" src="" alt="preview">
+    </div>
+  </div>
+
+  <script>
+    function showTooltip(evt, code) {
+      const tooltip = document.getElementById("tooltip");
+      const img = document.getElementById("tooltip-img");
+
+      img.src = "../img/" + code + ".jpg";  // Ruta a la carpeta img
+      tooltip.style.display = "block";
+      tooltip.style.top = (evt.pageY + 15) + "px";
+      tooltip.style.left = (evt.pageX + 15) + "px";
+    }
+
+    function hideTooltip() {
+      document.getElementById("tooltip").style.display = "none";
+    }
+  </script>
 
 </body>
 </html>
