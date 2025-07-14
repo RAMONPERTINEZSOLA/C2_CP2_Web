@@ -41,7 +41,7 @@
 </head>
 <body>
 
-  <a href="../../index.html" class="button">← Back to index</a>
+  <a href="../index.html" class="button">← Back to index</a>
 
   <h1>Drawer: C3_1_V_A</h1>
   <p id="product-name"><strong>Product Name:</strong> loading...</p>
@@ -72,7 +72,7 @@
   <script>
     const drawerCode = "C3_1_V_A";
 
-    fetch('../../../stock.csv')
+    fetch('../../stock.csv')
       .then(res => {
         if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
         return res.text();
