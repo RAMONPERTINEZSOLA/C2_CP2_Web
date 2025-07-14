@@ -50,13 +50,16 @@
 
   <div style="position: relative;">
 
-    <img src="../images/C3_bluedrawer_3R.png" usemap="#image-map" alt="C3_1_V drawer">    
+    <img src="../images/C3_bluedrawer_3R.png" usemap="#image-map" alt="C3_1_V drawer">
 
-<map name="image-map">
-    <area target="" alt="C3_bluedrawer_3R_A" title="C3_bluedrawer_3R_A" href="" coords="949,724,1295,168" shape="rect">
-    <area target="" alt="C3_bluedrawer_3R_B" title="C3_bluedrawer_3R_B" href="" coords="642,726,900,167" shape="rect">
-    <area target="" alt="C3_bluedrawer_3R_C" title="C3_bluedrawer_3R_C" href="" coords="613,727,233,171" shape="rect">
-</map>
+    <map name="image-map">
+      <area target="" alt="C3_1_V_A" title="C3_1_V_A" href="C3_1_V_A.html" coords="949,724,1295,168" shape="rect" 
+            onmouseover="showTooltip(event, 'C3_1_V_A')" onmouseout="hideTooltip()">
+      <area target="" alt="C3_1_V_B" title="C3_1_V_B" href="C3_1_V_B.html" coords="642,726,900,167" shape="rect" 
+            onmouseover="showTooltip(event, 'C3_1_V_B')" onmouseout="hideTooltip()">
+      <area target="" alt="C3_1_V_C" title="C3_1_V_C" href="C3_1_V_C.html" coords="613,727,233,171" shape="rect" 
+            onmouseover="showTooltip(event, 'C3_1_V_C')" onmouseout="hideTooltip()">
+    </map>
 
     <div id="tooltip">
       <img id="tooltip-img" src="" alt="preview">
@@ -68,7 +71,7 @@
       const tooltip = document.getElementById("tooltip");
       const img = document.getElementById("tooltip-img");
 
-      img.src = "../img/" + code + ".jpg";  // Ruta a la carpeta img
+      img.src = "../img/" + code + ".jpg";
       tooltip.style.display = "block";
       tooltip.style.top = (evt.pageY + 15) + "px";
       tooltip.style.left = (evt.pageX + 15) + "px";
