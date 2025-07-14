@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>C3_0_IV</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px; max-width: 800px; }
+    h1 { font-size: 24px; margin-bottom: 10px; }
+    a.button { display: inline-block; padding: 10px 20px; margin-bottom: 30px;
+                background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+    .images { display: flex; gap: 40px; flex-wrap: wrap; }
+    .images img { max-width: 350px; border: 1px solid #ddd; padding: 5px; background: #f9f9f9; }
+    .description { margin-top: 30px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="button">← Back to index</a>
+
+  <h1>Drawer: C3_0_IV</h1>
+  <p id="product-name"><strong>Product Name:</strong> loading...</p>
+  <p id="product-code"><strong>Product Code:</strong> loading...</p>
+
+  <div class="images">
+    <div>
+      <p><strong>Drawer Photo:</strong></p>
+      <img src="../img/C3_0_IV.jpg" alt="Drawer image C3_0_IV" />
+    </div>
+    <div>
+      <p><strong>Cabinet Highlight:</strong></p>
+      <img src="../img/C3_cabinet_C3_0_IV.png" alt="Cabinet highlight" />
+    </div>
+  </div>
+
+  <div class="description">
+    <p><strong>Description:</strong> <span id="description-text">loading...</span></p>
+  </div>
+
+  <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
+
+  <script>
+    const drawerCode = "C3_0_IV";
+
+    fetch('../../../stock.csv')
+      .then(res => {
+        if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
+        return res.text();
+      })
+      .then(csv => {
+        const rows = csv.trim().split("\n");
+        const headers = rows[0].split(",");
+        const data = rows.slice(1).map(row => {
+          const values = row.split(",");
+          return headers.reduce((obj, header, idx) => {
+            obj[header.trim()] = values[idx] ? values[idx].trim() : "";
+            return obj;
+          }, {});
+        });
+
+        const match = data.find(row => row.drawerCode === drawerCode);
+        if (!match) throw new Error("❌ Drawer not found in CSV.");
+
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode}`;
+        document.getElementById("description-text").textContent = match.description;
+        document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
+      })
+      .catch(err => {
+        document.getElementById("stock-display").innerText =
+          "❌ Error loading stock: " + err.message;
+      });
+  </script>
+</body>
+</html>
