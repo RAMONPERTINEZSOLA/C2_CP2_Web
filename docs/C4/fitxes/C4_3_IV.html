@@ -49,15 +49,16 @@
   <p>Click on a section of the drawer to view details:</p>
 
   <div style="position: relative;">
-    <img src="../images/C4_bluedrawer_2R.png" usemap="#image-map" alt="C4_3_IV drawer">
+
+    <img src="../images/C4_bluedrawer_3R.png" usemap="#image-map" alt="C4_3_IV drawer">
+
     <map name="image-map">
-      <area shape="rect" coords="792,730,1279,168" href="C4_1_I_A.html" 
-        onmouseover="showTooltip(event, 'C4_3_IV_A')" onmouseout="hideTooltip()"
-        alt="C4_3_IV_A" title="C4_3_IV_A">
-      
-      <area shape="rect" coords="767,731,295,170" href="C4_3_IV_B.html"
-        onmouseover="showTooltip(event, 'C4_3_IV_B')" onmouseout="hideTooltip()"
-        alt="C4_3_IV_B" title="C4_3_IV_B">
+      <area target="" alt="C4_3_IV_A" title="C4_3_IV_A" href="C4_3_IV_A.html" coords="949,724,1295,168" shape="rect" 
+            onmouseover="showTooltip(event, 'C4_3_IV_A')" onmouseout="hideTooltip()">
+      <area target="" alt="C4_3_IV_B" title="C4_3_IV_B" href="C4_3_IV_B.html" coords="642,726,900,167" shape="rect" 
+            onmouseover="showTooltip(event, 'C4_3_IV_B')" onmouseout="hideTooltip()">
+      <area target="" alt="C4_3_IV_C" title="C4_3_IV_C" href="C4_3_IV_C.html" coords="613,727,233,171" shape="rect" 
+            onmouseover="showTooltip(event, 'C4_3_IV_C')" onmouseout="hideTooltip()">
     </map>
 
     <div id="tooltip">
@@ -70,7 +71,7 @@
       const tooltip = document.getElementById("tooltip");
       const img = document.getElementById("tooltip-img");
 
-      img.src = "../img/" + code + ".jpg";  // Ruta a la carpeta img
+      img.src = "../img/" + code + ".jpg";
       tooltip.style.display = "block";
       tooltip.style.top = (evt.pageY + 15) + "px";
       tooltip.style.left = (evt.pageX + 15) + "px";
