@@ -1,17 +1,42 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>C3_6_I</title>
   <style>
-    body { font-family: sans-serif; margin: 40px; max-width: 800px; }
-    h1 { font-size: 24px; margin-bottom: 10px; }
-    a.button { display: inline-block; padding: 10px 20px; margin-bottom: 30px;
-                background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
-    .images { display: flex; gap: 40px; flex-wrap: wrap; }
-    .images img { max-width: 350px; border: 1px solid #ddd; padding: 5px; background: #f9f9f9; }
-    .description { margin-top: 30px; font-size: 16px; }
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      max-width: 800px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    a.button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-bottom: 30px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .images {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .images img {
+      max-width: 350px;
+      border: 1px solid #ddd;
+      padding: 5px;
+      background: #f9f9f9;
+    }
+    .description {
+      margin-top: 30px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -22,15 +47,15 @@
   <p id="product-code"><strong>Product Code:</strong> loading...</p>
 
   <div class="images">
-    <div>
-      <p><strong>Drawer Photo:</strong></p>
-      <img src="../img/C3_6_I.jpg" alt="Drawer image C3_6_I" />
-    </div>
-    <div>
-      <p><strong>Cabinet Highlight:</strong></p>
-      <img src="../img/C3_cabinet_C3_6_I.png" alt="Cabinet highlight" />
-    </div>
+  <div>
+    <p><strong>Drawer image:</strong></p>
+    <img src="../images/C3_6_I.jpg" alt="Drawer image" />
   </div>
+  <div>
+    <p><strong>Drawer Location:</strong></p>
+    <img src="../images/C3_rack_C3_6_I.jpg" alt="Drawer Location" />
+  </div>
+</div>
 
   <div class="description">
     <p><strong>Description:</strong> <span id="description-text">loading...</span></p>
@@ -41,7 +66,7 @@
   <script>
     const drawerCode = "C3_6_I";
 
-    fetch('../../../stock.csv')
+    fetch('../../stock.csv')
       .then(res => {
         if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
         return res.text();
