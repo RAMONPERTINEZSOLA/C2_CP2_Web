@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Drawer C5_2_II</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 40px;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-bottom: 30px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    #tooltip {
+      display: none;
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+
+    #tooltip img {
+      max-width: 200px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="../index.html" class="button">← Back to index</a>
+
+  <h1>Drawer: C5_2_II</h1>
+  <p>Click on a section of the drawer to view details:</p>
+
+  <div style="position: relative;">
+
+    <img src="../images/C5_bluedrawer_3R.png" usemap="#image-map" alt="C5_2_II drawer">
+
+    <map name="image-map">
+      <area target="" alt="C5_2_II_A" title="C5_2_II_A" href="C5_2_II_A.html" coords="949,724,1295,168" shape="rect" 
+            onmouseover="showTooltip(event, 'C5_2_II_A')" onmouseout="hideTooltip()">
+      <area target="" alt="C5_2_II_B" title="C5_2_II_B" href="C5_2_II_B.html" coords="642,726,900,167" shape="rect" 
+            onmouseover="showTooltip(event, 'C5_2_II_B')" onmouseout="hideTooltip()">
+      <area target="" alt="C5_2_II_C" title="C5_2_II_C" href="C5_2_II_C.html" coords="613,727,233,171" shape="rect" 
+            onmouseover="showTooltip(event, 'C5_2_II_C')" onmouseout="hideTooltip()">
+    </map>
+
+    <div id="tooltip">
+      <img id="tooltip-img" src="" alt="preview">
+    </div>
+  </div>
+
+  <script>
+    function showTooltip(evt, code) {
+      const tooltip = document.getElementById("tooltip");
+      const img = document.getElementById("tooltip-img");
+
+      img.src = "../img/" + code + ".jpg";
+      tooltip.style.display = "block";
+      tooltip.style.top = (evt.pageY + 15) + "px";
+      tooltip.style.left = (evt.pageX + 15) + "px";
+    }
+
+    function hideTooltip() {
+      document.getElementById("tooltip").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>
