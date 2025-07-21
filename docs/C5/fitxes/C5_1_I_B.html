@@ -24,8 +24,8 @@
     }
     .images {
       display: flex;
-      gap: 40px;
       flex-wrap: wrap;
+      gap: 30px;
     }
     .images img {
       max-width: 350px;
@@ -40,6 +40,7 @@
   </style>
 </head>
 <body>
+
   <a href="../index.html" class="button">← Back to index</a>
 
   <h1>Drawer: C5_1_I_B</h1>
@@ -47,20 +48,20 @@
   <p id="product-code"><strong>Product Code:</strong> loading...</p>
 
   <div class="images">
-  <div>
-    <p><strong>Drawer image:</strong></p>
-    <img src="../images/C5_1_I_B.jpg" alt="Drawer image" />
+    <div>
+      <p><strong>Drawer image:</strong></p>
+      <img src="../images/C5_1_I_B.jpg" alt="Drawer image C5_1_I_B" />
+    </div>
+    <div>
+      <p><strong>Drawer Photo:</strong></p>
+      <img src="../images/C5_1_I.jpg" alt="Drawer photo C5_1_I" />
+    </div>
+    <div>
+      <p><strong>Drawer Location:</strong></p>
+      <img src="../images/C5_bluedrawer_3R_B.jpg" alt="Drawer highlight" />
+      <img src="../images/C5_rack_C5_1_I.jpg" alt="Rack cabinet" />
+    </div>
   </div>
-  <div>
-    <p><strong>Drawer Photo:</strong></p>
-    <img src="../images/C5_1_I.jpg" alt="Drawer image C5_1_I" />
-  </div>
-  <div>
-    <p><strong>Drawer Location:</strong></p>
-    <img src="../images/C5_bluedrawer_2R_B.jpg" alt="Drawer Location" />
-    <img src="../images/C5_rack_C5_1_I.png" alt="Drawer Location" />
-  </div>
-</div>
 
   <div class="description">
     <p><strong>Description:</strong> <span id="description-text">loading...</span></p>
@@ -100,5 +101,6 @@
           "❌ Error loading stock: " + err.message;
       });
   </script>
+
 </body>
 </html>
