@@ -1,17 +1,138 @@
-<!-- docs/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Parcsafe Stock View</title>
+  <title>Parcsafe Stock Viewer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #004d40;
+      color: white;
+      padding: 30px 0;
+      text-align: center;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin: 10px 0;
+    }
+
+    a {
+      text-decoration: none;
+      color: #00796b;
+      background-color: white;
+      padding: 10px 16px;
+      display: block;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: background-color 0.2s;
+    }
+
+    a:hover {
+      background-color: #e0f2f1;
+    }
+
+    h2 {
+      margin-top: 40px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      font-size: 13px;
+      color: #888;
+    }
+  </style>
 </head>
 <body>
-  <h1>Benvingut al visor de calaixos de Parcsafe</h1>
-  <ul>
-    <li><a href="C2/CP2/index.html">C2 – CP2</a></li>
-    <li><a href="C3/index.html">C3</a></li>
-    <li><a href="C4/index.html">C4</a></li>
-    <li><a href="C5/index.html">C5</a></li>
-  </ul>
+  <header>
+    <h1>Parcsafe Stock Viewer</h1>
+  </header>
+
+  <main>
+    <input type="text" id="searchBox" placeholder="Search for any item (e.g., C4_3_II)...">
+    <ul id="resultsList">
+      <!-- Search results will appear here -->
+    </ul>
+
+    <h2>Browse by Section:</h2>
+    <ul>
+      <li><a href="C2/CP2/index.html">📁 C2 – CP2</a></li>
+      <li><a href="C3/index.html">📁 C3</a></li>
+      <li><a href="C4/index.html">📁 C4</a></li>
+      <li><a href="C5/index.html">📁 C5</a></li>
+    </ul>
+  </main>
+
+  <footer>
+    © 2025 Parcsafe · All rights reserved
+  </footer>
+
+  <!-- Load fitxes from each folder -->
+  <script src="C2/CP2/fitxes.js"></script>
+  <script src="C3/fitxes.js"></script>
+  <script src="C4/fitxes.js"></script>
+  <script src="C5/fitxes.js"></script>
+
+  <script>
+    // All fitxes will be pushed into this array
+    const allFitxes = [];
+
+    // Each fitxes.js file must call: addFitxes([{name, path}, ...])
+    function addFitxes(list) {
+      allFitxes.push(...list);
+    }
+
+    const searchBox = document.getElementById('searchBox');
+    const resultsList = document.getElementById('resultsList');
+
+    function updateResults() {
+      const query = searchBox.value.toLowerCase();
+      resultsList.innerHTML = '';
+
+      const filtered = allFitxes.filter(f => f.name.toLowerCase().includes(query));
+
+      if (filtered.length === 0 && query.length > 0) {
+        resultsList.innerHTML = '<li>No results found</li>';
+        return;
+      }
+
+      filtered.forEach(f => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = f.path;
+        a.textContent = f.name;
+        li.appendChild(a);
+        resultsList.appendChild(li);
+      });
+    }
+
+    searchBox.addEventListener('input', updateResults);
+  </script>
 </body>
 </html>
