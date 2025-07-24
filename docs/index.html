@@ -115,18 +115,19 @@
     © 2025 Parcsafe · All rights reserved
   </footer>
 
-  <!-- Scripts fitxes -->
-  <script src="C2/CP2/fitxes.js"></script>
-  <script src="C3/fitxes.js"></script>
-  <script src="C4/fitxes.js"></script>
-  <script src="C5/fitxes.js"></script>
+ <script>
+  const allFitxes = [];
 
-  <script>
-    const allFitxes = [];
+  function addFitxes(list) {
+    allFitxes.push(...list);
+  }
+</script>
 
-    function addFitxes(list) {
-      allFitxes.push(...list);
-    }
+<!-- Scripts fitxes -->
+<script src="C2/CP2/fitxes.js"></script>
+<script src="C3/fitxes.js"></script>
+<script src="C4/fitxes.js"></script>
+<script src="C5/fitxes.js"></script>
 
     const searchBox = document.getElementById('searchBox');
     const resultsList = document.getElementById('resultsList');
