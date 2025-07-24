@@ -12,10 +12,26 @@
       max-width: 90%;
       height: auto;
     }
+    .top-bar {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.back-button img {
+  height: 28px;
+  width: auto;
+  cursor: pointer;
+}
+
   </style>
 </head>
 <body>
- <a href="../../index.html" class="back-button">⬅️ BACK</a>
+<div class="top-bar">
+  <a class="back-button" href="../../index.html">
+    <img src="../../back_arrow.png" alt="Back to main" title="Back to main" />
+  </a>
+</div>
+
   <h1>Interactive Cabinet C2_CP2</h1>
 <a href="https://parcsafe-my.sharepoint.com/:x:/g/personal/daniel_parker_parcsafe_com_au/EfLLWaLmpYdHoDA7pT-XOgoBpL9oPL_C1Xvk-ouX2qh9MQ?e=t7DhUm" target="_blank" class="button">📊 View Live Stock Excel</a>
   <p>Click on a drawer to view the product</p>
@@ -24,11 +40,6 @@
   <input type="text" id="searchBox" placeholder="Enter drawer code (e.g. C2_CP2_5_III)" style="padding: 8px; width: 250px;">
   <button onclick="goToDrawer()" style="padding: 8px;">Search</button>
 </div>
-
-
-
-
-
 
 
   <img src="C2_CP2.jpg" alt="Armari 12x5" usemap="#image-map">
