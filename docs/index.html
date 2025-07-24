@@ -19,7 +19,7 @@
     }
 
     header img {
-      height: 60px;
+      height: 120px;
     }
 
     main {
@@ -115,7 +115,6 @@
     © 2025 Parcsafe · All rights reserved
   </footer>
 
-  <!-- Inicialitza array -->
   <script>
     const allFitxes = [];
 
@@ -124,24 +123,27 @@
     }
   </script>
 
-  <!-- Fitxes.js -->
+  <!-- Scripts fitxes -->
   <script src="C2/CP2/fitxes.js"></script>
   <script src="C3/fitxes.js"></script>
   <script src="C4/fitxes.js"></script>
   <script src="C5/fitxes.js"></script>
 
-  <!-- Buscador -->
   <script>
     const searchBox = document.getElementById('searchBox');
     const resultsList = document.getElementById('resultsList');
 
     function updateResults() {
-      const query = searchBox.value.toLowerCase();
+      const query = searchBox.value.toLowerCase().trim();
       resultsList.innerHTML = '';
+
+      if (query.length === 0) {
+        return; // Si el camp està buit, no mostrar res
+      }
 
       const filtered = allFitxes.filter(f => f.name.toLowerCase().includes(query));
 
-      if (filtered.length === 0 && query.length > 0) {
+      if (filtered.length === 0) {
         resultsList.innerHTML = '<li>No results found</li>';
         return;
       }
