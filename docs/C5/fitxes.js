@@ -1,0 +1,23 @@
+addFitxes([
+  { name: "C5_0", path: "C5/fitxes/C5_0.html" },
+  { name: "C5_1_I", path: "C5/fitxes/C5_1_I.html" },
+  { name: "C5_1_II", path: "C5/fitxes/C5_1_II.html" },
+  { name: "C5_1_III", path: "C5/fitxes/C5_1_III.html" },
+  { name: "C5_1_IV", path: "C5/fitxes/C5_1_IV.html" },
+  { name: "C5_1_V", path: "C5/fitxes/C5_1_V.html" },
+  { name: "C5_1_VI", path: "C5/fitxes/C5_1_VI.html" },
+  { name: "C5_2_I", path: "C5/fitxes/C5_2_I.html" },
+  { name: "C5_2_II", path: "C5/fitxes/C5_2_II.html" },
+  { name: "C5_2_III", path: "C5/fitxes/C5_2_III.html" },
+  { name: "C5_2_IV", path: "C5/fitxes/C5_2_IV.html" },
+  { name: "C5_2_V", path: "C5/fitxes/C5_2_V.html" },
+  { name: "C5_2_VI", path: "C5/fitxes/C5_2_VI.html" },
+  { name: "C5_3_I", path: "C5/fitxes/C5_3_I.html" },
+  { name: "C5_3_II", path: "C5/fitxes/C5_3_II.html" },
+  { name: "C5_4_I", path: "C5/fitxes/C5_4_I.html" },
+  { name: "C5_4_II", path: "C5/fitxes/C5_4_II.html" },
+  { name: "C5_5_I", path: "C5/fitxes/C5_5_I.html" },
+  { name: "C5_5_II", path: "C5/fitxes/C5_5_II.html" },
+  { name: "C5_6_I", path: "C5/fitxes/C5_6_I.html" },
+  { name: "C5_6_II", path: "C5/fitxes/C5_6_II.html" }
+]);
