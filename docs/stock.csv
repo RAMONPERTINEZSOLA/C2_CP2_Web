@@ -1,0 +1,363 @@
+drawerCode,stockQty,productName,productCode,description
+A1_0,--,--,--,--
+A1_1,--,--,--,--
+A1_2,--,--,--,--
+A1_3,--,--,--,--
+A1_4,--,--,--,--
+A2_0,--,--,--,--
+A2_1,--,--,--,--
+A2_2,--,--,--,--
+A2_3,--,--,--,--
+A2_4,--,--,--,--
+A3_0,--,--,--,--
+A3_1,--,--,--,--
+A3_2,--,--,--,--
+A3_3,--,--,--,--
+A3_4,--,--,--,--
+A4_0,--,--,--,--
+A4_1,--,--,--,--
+A4_2,--,--,--,--
+A4_3,--,--,--,--
+A4_4,--,--,--,--
+B1_0,--,--,--,--
+B1_1,--,--,--,--
+B2_0,--,--,--,--
+C1_1,--,--,--,--
+C1_2,--,--,--,--
+C1_3,--,--,--,--
+C2_1,--,--,--,--
+C2_2,--,--,--,--
+C2_3,--,--,--,--
+C2_4,--,--,--,--
+C2_CP2_0_I,--,--,--,--
+C2_CP2_0_II,--,--,--,--
+C2_CP2_0_III,--,--,--,--
+C2_CP2_0_IV,74,NAILS,0.1-FIX-NAI-10,NAILS
+C2_CP2_0_V,41,RIVETS,0.1-FIX-RIV-10,RIVETS
+C2_CP2_1_I,66,M8x30 mm,0.1-FIX-MMM-10,M8x30 mm
+C2_CP2_1_II,--,--,--,--
+C2_CP2_1_III,--,--,--,--
+C2_CP2_1_IV,666,MIX STUFF,0.1-FIX-MST-10,MIX STUFF
+C2_CP2_1_V,555,SCREWS: SELF TAPPPERS,0.1-FIX-SST-10,SCREWS: SELF TAPPPERS
+C2_CP2_2_I,--,--,--,--
+C2_CP2_2_II,35,M8x75mm HEX BOLT ZINC PLATED,0.1-FIX-MHB-10,M8x75mm HEX BOLT ZINC PLATED
+C2_CP2_2_III,888,MIX,0.1-OTH-MIX-10,MIX
+C2_CP2_2_IV,56,MIX 2,0.1-OTH-M2-10,MIX 2
+C2_CP2_2_V,6666,M6x35 mm BOLT NUTS,0.1-FIX-MMD-10,M6x35 mm BOLT NUTS
+C2_CP2_3_I,56,M10x30 mm HEX BOLT ZINC PLATED,0.1-FIX-MME-10,M10x30 mm HEX BOLT ZINC PLATED
+C2_CP2_3_II,74,M8x110 mm HEX BOLT ZINC PLATED,0.1-FIX-MMH-10,M8x110 mm HEX BOLT ZINC PLATED
+C2_CP2_3_III,--,--,--,--
+C2_CP2_3_IV,1000,M6x15 mm SCREW BOLT,0.1-FIX-MMS-10,M6x15 mm SCREW BOLT
+C2_CP2_3_V,--,--,--,--
+C2_CP2_4_I,90,6x55 mm Rod Hangerz (M8M10),0.1-ELE-6MR-10,6x55 mm Rod Hangerz (M8M10)
+C2_CP2_4_II,--,--,--,--
+C2_CP2_4_III,--,--,--,--
+C2_CP2_4_IV,--,--,--,--
+C2_CP2_4_V,--,--,--,--
+C2_CP2_5_I,99,M10x130 mm CHEMSETANCHOR STUD,0.1-FIX-MMJ-10,M10x130 mm CHEMSETANCHOR STUD
+C2_CP2_5_II,111,M12x160 mm CHEMSETANCHOR,0.1-FIX-MMK-10,M12x160 mm CHEMSETANCHOR
+C2_CP2_5_III,--,--,--,--
+C2_CP2_5_IV,--,--,--,--
+C2_CP2_5_V,21,M6.5 x 32 mm GRABCON HEX SCREWS *ICCONS,0.1-FIX-MX3-10,M6.5 x 32 mm GRABCON HEX SCREWS
+C2_CP2_6_I,93,MULTI WASHER,0.1-FIX-MWC-10,MULTI WASHER
+C2_CP2_6_II,149,SQUARE WASHERS M12,0.1-FIX-SWB-10,SQUARE WASHERS M12
+C2_CP2_6_III,250,SQUARE WASHERS M10,0.1-FIX-SWA-10,SQUARE WASHERS M10
+C2_CP2_6_IV,252,SQUARE WASHERS M8,0.1-FIX-SWM-10,SQUARE WASHERS M8
+C2_CP2_6_V,--,--,--,--
+C2_CP2_7_I,36,M10x100 mm HEX COACH SCREWS,0.1-FIX-MMI-10,M10x100 mm HEX COACH SCREWS
+C2_CP2_7_II,63,M10x75 mm HEX COACH SCREWS,0.1-FIX-MMG-10,M10x75 mm HEX COACH SCREWS
+C2_CP2_7_III,77,M12x60 mm NYLON FRAME FIXING PLUG,0.1-FIX-MMN-10,M12x60 mm NYLON FRAME FIXING PLUG
+C2_CP2_7_IV,80,M10 WASHERS,0.1-FIX-MWB-10,M10 WASHERS
+C2_CP2_7_V,45,STAINLESS COACH SCREWS M10x75 mm,0.1-FIX-SCS-10,STAINLESS COACH SCREWS M10x75 mm
+C2_CP2_8_I,12,NYLON CABLE GLANDS 16mm,0.1-ELE-NCA-10,NYLON CABLE GLANDS 16mm
+C2_CP2_8_II,44,ZIP TIES 4x200mm,0.1-ELE-ZT4-10,ZIP TIES 4x200mm
+C2_CP2_8_III,--,--,--,--
+C2_CP2_8_IV,--,--,--,--
+C2_CP2_8_V,--,--,--,--
+C2_CP2_9_I,333,"QUICK TERMINAL 2 - 3 - 5 PIN, brand WAGO",0.1-ELE-QTA-10,"QUICK TERMINAL 2 - 3 - 5 PIN, brand WAGO"
+C2_CP2_9_II,8,3 POLE TERMINAL,0.1-ELE-3PT-10,3 POLE TERMINAL
+C2_CP2_9_III,--,--,--,--
+C2_CP2_9_IV,--,--,--,--
+C2_CP2_9_V,123,RJ45 ETHERNET CONNECTORS,0.1-ELE-REC-10,RJ45 ETHERNET CONNECTORS
+C2_CP2_10_I,2,POWER RELAY + INTERFACE RELAY_1,0.1-ELE-PRA-10,POWER RELAY + INTERFACE RELAY_1
+C2_CP2_10_II,3,POWER RELAY + INTERFACE RELAY,0.1-ELE-PR+-10,POWER RELAY + INTERFACE RELAY
+C2_CP2_10_III,5,TIMER RELAY + TIMER SWITCH,0.1-ELE-TR+-10,TIMER RELAY + TIMER SWITCH
+C2_CP2_10_IV,6,TIME SWITCH,0.1-ELE-TSW-10,TIME SWITCH
+C2_CP2_10_V,--,--,--,--
+C2_CP2_11_I,5,KEYS,0.1-OTH-KEY-10,KEYS
+C2_CP2_11_II,7,Codex 9000 Key (EN_EX550 & BI550),15.01-CMS-C9K-10,XCLE94099 - Codex Key Code 9000
+C2_CP2_11_III,4,LBA 6000 Key,0.1-ENT-L6K-10,LBA 6000 Key
+C2_CP2_11_IV,1,MIX BATTERIES,0.1-ELE-MBA-10,MIX BATTERIES
+C2_CP2_11_V,--,--,--,--
+C3_0_I,3,Velocity Vehicle Barriers - Spring White,20.03-ENT-VVW-10,Velocity Vehicle Barriers - Spring White
+C3_0_II,34,Compression Spring Black,20.03-ENT-CSK-10,VLSPRGB - Velocity Compression Spring Gold/Black
+C3_0_III,12,Compression Spring Gold,20.03-ENT-CSJ-10,VLSPRG - Velocity Compression Spring Gold
+C3_0_IV,20,ENTA Compression Spring Yellow,20.03-ENT-ECY-10,VLSPRY - Velocity Compression Spring Yellow
+C3_0_V,0,0,20.03-ENT-----10,0
+C3_0_VI,0,0,20.03-ENT-----10,0
+C3_1_I_A,3333,Spring Cylinder Housing,20.03-ENT-SCH-10,Spring Cylinder Housing
+C3_1_I_B,250,Spring Seat Housing,20.03-ENT-SSH-10,Spring Seat Housing
+C3_1_II,0,0,20.03-ENT-----10,0
+C3_1_III,1,50m Roller Cable Turnstar,20.03-ENT-5RC-10,50m Roller Cable Turnstar
+C3_1_IV,1,Access control with coins,20.03-ENT-ACA-10,Access control with coins
+C3_1_V_A,21,0,20.03-ENT-----10,0
+C3_1_V_B,21,0,20.03-ENT-----10,0
+C3_1_V_C,21,0,20.03-ENT-----10,0
+C3_1_VI,21,0,20.03-ENT-----10,0
+C3_2_I_A,21,0,20.03-ENT-----10,0
+C3_2_I_B,21,0,20.03-ENT-----10,0
+C3_2_I_C,21,End Cap Plate,20.03-ENT-ECP-10,End Cap Plate
+C3_2_II_A,21,0,20.03-ENT-----10,0
+C3_2_II_B,21,0,20.03-ENT-----10,0
+C3_2_II_C,21,TIP COVER PLATE,20.03-ENT-TCP-10,TIP COVER PLATE
+C3_2_III_A,21,0,20.03-ENT-----10,0
+C3_2_III_B,21,0,20.03-ENT-----10,0
+C3_2_III_C,21,0,20.03-ENT-----10,0
+C3_2_IV_A,21,0,20.03-ENT-----10,0
+C3_2_IV_B,21,0,20.03-ENT-----10,0
+C3_2_IV_C,21,0,20.03-ENT-----10,0
+C3_2_V_A,21,Link Arm,20.03-ENT-LAR-10,Link Arm
+C3_2_V_B,21,0,20.03-ENT-----10,0
+C3_2_V_C,21,Adjustable Steel Mounting Bracket with Threaded Rod,20.03-ENT-ASM-10,"Galvanized steel mounting plate with slotted holes for flexible alignment. Includes pre-installed threaded rod and hex bolt, ideal for adjustable installations in structural or electrical systems."
+C3_2_VI_A,21,30x8 Rubber Buffer,20.03-ENT-3RB-10,30x8 Rubber Buffer
+C3_2_VI_B,21,0,20.03-ENT-----10,0
+C3_2_VI_C,21, Powder Coated Steel – ENTA Turnstar Gate Arm,20.03-ENT-PCS-10,"Support arm from ENTA (Turnstar), typically used in gate or turnstile mechanisms. Constructed from durable powder-coated steel with elongated slot for adjustable mounting. Designed for robust performance in access control systems."
+C3_3_I_A,21,0,20.03-ENT-----10,0
+C3_3_I_B,21,SBL106TUR Logic Controller,20.03-ENT-SLC-10,SBL106TUR Logic Controller
+C3_3_I_C,21,Power Supply 220-110V,20.03-ENT-PSA-10,Power Supply 220-110V
+C3_3_II_A,21,0,20.03-ENT-----10,0
+C3_3_II_B,21, 3-Wire Twisted Cable for Flexible LED – Signal Connector,20.03-ENT-3TC-10,"Three-core twisted cable (red, white, green) with 3-pin connector, designed for signal transmission to flexible LED modules. The twisted wires reduce interference, ensuring stable LED performance and precise control."
+C3_3_II_C,21,0,20.03-ENT-----10,0
+C3_3_III_A,21,0,20.03-ENT-----10,0
+C3_3_III_B,21,0,20.03-ENT-----10,0
+C3_3_III_C,21,0,20.03-ENT-----10,0
+C3_3_IV_A,21,Power & Signal Cable for Boom Gate System,20.03-ENT-P&S-10,"Custom harness with power terminals and RJ-style connector, typically used for wiring boom gate motors or controllers. Includes female spade connectors, a twisted pair for signal/data, and extra lines for sensors or auxiliary devices. Designed for quick installation and reliable field connections."
+C3_3_IV_B,21,VAUTEX VS7A-12,20.03-ENT-VVS-10,"12V 7Ah sealed rechargeable lead-acid battery (AGM type), designed for high-rate discharge applications such as backup systems, access control, alarms, and emergency power. Features voltage regulation for standby use (13.6–13.9V) and cyclic use (14.5–15.0V). Maintenance-free and leak-proof."
+C3_3_V_A,21,Motor 24 BLDC 100W,20.03-ENT-M2B-10,Motor 24 BLDC 100W
+C3_3_V_B,21,Power Switch ON - OFF,20.03-ENT-PSO-10,Power Switch ON - OFF
+C3_3_V_C,21,Switch Plate,20.03-ENT-SPL-10,Switch Plate
+C3_3_VI,21,0,20.03-ENT-----10,0
+C3_4_I,21,0,#SPILL!,0
+C3_4_II,21,0,#SPILL!,0
+C3_5_I,21,0,#SPILL!,0
+C3_5_II,21,0,#SPILL!,0
+C3_6_I,21,0,#SPILL!,0
+C3_6_II,21,0,#SPILL!,0
+C3_7_I,21,0,#SPILL!,0
+C3_7_II,21,0,#SPILL!,0
+C4_0_I,21,0,#SPILL!,0
+C4_0_II,21,0,#SPILL!,0
+C4_0_III,21,0,#SPILL!,0
+C4_0_IV,21,0,#SPILL!,0
+C4_0_V,21,0,#SPILL!,0
+C4_0_VI,21,0,#SPILL!,0
+C4_1_I_A,21,Green Single-Core Cable,12.01--GSC-10,"Flexible green wire, single-core, typically used for grounding or low-voltage signal wiring in control systems."
+C4_1_I_B,21,4-Core Grey Control Cable,12.01--4GC-10,"Multi-strand flexible cable with 4 insulated conductors, commonly used for control circuits in automation and gate systems. Marked ""UL2464 4x0.75mm²"" or similar."
+C4_1_II,21,Mounting Plate LBA,12.01--MPL-10,"Galvanized steel base plate with square cutout and pre-drilled holes, used for securing LBA manual post systems."
+C4_1_III,21,Manual Latch Support Arm,12.01--MLS-10,"Galvanized rotating support arm with welded base plate, used for manually securing removable boom gates or barriers in parking systems."
+C4_1_IV,21,Altivar ATV12H037M2,12.01--AAT-10,"0.37 kW variable frequency drive (VFD), 200-240V input, for controlling three-phase motors in automation systems"
+C4_1_V,21,0,12.01------10,0
+C4_1_VI,21,"VOPAC Ethernet Card AS1622, VOPAC MCB Card AS1620 with female connectors, HMI Card AS1621 (Tested)",12.01--VEC-10,"Communication card for AS1622 system, Control board with female connectors for AS1620, Interface card tested for AS1621 system"
+C4_1_VII,--,--,--,--
+C4_2_I,21,LED Strip 24V RGB 14.4W/m,12.01--LS2-10,"Flexible 24V RGB LED strip, 14.4W per meter, used for ambient or decorative lighting in signage or enclosures."
+C4_2_II_A,21,"Plastic Floor Cover, Reflective Warning Tape",12.01--PFC-10,"Plastic cover for floor or wall cable holes, provides clean finish and basic protection, Highly visible red reflective tape for marking hazardous areas or improving visibility in low-light conditions"
+C4_2_II_B,21,"K1 Connector, M16 Plastic Plug",12.01--KCM-10,"Quick splice K1 connector for low-voltage cable joints, allows connection without stripping wires, moisture-resistant,
+Grey M16 plastic plug for sealing holes in enclosures or panels, features external thread for quick installation and secure fit."
+C4_2_II_C,21,"Plastic Cover Cap, Rubber Grommet, Flat Head Allen Screw (M4), Cable Gland (M16), Flat Head Allen Screw (M5)",12.01--PCC-10,"White semi-circular cap for concealing open slots or unused ports, Black rubber ring used for cable protection through panel holes, Stainless steel M4 screw with countersunk flat head and hex drive, M16 plastic cable gland for sealing and securing cables on enclosures, Stainless steel M5 screw with countersunk flat head and hex drive"
+C4_2_III_A,21,Bearing Block Assembly,12.01--BBA-10,"Aluminium square block with integrated ball bearing and hex socket screw, used for rotating shaft support or guiding applications."
+C4_2_III_B,21,Aluminium Spacer Block,12.01--ASE-10,"Rectangular aluminium block with central threaded hole, used as a spacer or mounting adapter for structural assemblies."
+C4_2_III_C,21,Metal Mounting Bracket,12.01--MMB-10,Steel bracket for mounting components onto vertical or horizontal surfaces. Commonly used in access control or signage systems.
+C4_2_IV_A,21,Metal Spacer + Plastic End Cap,12.01--MS+-10,"Metal Spacer: Precision-cut tubular sleeve made of stainless steel or zinc-plated steel. Internally hollow to allow bolt insertion.
+Plastic End Cap: Push-fit cap made from durable white plastic (typically PP or PVC), shaped to fit snugly over the spacer or bolt head."
+C4_2_IV_B,21,Allen Bolt + Nyloc Nut – Stainless Steel,12.01--AB+-10,Inoxidable M8 bolt with nyloc nut.
+C4_2_IV_C,21,Stainless Steel Bolt + Nyloc Nut,12.01--SSA-10,Allen bolt with matching stainless steel nyloc nut.
+C4_2_V_A,21,Threaded Mounting Base LBA,12.01--TMO-10,Threaded metal mounting base with 4 holes and welded reinforcement.
+C4_2_V_B,21,Metal Mounting Bracket Flat LBA,12.01--MMA-10,"Flat metal bracket with 4 holes, LBA mounting accessory."
+C4_2_VI_A,21,Metal Sensor Mounting Bracket LBA,12.01--MSM-10,Stamped metal bracket with multiple holes for sensor or device mounting (LBA).
+C4_2_VI_B,21,Metal Mounting Plate LBA,12.01--MMP-10,"Metal mounting plate with 2 holes, LBA component."
+C4_2_VI_C,21,Boom Gate Support Arm LBA,12.01--BGS-10,"Adjustable support arm for LBA boom gates, with rubber base."
+C4_3_I_A,21,AX2 Radar Vehicle Sensor with cable,0.1-ASS-ARV-10,AX2 Radar Vehicle Sensor with cable
+C4_3_I_B,21,AX2 Radar Vehicle Detector Bracket,0.1-ASS-ARA-10,AX2 Radar Vehicle Detector Bracket
+C4_3_II_A,21,Infrared Beam Sensor Ips-20r,0.1-ASS-IBS-10,Active infrared beam sensor IPS-20R for gate or barrier safety.
+C4_3_II_B,21,"Reflective Sensor With Cable
+Infrared Sensor Cylinder Type",0.1-ASS-RSC-10,"Reflective proximity sensor with 4-wire cable for automatic doors or access systems.
+Infrared sensor (cylindrical housing) for presence detection or beam interruption."
+C4_3_II_C,21,Dual Loop Detector 24v for DIN Rail Mounting,0.1-ASS-DLA-10,Dual Loop Detector 24v for DIN Rail Mounting LD216
+C4_3_III_A,21,PIN PAD ACCESS CONTROL,0.1-ACS-PPA-10,PIN PAD ACCESS CONTROL
+C4_3_III_B,21,GSM ACCESS CONTROL,0.1-ACS-GAC-10,GSM ACCESS CONTROL
+C4_3_IV_A,21,Remote Control Signal Receiver,0.1-ACS-RCB-10,"Receiver for remote control signals, installed inside gates or barriers."
+C4_3_IV_B,21,REMOTE CONTROL 4 BOTTOMS,0.1-ACS-RC4-10,REMOTE CONTROL
+C4_3_IV_C,21,REMOTE CONTROL 1 BOTTOM,0.1-ACS-RC1-10,REMOTE CONTROL
+C4_3_V_A,21,REMOTE RECEIVER,0.1-ACS-RRE-10,REMOTE RECEIVER
+C4_3_V_B,21,0,-ACS-----10,0
+C4_3_V_C,21,ACCESS KEY SELECTOR,0.1-ACS-AKS-10,ACCESS KEY SELECTOR
+C4_3_VI_A,21,PUSH BOTTON,0.1-ACS-PBO-10,PUSH BOTTON
+C4_3_VI_B,21,NO RELAY for PUSH BOTTON,0.1-ACS-NRP-10,NO RELAY for PUSH BOTTON
+C4_3_VI_C,21,BOX for PUSH BOTTON,0.1-ACS-BPB-10,BOX for PUSH BOTTON
+C4_4_I,21,0,#SPILL!,0
+C4_4_II,21,0,#SPILL!,0
+C4_5_I,21,0,#SPILL!,0
+C4_5_II,21,0,#SPILL!,0
+C4_6_I,21,0,#SPILL!,0
+C4_6_II,21,0,#SPILL!,0
+C4_7_I,21,0,#SPILL!,0
+C4_7_II,21,0,#SPILL!,0
+C5_0,21,Rubber Speed Humps,0.1-ACS-RSH-10,"Stack of rubber speed humps with yellow reflective strips, stored on a pallet under a warehouse shelf."
+C5_1_I_A,21,4g LTE Modem Modules,0.1-ACS-4LM-10,"4G/LTE modem communication modules stored in a blue warehouse bin, protected with pink bubble wrap.
+"
+C5_1_I_B,21,GPS Antennas & Modems,0.1-ACS-GA&-10,"GPS antennas with SMA connectors and Quectel EC25 4G modem modules, organized in a divided blue bin with protective packaging."
+C5_1_I_C,21,Blue PCB GPS Modules,0.1-ACS-BPG-10,"Two GPS communication modules with blue PCBs and SMA connectors, stored with mounting accessories in a blue warehouse bin."
+C5_1_II_A,21,0,#SPILL!,0
+C5_1_II_B,21,RF Antenna 915MHZ N Male Taoglas,0.1-ACS-RA9-10,"Taoglas Limited RF Antenna, 915 MHz WHIP type with straight N Male connector. Manufacturer part number: TI.16.5F11. Supplied by Digi-Key (PN: 931-1215-ND). RoHS3 compliant, made in Taiwan."
+C5_1_II_C,21,HGV-2409U 2.4GHZ Antenna Box L-com,0.1-ACS-H2A-10,"L-com HGV-2409U outdoor omnidirectional antenna, 2.4 GHz, 9 dBi gain. Includes N-Female connector. Suitable for Wi-Fi and wireless applications. RoHS and CE certified. Made in China."
+C5_1_III_A,21,0,#SPILL!,0
+C5_1_III_B,21,HGV-2409U Antennas L-com,0.1-ACS-HAL-10,"Multiple L-com HGV-2409U omnidirectional Wi-Fi antennas (2.4 GHz, 9 dBi) stored in a blue warehouse bin. Each unit includes N-female connector and base mount."
+C5_1_III_C,21,Wifi Antennas Mixed Types L-com,0.1-ACS-WAM-10,"L-com outdoor Wi-Fi antennas stored in a blue bin, including both fiberglass (HGV-2409U) and metallic-bodied variants. All with N-female connectors and mounting bases."
+C5_1_IV_A,21,TL Sensorv2c Parking Logic Module,16.01-ASS-TSP-10,"TL-SENSORV2C Parking Logic Sensor, hardware revision V3A. Used in vehicle detection and parking guidance systems. Units labelled with serial codes and bubble-wrapped for protection."
+C5_1_IV_B,21,TL Sensorv2c Parking Logic Module Long,16.01-ASS-TSA-10,Encapsulated version of the TL-SENSORV2C Parking Logic Sensor. Long green module protected with transparent resin casing. Used for vehicle detection and communication in parking guidance systems. Labelled with serial code and activation instructions.
+C5_1_V,21,Lithium Battery Charger Sp1bc401,#SPILL!,"Charger for lithium batteries, model SP1BC401, part number EP6012F4."
+C5_1_VI,21,0,#SPILL!,0
+C5_2_I,21,Solar Control Box Parking Logix,16.01-ACS-SCB-10,Outdoor control box by Parking Logix for solar-powered projects.
+C5_2_II,21,Solar Long Range Box Parking Logix,16.01-ACS-SLR-10,Parking Logix solar-powered control box with dual antennas for long-range communication.
+C5_2_III,21,AC Long Range Box Parking Logix,16.01-ACS-ALR-10,AC-powered Parking Logix control box with dual antennas for long-range communication.
+C5_2_IV,21,AC Control Box Parking Logix,16.01-ACS-ACD-10,"Parking Logix control box powered by AC, designed for fixed installations."
+C5_2_V,21,Sign Repeater Box Parking Logix,16.01-ACS-SRB-10,Wireless repeater box for parking signage systems.
+C5_2_VI,21,0,#SPILL!,0
+C5_3_I,21,0,#SPILL!,0
+C5_3_II,21,0,#SPILL!,0
+C5_4_I,21,0,#SPILL!,0
+C5_4_II,21,0,#SPILL!,0
+C5_5_I,21,0,#SPILL!,0
+C5_5_II,21,0,#SPILL!,0
+C5_6_I,21,0,#SPILL!,0
+C5_6_II,21,0,#SPILL!,0
+D1_0_I,--,--,--,--
+D1_0_II,--,--,--,--
+D1_0_III,--,--,--,--
+D1_0_IV,--,--,--,--
+D1_0_V,--,--,--,--
+D1_0_VI,--,--,--,--
+D1_1_I,--,--,--,--
+D1_1_II,--,--,--,--
+D1_1_III,--,--,--,--
+D1_1_IV,--,--,--,--
+D1_1_V,--,--,--,--
+D1_1_VI,--,--,--,--
+D1_1_VII,--,--,--,--
+D1_2_I,--,--,--,--
+D1_2_II,--,--,--,--
+D1_2_III,--,--,--,--
+D1_2_IV,--,--,--,--
+D1_2_V,--,--,--,--
+D1_2_VI,--,--,--,--
+D1_2_VII,--,--,--,--
+D1_3_I,--,--,--,--
+D1_3_II,--,--,--,--
+D1_3_III,--,--,--,--
+D1_3_IV,--,--,--,--
+D1_3_V,--,--,--,--
+D1_3_VI,--,--,--,--
+D1_3_VII,--,--,--,--
+D1_4,--,--,--,--
+D1_5,--,--,--,--
+D1_6,--,--,--,--
+D1_7,--,--,--,--
+D2_0_I,--,--,--,--
+D2_0_II,--,--,--,--
+D2_0_III,--,--,--,--
+D2_0_IV,--,--,--,--
+D2_0_V,--,--,--,--
+D2_0_VI,--,--,--,--
+D2_1_I,--,--,--,--
+D2_1_II,--,--,--,--
+D2_1_III,--,--,--,--
+D2_1_IV,--,--,--,--
+D2_1_V,--,--,--,--
+D2_1_VI,--,--,--,--
+D2_1_VII,--,--,--,--
+D2_2_I,--,--,--,--
+D2_2_II,--,--,--,--
+D2_2_III,--,--,--,--
+D2_2_IV,--,--,--,--
+D2_2_V,--,--,--,--
+D2_2_VI,--,--,--,--
+D2_2_VII,--,--,--,--
+D2_3_I,--,--,--,--
+D2_3_II,--,--,--,--
+D2_3_III,--,--,--,--
+D2_3_IV,--,--,--,--
+D2_3_V,--,--,--,--
+D2_3_VI,--,--,--,--
+D2_3_VII,--,--,--,--
+D2_4,--,--,--,--
+D2_5,--,--,--,--
+D2_6,--,--,--,--
+D2_7,--,--,--,--
+E1_1,--,--,--,--
+E1_2,--,--,--,--
+E1_3,--,--,--,--
+E2_0_I,--,--,--,--
+E2_0_II,--,--,--,--
+E2_0_III,--,--,--,--
+E2_0_IV,--,--,--,--
+E2_0_V,--,--,--,--
+E2_0_VI,--,--,--,--
+E2_1_I,--,--,--,--
+E2_1_II,--,--,--,--
+E2_1_III,--,--,--,--
+E2_1_IV,--,--,--,--
+E2_1_V,--,--,--,--
+E2_1_VI,--,--,--,--
+E2_1_VII,--,--,--,--
+E2_3,--,--,--,--
+E2_4,--,--,--,--
+E2_5,--,--,--,--
+E3_0_I,--,--,--,--
+E3_0_II,--,--,--,--
+E3_0_III,--,--,--,--
+E3_0_IV,--,--,--,--
+E3_0_V,--,--,--,--
+E3_0_VI,--,--,--,--
+E3_1_I,--,--,--,--
+E3_1_II,--,--,--,--
+E3_1_III,--,--,--,--
+E3_1_IV,--,--,--,--
+E3_1_V,--,--,--,--
+E3_1_VI,--,--,--,--
+E3_1_VII,--,--,--,--
+E3_2_I,--,--,--,--
+E3_2_II,--,--,--,--
+E3_2_III,--,--,--,--
+E3_2_IV,--,--,--,--
+E3_2_V,--,--,--,--
+E3_2_VI,--,--,--,--
+E3_2_VII,--,--,--,--
+E3_3_I,--,--,--,--
+E3_3_II,--,--,--,--
+E3_3_III,--,--,--,--
+E3_3_IV,--,--,--,--
+E3_3_V,--,--,--,--
+E3_3_VI,--,--,--,--
+E3_3_VII,--,--,--,--
+E3_4,--,--,--,--
+E3_5,--,--,--,--
+E3_6,--,--,--,--
+E3_7,--,--,--,--
+E4_1,--,--,--,--
+E4_2,--,--,--,--
+E4_3,--,--,--,--
+F_NSW_0,--,--,--,--
+F_NSW_1,--,--,--,--
+F_NSW_2,--,--,--,--
+F_NSW_3,--,--,--,--
+F_NSW_4,--,--,--,--
+F_QLD_0,--,--,--,--
+F_QLD_1,--,--,--,--
+F_QLD_2,--,--,--,--
+F_QLD_3,--,--,--,--
+F_QLD_4,--,--,--,--
+F_VIC_0,--,--,--,--
+F_VIC_1,--,--,--,--
+F_VIC_2,--,--,--,--
+F_VIC_3,--,--,--,--
+F_VIC_4,--,--,--,--
