@@ -49,7 +49,9 @@
   <p>Click on a section of the drawer to view details:</p>
 
   <div style="position: relative;">
-    <img src="../images/C4_bluedrawer_2R.png" usemap="#image-map" alt="C5_1_IV drawer">
+
+    <map name="image-map">
+    <img src="../images/C5_bluedrawer_2R.png" usemap="#image-map" alt="C5_1_IV drawer">
     <map name="image-map">
       <area shape="rect" coords="792,730,1279,168" href="C5_1_IV_A.html" 
         onmouseover="showTooltip(event, 'C5_1_IV_A')" onmouseout="hideTooltip()"
@@ -70,7 +72,7 @@
       const tooltip = document.getElementById("tooltip");
       const img = document.getElementById("tooltip-img");
 
-      img.src = "../img/" + code + ".jpg";  // Ruta a la carpeta img
+      img.src = "../img/" + code + ".jpg";
       tooltip.style.display = "block";
       tooltip.style.top = (evt.pageY + 15) + "px";
       tooltip.style.left = (evt.pageX + 15) + "px";
