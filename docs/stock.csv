@@ -90,8 +90,8 @@ C2_CP2_11_III,4,LBA 6000 Key,0.1-ENT-L6K-10,LBA 6000 Key
 C2_CP2_11_IV,1,MIX BATTERIES,0.1-ELE-MBA-10,MIX BATTERIES
 C2_CP2_11_V,--,--,--,--
 C3_0_I,3,Velocity Vehicle Barriers - Spring White,20.03-ENT-VVW-10,Velocity Vehicle Barriers - Spring White
-C3_0_II,55555555,Compression Spring Black,20.03-ENT-CSJ-10,VLSPRGB - Velocity Compression Spring Gold/Black
-C3_0_III,555,Compression Spring Gold,20.03-ENT-CSI-10,VLSPRG - Velocity Compression Spring Gold
+C3_0_II,TEST,Compression Spring Black,20.03-ENT-CSJ-10,VLSPRGB - Velocity Compression Spring Gold/Black
+C3_0_III,teeeeeest,Compression Spring Gold,20.03-ENT-CSI-10,VLSPRG - Velocity Compression Spring Gold
 C3_0_IV,4444,ENTA Compression Spring Yellow,20.03-ENT-ECY-10,VLSPRY - Velocity Compression Spring Yellow
 C3_0_V,0,0,20.03-ENT-----10,0
 C3_0_VI,0,0,20.03-ENT-----10,0
