@@ -90,9 +90,9 @@ C2_CP2_11_III,4,LBA 6000 Key,0.1-ENT-L6K-10,LBA 6000 Key
 C2_CP2_11_IV,1,MIX BATTERIES,0.1-ELE-MBA-10,MIX BATTERIES
 C2_CP2_11_V,--,--,--,--
 C3_0_I,3,Velocity Vehicle Barriers - Spring White,20.03-ENT-VVW-10,Velocity Vehicle Barriers - Spring White
-C3_0_II,34,Compression Spring Black,20.03-ENT-CSJ-10,VLSPRGB - Velocity Compression Spring Gold/Black
-C3_0_III,12,Compression Spring Gold,20.03-ENT-CSI-10,VLSPRG - Velocity Compression Spring Gold
-C3_0_IV,20,ENTA Compression Spring Yellow,20.03-ENT-ECY-10,VLSPRY - Velocity Compression Spring Yellow
+C3_0_II,55555555,Compression Spring Black,20.03-ENT-CSJ-10,VLSPRGB - Velocity Compression Spring Gold/Black
+C3_0_III,555,Compression Spring Gold,20.03-ENT-CSI-10,VLSPRG - Velocity Compression Spring Gold
+C3_0_IV,4444,ENTA Compression Spring Yellow,20.03-ENT-ECY-10,VLSPRY - Velocity Compression Spring Yellow
 C3_0_V,0,0,20.03-ENT-----10,0
 C3_0_VI,0,0,20.03-ENT-----10,0
 C3_1_I_A,3333,Spring Cylinder Housing,20.03-ENT-SCH-10,Spring Cylinder Housing
@@ -137,7 +137,7 @@ C3_3_V_A,21,Motor 24 BLDC 100W,20.03-ENT-M2B-10,Motor 24 BLDC 100W
 C3_3_V_B,21,Power Switch ON - OFF,20.03-ENT-PSO-10,Power Switch ON - OFF
 C3_3_V_C,21,Switch Plate,20.03-ENT-SPL-10,Switch Plate
 C3_3_VI,21,0,20.03-ENT-----10,0
-C3_4_I,21,0,#SPILL!,0
+C3_4_I,55555,0,#SPILL!,0
 C3_4_II,21,0,#SPILL!,0
 C3_5_I,21,0,#SPILL!,0
 C3_5_II,21,0,#SPILL!,0
