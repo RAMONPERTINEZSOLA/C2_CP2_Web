@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fixing GitHub 422 Error – Missing sha</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f6f8fa;
+      color: #24292f;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    header {
+      background: white;
+      padding: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: #0969da;
+      font-weight: 600;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(9, 105, 218, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 2rem;
+      color: #0550ae;
+    }
+
+    h2 {
+      margin-top: 32px;
+      color: #0a3069;
+    }
+
+    code, pre {
+      background: #f1f5fb;
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+
+    pre {
+      padding: 16px;
+      overflow: auto;
+    }
+
+    .callout {
+      border-left: 4px solid #218bff;
+      background: #e7f3ff;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 24px 0;
+    }
+
+    ol li {
+      margin-bottom: 12px;
+    }
+
+    footer {
+      text-align: center;
+      margin: 40px 0;
+      color: #57606a;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../index.html">
+      <img src="../back_arrow.png" alt="Back" width="28" height="28">
+      <span>Back to knowledge base</span>
+    </a>
+  </header>
+
+  <main>
+    <h1>GitHub API 422: "sha" wasn't supplied</h1>
+    <p>
+      When you use the <strong>Create or Update file contents</strong> endpoint from GitHub (for example via an
+      automation tool such as n8n) you must provide the <code>sha</code> of the file whenever you update an
+      existing file. Without it, GitHub cannot determine whether you intend to overwrite the current version, so
+      it responds with HTTP 422 and the message <em>"Invalid request. \"sha\" wasn't supplied."</em>
+    </p>
+
+    <div class="callout">
+      <strong>Quick fix:</strong> Fetch the current file metadata first, copy the returned <code>sha</code> value, and include it in your next
+      update request under the <code>sha</code> field.
+    </div>
+
+    <h2>How to fix the error</h2>
+    <ol>
+      <li>
+        Perform a <strong>Get repository content</strong> call for the target path
+        (or add an n8n <em>GitHub &rarr; Get File</em> node). This returns the latest <code>sha</code>.
+      </li>
+      <li>
+        Pass that <code>sha</code> into the <strong>Create/Update File</strong> node when you want to modify the file.
+        In n8n this field sits under the <em>Additional Fields → Sha</em> option.
+      </li>
+      <li>
+        Re-run the workflow. GitHub now recognises the request as an update to the existing file and succeeds.
+      </li>
+    </ol>
+
+    <h2>Why the SHA is required</h2>
+    <p>
+      GitHub protects your repository from accidental overwrites. The <code>sha</code> value identifies the exact
+      version of the file you are editing. Supplying it confirms that you are working from the latest revision. If
+      the file changed in the meantime, GitHub will reject the update with a helpful conflict message so you can
+      resolve it safely.
+    </p>
+
+    <h2>Troubleshooting tips</h2>
+    <ul>
+      <li>Ensure that you are using the <strong>update</strong> operation, not <strong>create</strong>, when the file already exists.</li>
+      <li>If your automation runs in parallel, fetch the <code>sha</code> immediately before updating to avoid stale values.</li>
+      <li>When creating a brand-new file you should <em>omit</em> the <code>sha</code>; providing it only for updates.</li>
+    </ul>
+  </main>
+
+  <footer>
+    © 2025 Parcsafe · GitHub automation troubleshooting guide
+  </footer>
+</body>
+</html>
