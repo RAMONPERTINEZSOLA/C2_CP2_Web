@@ -7,8 +7,8 @@ on:
 
 # ⚙️ Aquest bloc és el més important
 concurrency:
-  group: pages-${{ github.ref }}
-  cancel-in-progress: true  # Evita que dos deployments corrin alhora
+  group: "github-pages"
+  cancel-in-progress: true
 
 permissions:
   contents: read
