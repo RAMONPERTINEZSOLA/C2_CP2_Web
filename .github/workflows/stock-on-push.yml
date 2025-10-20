@@ -1,0 +1,67 @@
+name: Stock pipeline on push
+on:
+  push:
+    paths:
+      - 'docs/stock.csv'
+
+permissions:
+  contents: write
+
+jobs:
+  validate_and_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate stock.csv
+        run: |
+          set -e
+          FILE="docs/stock.csv"
+          [ -f "$FILE" ] || { echo "❌ $FILE not found"; exit 1; }
+
+          header=$(head -n1 "$FILE" | tr -d '\r')
+          req="drawerCode,productName,productCode,description,stockQty"
+          [ "$header" = "$req" ] || { echo "❌ Bad header: $header"; exit 1; }
+
+          # Validate rows
+          awk -F, 'NR>1{
+            if($1==""){print "❌ Empty drawerCode at line " NR; exit 1}
+            if($5!~/^[0-9]+$/){print "❌ Non-integer stockQty at line " NR; exit 1}
+          }' "$FILE"
+
+          # No duplicates drawerCode
+          dup=$(tail -n +2 "$FILE" | cut -d, -f1 | sort | uniq -d | head -n1)
+          if [ -n "$dup" ]; then
+            echo "❌ Duplicate drawerCode: $dup"; exit 1
+          fi
+
+      - name: Generate version.json (cache-busting)
+        run: |
+          ts=$(date -u +%Y%m%dT%H%M%SZ)
+          echo "{\"version\":\"$ts\"}" > docs/version.json
+
+      # (Opcional) Per-product JSON — comenta aquest bloc si no el vols
+      - name: Build per-product JSON files
+        run: |
+          mkdir -p docs/data
+          tail -n +2 docs/stock.csv | while IFS=, read -r code name pcode desc qty; do
+            # Escapat bàsic a JSON (usa python per no patir)
+            py='import json,sys; print(json.dumps(sys.stdin.read().rstrip()))'
+            esc() { echo "$1" | python3 -c "$py"; }
+            printf '{ "drawerCode": %s, "productName": %s, "productCode": %s, "description": %s, "stockQty": %s }\n' \
+              "$(esc "$code")" "$(esc "$name")" "$(esc "$pcode")" "$(esc "$desc")" "$qty" \
+              > "docs/data/${code}.json"
+          done
+
+      - name: Commit derived artifacts
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/version.json docs/data/*.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "build(stock): regenerate derived data from stock.csv"
+            git push
+          fi
