@@ -48,7 +48,6 @@
     .stock-ui .save{background:#198754}
     .stock-ui .danger{background:#dc3545}
 
-    /* Warning banner — pastel red + underline + animated exclamations */
     .stock-ui .warn{
       margin-top:12px;padding:10px 14px;border-radius:10px;
       background:#ffe3e3;color:#b3261e;font-weight:700;display:none;
@@ -67,14 +66,31 @@
       100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}
     }
     @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #198754;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      display: none;
+      animation: fade 3s ease forwards;
+    }
+    @keyframes fade {
+      0% { opacity: 0; transform: translate(-50%, 10px); }
+      10% { opacity: 1; transform: translate(-50%, 0); }
+      90% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, 10px); }
+    }
   </style>
 </head>
 <body>
   <a href="../index.html" class="button">← Back to index</a>
-  <!-- Botó per a l’edició massiva directament al web editor de GitHub -->
-  <a class="button"
-     href="https://github.com/RAMONPERTINEZSOLA/C2_CP2_Web/edit/main/docs/stock.csv"
-     target="_blank">Bulk edit stock.csv</a>
 
   <h1>Drawer: C2_CP2_0_I</h1>
   <p id="product-name"><strong>Product Name:</strong> loading...</p>
@@ -114,47 +130,40 @@
     <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
   </div>
 
+  <div id="toast"></div>
+
   <script>
     const drawerCode = "C2_CP2_0_I";
+    const API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
 
-    // Llegeix el CSV directament del repo (cache-busting amb timestamp)
+    // --- Load CSV and setup UI ---
     fetch(`../../../stock.csv?t=${Date.now()}`)
-      .then(res => {
-        if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
-        return res.text();
-      })
+      .then(res => res.text())
       .then(csv => {
         const rows = csv.trim().split("\n");
         const headers = rows[0].split(",");
-        const data = rows.slice(1).map(row => {
-          const values = row.split(",");
-          return headers.reduce((obj, header, idx) => {
-            obj[header.trim()] = values[idx] ? values[idx].trim() : "";
-            return obj;
+        const data = rows.slice(1).map(r => {
+          const vals = r.split(",");
+          return headers.reduce((o, h, i) => {
+            o[h.trim()] = vals[i] ? vals[i].trim() : "";
+            return o;
           }, {});
         });
-
-        const match = data.find(row => row.drawerCode === drawerCode);
-        if (!match) throw new Error("❌ Drawer not found in CSV.");
-
+        const match = data.find(r => r.drawerCode === drawerCode);
+        if (!match) throw new Error("Drawer not found");
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName}`;
         document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode}`;
         document.getElementById("description-text").textContent = match.description;
         document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
-
-
-        // Initialize Stock UI after data is loaded
-        initStockUI(parseInt(match.stockQty || "0", 10), drawerCode);
+        initStockUI(parseInt(match.stockQty || "0", 10));
       })
-      .catch(err => {
-        document.getElementById("stock-display").innerText =
-          "❌ Error loading stock: " + err.message;
+      .catch(e => {
+        document.getElementById("stock-display").innerText = "❌ Error: " + e.message;
       });
 
     // --- Stock UI logic ---
-    function initStockUI(initialQty, drawerCode) {
+    function initStockUI(initialQty) {
       const MIN_STOCK = 10;
-
       const curEl = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
       const newEl = document.getElementById('newQty');
@@ -164,9 +173,16 @@
       const reset = document.getElementById('resetBtn');
       const save = document.getElementById('saveBtn');
       const warn = document.getElementById('minWarn');
+      const toast = document.getElementById('toast');
 
-      let cur = Number.isFinite(initialQty)? initialQty : 0;
-      let delta = 0;
+      let cur = initialQty, delta = 0;
+
+      function showToast(msg, color="#198754"){
+        toast.textContent = msg;
+        toast.style.backgroundColor = color;
+        toast.style.display = "block";
+        setTimeout(()=> toast.style.display="none", 2500);
+      }
 
       function refresh(){
         curEl.textContent = cur;
@@ -174,52 +190,35 @@
         const nv = cur + delta;
         newEl.textContent = nv;
         exact.value = nv;
-
-        const stockH2 = document.getElementById('stock-display');
-        if (stockH2) stockH2.textContent = '📦 STOCK: ' + nv;
-
-        if (nv < MIN_STOCK) {
-          warn.classList.add('pulse');
-          warn.style.display = 'block';
-        } else {
-          warn.classList.remove('pulse');
-          warn.style.display = 'none';
-        }
+        document.getElementById('stock-display').textContent = '📦 STOCK: ' + nv;
+        if (nv < MIN_STOCK) { warn.classList.add('pulse'); warn.style.display='block'; }
+        else { warn.classList.remove('pulse'); warn.style.display='none'; }
       }
 
       minus.addEventListener('click', ()=>{ delta -= 1; refresh(); });
       plus.addEventListener('click', ()=>{ delta += 1; refresh(); });
-      exact.addEventListener('input', ()=>{ const val = parseInt(exact.value, 10); if(!isNaN(val)){ delta = val - cur; refresh(); }});
-      reset.addEventListener('click', ()=>{ delta = 0; refresh(); });
+      exact.addEventListener('input', ()=>{ const v=parseInt(exact.value,10); if(!isNaN(v)){ delta=v-cur; refresh(); }});
+      reset.addEventListener('click', ()=>{ delta=0; refresh(); });
 
-      // ✅ Listener "Save" NOMÉS GITHUB (obre Issue → workflow farà el commit a docs/stock.csv)
-      save.addEventListener('click', () => {
+      // ✅ SAVE → direct update via Cloudflare Worker
+      save.addEventListener('click', async ()=> {
         const newVal = cur + delta;
-        const ok = confirm(`Save ${drawerCode} → ${newVal}?`);
-        if (!ok) return;
-
-        // Reflecteix a la UI de seguida (opcional)
-        localStorage.setItem('stock:'+drawerCode, String(newVal));
-        cur = newVal;
-        delta = 0;
-        refresh();
-
-        // Crea un Issue preomplert al repo (no cal token)
-        const title = encodeURIComponent(`stock update: ${drawerCode} → ${newVal}`);
-        const body  = encodeURIComponent([
-          `drawerCode: ${drawerCode}`,
-          `newQty: ${newVal}`,
-          `source: pages`
-        ].join('\n'));
-        const issueUrl = `https://github.com/RAMONPERTINEZSOLA/C2_CP2_Web/issues/new?title=${title}&body=${body}`;
-        window.open(issueUrl, '_blank');
-
-        alert('✔️ Request sent to GitHub. stock.csv s’actualitzarà automàticament quan el workflow acabi.');
+        if(!confirm(`Estàs segur que vols modificar el stock a ${newVal}?`)) return;
+        try{
+          const r = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ drawerCode, newQty: newVal })
+          });
+          if (!r.ok) throw new Error(await r.text());
+          cur = newVal; delta = 0; refresh();
+          showToast('✔️ Stock actualitzat correctament');
+        }catch(e){
+          console.error(e);
+          showToast('❌ Error actualitzant', '#b3261e');
+        }
       });
 
-      // Carrega valor guardat localment si existeix (abans que arribi el redeploy)
-      const saved = localStorage.getItem('stock:'+drawerCode);
-      if(saved !== null){ cur = parseInt(saved,10); }
       refresh();
     }
   </script>
