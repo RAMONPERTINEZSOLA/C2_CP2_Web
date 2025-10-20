@@ -203,7 +203,7 @@
       // ✅ SAVE → direct update via Cloudflare Worker
       save.addEventListener('click', async ()=> {
         const newVal = cur + delta;
-        if(!confirm(`Estàs segur que vols modificar el stock a ${newVal}?`)) return;
+        if(!confirm(`Are you sure you want to update the stock to ${newVal}?`)) return;
         try{
           const r = await fetch(API, {
             method: 'POST',
@@ -212,10 +212,10 @@
           });
           if (!r.ok) throw new Error(await r.text());
           cur = newVal; delta = 0; refresh();
-          showToast('✔️ Stock actualitzat correctament');
+          showToast('✔️ Stock successfully updated');
         }catch(e){
           console.error(e);
-          showToast('❌ Error actualitzant', '#b3261e');
+          showToast('❌ Error updating stock', '#b3261e');
         }
       });
 
