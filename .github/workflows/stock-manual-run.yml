@@ -1,0 +1,73 @@
+name: Stock manual update
+
+on:
+  workflow_dispatch:
+    inputs:
+      drawerCode:
+        description: 'Drawer code (e.g., C2_CP2_0_I)'
+        required: true
+        type: string
+      newQty:
+        description: 'New quantity (integer >= 0)'
+        required: true
+        type: number
+
+permissions:
+  contents: write
+
+jobs:
+  update_one:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Validate inputs
+        shell: bash
+        run: |
+          set -e
+          DC="${{ github.event.inputs.drawerCode }}"
+          QTY="${{ github.event.inputs.newQty }}"
+          echo "drawerCode=$DC"
+          echo "newQty=$QTY"
+          echo "$QTY" | grep -Eq '^[0-9]+$' || { echo "newQty is not integer"; exit 1; }
+
+      - name: Update docs/stock.csv
+        shell: bash
+        env:
+          DC: ${{ github.event.inputs.drawerCode }}
+          QTY: ${{ github.event.inputs.newQty }}
+        run: |
+          set -e
+          FILE="docs/stock.csv"
+          [ -f "$FILE" ] || { echo "$FILE not found"; exit 1; }
+
+          header=$(head -n1 "$FILE" | tr -d '\r')
+          req="drawerCode,stockQty,productName,productCode,description"
+          [ "$header" = "$req" ] || { echo "Bad header: $header"; exit 1; }
+
+          # Update column 2 (stockQty) where column 1 (drawerCode) matches
+          awk -F, -v dc="$DC" -v qty="$QTY" 'BEGIN{OFS=","}
+            NR==1{print; next}
+            $1==dc{$2=qty; updated=1} {print}
+            END{ if(!updated) exit 42 }
+          ' "$FILE" > "$FILE.tmp" || code=$?
+
+          if [ "${code:-0}" = "42" ]; then
+            echo "drawerCode $DC not found"; exit 1
+          fi
+
+          mv "$FILE.tmp" "$FILE"
+
+      - name: Commit & push change
+        shell: bash
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/stock.csv
+          if git diff --cached --quiet; then
+            echo "No changes to commit"; exit 0
+          fi
+          git commit -m "chore(stock): ${{ github.event.inputs.drawerCode }} → ${{ github.event.inputs.newQty }} (manual run)"
+          git push

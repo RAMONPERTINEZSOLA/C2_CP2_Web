@@ -43,14 +43,13 @@ jobs:
           ts=$(date -u +%Y%m%dT%H%M%SZ)
           echo "{\"version\":\"$ts\"}" > docs/version.json
 
-      # OPTIONAL — per-product JSON files. Deixa-ho si et va bé; comenta-ho si no els vols.
+      # OPTIONAL — per-product JSON files. Comenta-ho si no els vols.
       - name: Build per-product JSON files
         shell: bash
         run: |
           mkdir -p docs/data
           # CSV order: code, qty, name, pcode, desc
           tail -n +2 docs/stock.csv | while IFS=, read -r code qty name pcode desc; do
-            # simple JSON escape using python
             py='import json,sys; print(json.dumps(sys.stdin.read().rstrip()))'
             esc() { echo "$1" | python3 -c "$py"; }
             printf '{ "drawerCode": %s, "stockQty": %s, "productName": %s, "productCode": %s, "description": %s }\n' \
