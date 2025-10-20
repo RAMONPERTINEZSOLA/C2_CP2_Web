@@ -1,0 +1,100 @@
+name: Stock updates from Issues
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Parse drawerCode & newQty from issue
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = (context.payload.issue.body || "").trim();
+            const drawerCode = body.match(/drawerCode:\s*([A-Za-z0-9_\-]+)/)?.[1] || "";
+            const newQtyStr  = body.match(/newQty:\s*(\d+)/)?.[1] || "";
+            if (!drawerCode || !newQtyStr) {
+              core.setFailed('Missing drawerCode or newQty in issue body.\nExpected lines like:\n  drawerCode: C2_CP2_0_I\n  newQty: 7');
+            } else {
+              core.setOutput('drawerCode', drawerCode);
+              core.setOutput('newQty', newQtyStr);
+            }
+
+      - name: Update docs/stock.csv
+        id: update
+        env:
+          DC: ${{ steps.parse.outputs.drawerCode }}
+          QTY: ${{ steps.parse.outputs.newQty }}
+        run: |
+          set -e
+          FILE="docs/stock.csv"
+          [ -f "$FILE" ] || { echo "❌ $FILE not found"; exit 1; }
+
+          # Validar capçalera
+          header=$(head -n1 "$FILE" | tr -d '\r')
+          req="drawerCode,productName,productCode,description,stockQty"
+          [ "$header" = "$req" ] || { echo "❌ Bad header: $header"; exit 1; }
+
+          # Confirmar que QTY és enter >=0
+          echo "$QTY" | grep -Eq '^[0-9]+$' || { echo "❌ newQty no és un enter"; exit 1; }
+
+          # Actualitzar la col 5 (stockQty) de la fila on col 1 (drawerCode) == DC
+          # Nota: Això assumeix que no hi ha comes dins dels camps (CSV simple).
+          found_before=$(awk -F, -v dc="$DC" 'NR>1 && $1==dc{print NR}' "$FILE" | wc -l)
+          awk -F, -v dc="$DC" -v qty="$QTY" 'BEGIN{OFS=","}
+            NR==1{print; next}
+            $1==dc{$5=qty; updated=1} {print}
+            END{ if(!updated) exit 42 }
+          ' "$FILE" > "$FILE.tmp" || code=$?
+
+          if [ "${code:-0}" = "42" ]; then
+            echo "❌ drawerCode $DC not found"; exit 1;
+          fi
+
+          mv "$FILE.tmp" "$FILE"
+
+          found_after=$(awk -F, -v dc="$DC" 'NR>1 && $1==dc{print NR}' "$FILE" | wc -l)
+          [ "$found_after" -ge 1 ] || { echo "❌ drawerCode $DC not found after update"; exit 1; }
+
+      - name: Commit & push change
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/stock.csv
+          if git diff --cached --quiet; then
+            echo "No changes to commit"; exit 0
+          fi
+          git commit -m "chore(stock): ${{ steps.parse.outputs.drawerCode }} → ${{ steps.parse.outputs.newQty }} (via issue #${{ github.event.issue.number }})"
+          git push
+
+      - name: Comment & close issue
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ok = "${{ steps.update.outcome }}" === "success";
+            const msg = ok ? "✅ Stock updated & committed." : "❌ Failed. Check workflow logs.";
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: msg
+            });
+            if (ok) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                state: 'closed'
+              });
+            }
