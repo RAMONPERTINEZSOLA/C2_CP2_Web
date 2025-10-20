@@ -71,6 +71,10 @@
 </head>
 <body>
   <a href="../index.html" class="button">← Back to index</a>
+  <!-- Botó per a l’edició massiva directament al web editor de GitHub -->
+  <a class="button"
+     href="https://github.com/RAMONPERTINEZSOLA/C2_CP2_Web/edit/main/docs/stock.csv"
+     target="_blank">Bulk edit stock.csv</a>
 
   <h1>Drawer: C2_CP2_0_I</h1>
   <p id="product-name"><strong>Product Name:</strong> loading...</p>
@@ -113,7 +117,7 @@
   <script>
     const drawerCode = "C2_CP2_0_I";
 
-    // C2/CP2/fitxes → 3 nivells per arribar a docs/stock.csv
+    // Llegeix el CSV directament del repo (cache-busting amb timestamp)
     fetch(`../../../stock.csv?t=${Date.now()}`)
       .then(res => {
         if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
@@ -149,7 +153,6 @@
     // --- Stock UI logic ---
     function initStockUI(initialQty, drawerCode) {
       const MIN_STOCK = 10;
-      const WEBHOOK_URL = "https://priority-bands-firm-treat.trycloudflare.com/webhook/stock-update";
 
       const curEl = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
@@ -165,64 +168,55 @@
       let delta = 0;
 
       function refresh(){
-  curEl.textContent = cur;
-  deltaEl.textContent = delta > 0 ? '+' + delta : delta;
-  const nv = cur + delta;
-  newEl.textContent = nv;
-  exact.value = nv;
+        curEl.textContent = cur;
+        deltaEl.textContent = delta > 0 ? '+' + delta : delta;
+        const nv = cur + delta;
+        newEl.textContent = nv;
+        exact.value = nv;
 
-  const stockH2 = document.getElementById('stock-display');
-  if (stockH2) stockH2.textContent = '📦 STOCK: ' + nv;
+        const stockH2 = document.getElementById('stock-display');
+        if (stockH2) stockH2.textContent = '📦 STOCK: ' + nv;
 
-  if (nv < MIN_STOCK) {
-    // SHOW now (override previous inline display:none)
-    warn.classList.add('pulse');
-    warn.style.display = 'block';         // 👈 força a mostrar-se immediatament
-  } else {
-    warn.classList.remove('pulse');
-    warn.style.display = 'none';
-  }
-}
-
+        if (nv < MIN_STOCK) {
+          warn.classList.add('pulse');
+          warn.style.display = 'block';
+        } else {
+          warn.classList.remove('pulse');
+          warn.style.display = 'none';
+        }
+      }
 
       minus.addEventListener('click', ()=>{ delta -= 1; refresh(); });
       plus.addEventListener('click', ()=>{ delta += 1; refresh(); });
       exact.addEventListener('input', ()=>{ const val = parseInt(exact.value, 10); if(!isNaN(val)){ delta = val - cur; refresh(); }});
       reset.addEventListener('click', ()=>{ delta = 0; refresh(); });
 
-      save.addEventListener('click', async ()=> {
-  const newVal = cur + delta;
-  const ok = confirm('You are modifying the material quantity. Are you sure you want to save?');
-  if(!ok) return;
-  try{
-    localStorage.setItem('stock:'+drawerCode, String(newVal));
+      // ✅ Listener "Save" NOMÉS GITHUB (obre Issue → workflow farà el commit a docs/stock.csv)
+      save.addEventListener('click', () => {
+        const newVal = cur + delta;
+        const ok = confirm(`Save ${drawerCode} → ${newVal}?`);
+        if (!ok) return;
 
-    if (WEBHOOK_URL) {
-      const res = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          drawerCode, oldQty: cur, change: delta, newQty: newVal,
-          updatedAt: new Date().toISOString()
-        })
+        // Reflecteix a la UI de seguida (opcional)
+        localStorage.setItem('stock:'+drawerCode, String(newVal));
+        cur = newVal;
+        delta = 0;
+        refresh();
+
+        // Crea un Issue preomplert al repo (no cal token)
+        const title = encodeURIComponent(`stock update: ${drawerCode} → ${newVal}`);
+        const body  = encodeURIComponent([
+          `drawerCode: ${drawerCode}`,
+          `newQty: ${newVal}`,
+          `source: pages`
+        ].join('\n'));
+        const issueUrl = `https://github.com/RAMONPERTINEZSOLA/C2_CP2_Web/issues/new?title=${title}&body=${body}`;
+        window.open(issueUrl, '_blank');
+
+        alert('✔️ Request sent to GitHub. stock.csv s’actualitzarà automàticament quan el workflow acabi.');
       });
-      if (!res.ok) {
-        const txt = await res.text().catch(()=> '');
-        throw new Error(`Webhook error ${res.status} ${res.statusText} ${txt}`);
-      }
-    }
 
-    cur = newVal;
-    delta = 0;
-    refresh();
-    alert('✔️ Quantity updated.' + (newVal < 10 ? ' ⚠️ LOW STOCK!' : ''));
-  } catch(e){
-    console.error(e);
-    alert('❌ Error saving: ' + (e?.message || e));
-  }
-});
-
-      // Load stored value if exists (useful before backend wiring)
+      // Carrega valor guardat localment si existeix (abans que arribi el redeploy)
       const saved = localStorage.getItem('stock:'+drawerCode);
       if(saved !== null){ cur = parseInt(saved,10); }
       refresh();
