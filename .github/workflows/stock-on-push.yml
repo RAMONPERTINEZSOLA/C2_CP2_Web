@@ -20,14 +20,15 @@ jobs:
           [ -f "$FILE" ] || { echo "❌ $FILE not found"; exit 1; }
 
           header=$(head -n1 "$FILE" | tr -d '\r')
-          req="drawerCode,productName,productCode,description,stockQty"
+          req="drawerCode,stockQty,productName,productCode,description"
           [ "$header" = "$req" ] || { echo "❌ Bad header: $header"; exit 1; }
 
           # Validate rows
           awk -F, 'NR>1{
-            if($1==""){print "❌ Empty drawerCode at line " NR; exit 1}
-            if($5!~/^[0-9]+$/){print "❌ Non-integer stockQty at line " NR; exit 1}
-          }' "$FILE"
+          if($1==""){print "❌ Empty drawerCode at line " NR; exit 1}
+         if($2!~/^[0-9]+$/){print "❌ Non-integer stockQty at line " NR; exit 1}
+         }' "$FILE"
+
 
           # No duplicates drawerCode
           dup=$(tail -n +2 "$FILE" | cut -d, -f1 | sort | uniq -d | head -n1)

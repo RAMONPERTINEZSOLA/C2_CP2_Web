@@ -51,10 +51,11 @@ jobs:
           # Nota: Això assumeix que no hi ha comes dins dels camps (CSV simple).
           found_before=$(awk -F, -v dc="$DC" 'NR>1 && $1==dc{print NR}' "$FILE" | wc -l)
           awk -F, -v dc="$DC" -v qty="$QTY" 'BEGIN{OFS=","}
-            NR==1{print; next}
-            $1==dc{$5=qty; updated=1} {print}
-            END{ if(!updated) exit 42 }
+          NR==1{print; next}
+          $1==dc{$2=qty; updated=1} {print}
+          END{ if(!updated) exit 42 }
           ' "$FILE" > "$FILE.tmp" || code=$?
+
 
           if [ "${code:-0}" = "42" ]; then
             echo "❌ drawerCode $DC not found"; exit 1;
