@@ -149,7 +149,7 @@
     // --- Stock UI logic ---
     function initStockUI(initialQty, drawerCode) {
       const MIN_STOCK = 10;
-      const WEBHOOK_URL = "https://priority-bands-firm-treat-treat.trycloudflare.com/webhook/stock-update";
+      const WEBHOOK_URL = "https://priority-bands-firm-treat.trycloudflare.com/webhook/stock-update";
 
       const curEl = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
@@ -191,30 +191,36 @@
       reset.addEventListener('click', ()=>{ delta = 0; refresh(); });
 
       save.addEventListener('click', async ()=> {
-        const newVal = cur + delta;
-        const ok = confirm('You are modifying the material quantity. Are you sure you want to save?');
-        if(!ok) return;
-        try{
-          // Local fallback (for demos/offline)
-          localStorage.setItem('stock:'+drawerCode, String(newVal));
+  const newVal = cur + delta;
+  const ok = confirm('You are modifying the material quantity. Are you sure you want to save?');
+  if(!ok) return;
+  try{
+    localStorage.setItem('stock:'+drawerCode, String(newVal));
 
-          // Optional backend sync
-          if(WEBHOOK_URL){
-            await fetch(WEBHOOK_URL, {
-              method: 'POST',
-              headers: {'Content-Type':'application/json'},
-              body: JSON.stringify({ drawerCode, oldQty: cur, change: delta, newQty: newVal, updatedAt: new Date().toISOString() })
-            });
-          }
-
-          cur = newVal;
-          delta = 0;
-          refresh();
-          alert('✔️ Quantity updated.' + (newVal < MIN_STOCK ? ' ⚠️ LOW STOCK!' : ''));
-        } catch(e){
-          alert('❌ Error saving: ' + e.message);
-        }
+    if (WEBHOOK_URL) {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          drawerCode, oldQty: cur, change: delta, newQty: newVal,
+          updatedAt: new Date().toISOString()
+        })
       });
+      if (!res.ok) {
+        const txt = await res.text().catch(()=> '');
+        throw new Error(`Webhook error ${res.status} ${res.statusText} ${txt}`);
+      }
+    }
+
+    cur = newVal;
+    delta = 0;
+    refresh();
+    alert('✔️ Quantity updated.' + (newVal < 10 ? ' ⚠️ LOW STOCK!' : ''));
+  } catch(e){
+    console.error(e);
+    alert('❌ Error saving: ' + (e?.message || e));
+  }
+});
 
       // Load stored value if exists (useful before backend wiring)
       const saved = localStorage.getItem('stock:'+drawerCode);
