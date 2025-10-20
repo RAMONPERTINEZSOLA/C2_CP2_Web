@@ -65,6 +65,37 @@
 
   <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
 
+  <style>
+    .stock-ui{margin:20px 0;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fafafa}
+    .stock-ui .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .stock-ui button{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;background:#0d6efd;color:#fff;font-weight:600}
+    .stock-ui button.secondary{background:#6c757d}
+    .stock-ui .pill{padding:6px 10px;border-radius:999px;background:#e9ecef;font-variant-numeric:tabular-nums}
+    .stock-ui input[type="number"]{width:120px;padding:8px 10px;border:1px solid #ccc;border-radius:8px}
+    .stock-ui .save{background:#198754}
+    .stock-ui .danger{background:#dc3545}
+    .stock-ui .warn{margin-top:12px;padding:10px 14px;border-radius:10px;background:#ffe3e3;color:#c1121f;font-weight:700;display:none}
+    .stock-ui .warn.pulse{display:block;animation:pulse 1s infinite}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,53,69,.7)}70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}}
+  </style>
+
+  <div class="stock-ui" id="stockUI">
+    <div class="row">
+      <span class="pill">Current: <strong id="curQty">–</strong></span>
+      <span class="pill">Change: <strong id="delta">0</strong></span>
+      <span class="pill">New: <strong id="newQty">–</strong></span>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="minusBtn">−1</button>
+      <button id="plusBtn">+1</button>
+      <label>Exact: <input id="exactInput" type="number" min="0" step="1" /></label>
+      <button class="secondary" id="resetBtn">Reset</button>
+      <button class="save" id="saveBtn">Save</button>
+    </div>
+    <div class="warn" id="minWarn">⚠️ Minimum stock reached!</div>
+  </div>
+
+
   <script>
     const drawerCode = "E2_2_II";
 
@@ -90,12 +121,106 @@
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName}`;
         document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode}`;
         document.getElementById("description-text").textContent = match.description;
-        document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
+        \1
+        window.__drawerCode = drawerCode;
+        window.__initialStock = parseInt(match.stockQty || "0", 10);
+        if (window.setupStockUI) window.setupStockUI(window.__initialStock, window.__drawerCode);
       })
       .catch(err => {
         document.getElementById("stock-display").innerText =
           "❌ Error loading stock: " + err.message;
       });
   </script>
+
+  <script>
+    (function(){
+      const MIN_STOCK = 10;
+      const WEBHOOK_URL = ""; // TODO: set your n8n webhook URL here
+
+      function setupStockUI(initialQty, drawerCode){
+        const ui = document.getElementById('stockUI');
+        if(!ui) return;
+        const curEl = document.getElementById('curQty');
+        const deltaEl = document.getElementById('delta');
+        const newEl = document.getElementById('newQty');
+        const minus = document.getElementById('minusBtn');
+        const plus = document.getElementById('plusBtn');
+        const exact = document.getElementById('exactInput');
+        const reset = document.getElementById('resetBtn');
+        const save = document.getElementById('saveBtn');
+        const warn = document.getElementById('minWarn');
+
+        let cur = Number.isFinite(initialQty)? initialQty : 0;
+        let delta = 0;
+
+        function refresh(){
+          curEl.textContent = cur;
+          deltaEl.textContent = delta>0? '+'+delta: delta;
+          const nv = cur + delta;
+          newEl.textContent = nv;
+          exact.value = nv;
+          const stockH2 = document.getElementById('stock-display');
+          if(stockH2){ stockH2.textContent = '📦 STOCK: ' + nv; }
+          if(nv < MIN_STOCK){
+            warn.classList.add('pulse');
+          } else {
+            warn.classList.remove('pulse');
+            warn.style.display = 'none'; // still hidden unless pulse active
+          }
+        }
+
+        minus.addEventListener('click', ()=>{ delta -= 1; refresh(); });
+        plus.addEventListener('click', ()=>{ delta += 1; refresh(); });
+        exact.addEventListener('input', ()=>{
+          const val = parseInt(exact.value, 10);
+          if(!isNaN(val)){ delta = val - cur; refresh(); }
+        });
+        reset.addEventListener('click', ()=>{ delta = 0; refresh(); });
+
+        save.addEventListener('click', async ()=>{
+          const newVal = cur + delta;
+          const ok = confirm('Estàs modificant la quantitat de material. Segur que vols guardar?');
+          if(!ok) return;
+          try{
+            // local persistence (fallback)
+            localStorage.setItem('stock:'+drawerCode, String(newVal));
+
+            // optional webhook for backend update
+            if(WEBHOOK_URL){
+              await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                  drawerCode,
+                  oldQty: cur,
+                  change: delta,
+                  newQty: newVal,
+                  updatedAt: new Date().toISOString()
+                })
+              });
+            }
+
+            cur = newVal;
+            delta = 0;
+            refresh();
+            alert('✔️ Quantitat actualitzada.' + (newVal < MIN_STOCK ? ' ⚠️ STOCK MÍNIM!' : ''));
+          }catch(e){
+            alert('❌ Error guardant: ' + e.message);
+          }
+        });
+
+        // Load local override if any (useful until backend is wired)
+        const saved = localStorage.getItem('stock:'+drawerCode);
+        if(saved !== null){
+          cur = parseInt(saved,10);
+        }
+        refresh();
+      }
+
+      // Expose to page
+      window.setupStockUI = setupStockUI;
+    })();
+  </script>
+
 </body>
 </html>
