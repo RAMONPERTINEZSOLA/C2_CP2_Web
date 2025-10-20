@@ -142,6 +142,7 @@
         document.getElementById("description-text").textContent = match.description;
         document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
 
+
         // Initialize Stock UI after data is loaded
         initStockUI(parseInt(match.stockQty || "0", 10), drawerCode);
       })
