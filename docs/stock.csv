@@ -121,18 +121,18 @@ C3_2_V_B,21,0,20.03-ENT-----10,0
 C3_2_V_C,21,Adjustable Steel Mounting Bracket with Threaded Rod,20.03-ENT-ASM-10,"Galvanized steel mounting plate with slotted holes for flexible alignment. Includes pre-installed threaded rod and hex bolt, ideal for adjustable installations in structural or electrical systems."
 C3_2_VI_A,21,30x8 Rubber Buffer,20.03-ENT-3RB-10,30x8 Rubber Buffer
 C3_2_VI_B,21,0,20.03-ENT-----10,0
-C3_2_VI_C,21, Powder Coated Steel – ENTA Turnstar Gate Arm,20.03-ENT-PCS-10,"Support arm from ENTA (Turnstar), typically used in gate or turnstile mechanisms. Constructed from durable powder-coated steel with elongated slot for adjustable mounting. Designed for robust performance in access control systems."
+C3_2_VI_C,21, Powder Coated Steel â€“ ENTA Turnstar Gate Arm,20.03-ENT-PCS-10,"Support arm from ENTA (Turnstar), typically used in gate or turnstile mechanisms. Constructed from durable powder-coated steel with elongated slot for adjustable mounting. Designed for robust performance in access control systems."
 C3_3_I_A,21,0,20.03-ENT-----10,0
 C3_3_I_B,21,SBL106TUR Logic Controller,20.03-ENT-SLC-10,SBL106TUR Logic Controller
 C3_3_I_C,21,Power Supply 220-110V,20.03-ENT-PSA-10,Power Supply 220-110V
 C3_3_II_A,21,0,20.03-ENT-----10,0
-C3_3_II_B,21, 3-Wire Twisted Cable for Flexible LED – Signal Connector,20.03-ENT-3TC-10,"Three-core twisted cable (red, white, green) with 3-pin connector, designed for signal transmission to flexible LED modules. The twisted wires reduce interference, ensuring stable LED performance and precise control."
+C3_3_II_B,21, 3-Wire Twisted Cable for Flexible LED â€“ Signal Connector,20.03-ENT-3TC-10,"Three-core twisted cable (red, white, green) with 3-pin connector, designed for signal transmission to flexible LED modules. The twisted wires reduce interference, ensuring stable LED performance and precise control."
 C3_3_II_C,21,0,20.03-ENT-----10,0
 C3_3_III_A,21,0,20.03-ENT-----10,0
 C3_3_III_B,21,0,20.03-ENT-----10,0
 C3_3_III_C,21,0,20.03-ENT-----10,0
 C3_3_IV_A,21,Power & Signal Cable for Boom Gate System,20.03-ENT-P&S-10,"Custom harness with power terminals and RJ-style connector, typically used for wiring boom gate motors or controllers. Includes female spade connectors, a twisted pair for signal/data, and extra lines for sensors or auxiliary devices. Designed for quick installation and reliable field connections."
-C3_3_IV_B,21,VAUTEX VS7A-12,20.03-ENT-VVS-10,"12V 7Ah sealed rechargeable lead-acid battery (AGM type), designed for high-rate discharge applications such as backup systems, access control, alarms, and emergency power. Features voltage regulation for standby use (13.6–13.9V) and cyclic use (14.5–15.0V). Maintenance-free and leak-proof."
+C3_3_IV_B,21,VAUTEX VS7A-12,20.03-ENT-VVS-10,"12V 7Ah sealed rechargeable lead-acid battery (AGM type), designed for high-rate discharge applications such as backup systems, access control, alarms, and emergency power. Features voltage regulation for standby use (13.6â€“13.9V) and cyclic use (14.5â€“15.0V). Maintenance-free and leak-proof."
 C3_3_V_A,21,Motor 24 BLDC 100W,20.03-ENT-M2B-10,Motor 24 BLDC 100W
 C3_3_V_B,21,Power Switch ON - OFF,20.03-ENT-PSO-10,Power Switch ON - OFF
 C3_3_V_C,21,Switch Plate,20.03-ENT-SPL-10,Switch Plate
@@ -152,7 +152,7 @@ C4_0_IV,21,0,#SPILL!,0
 C4_0_V,21,0,#SPILL!,0
 C4_0_VI,21,0,#SPILL!,0
 C4_1_I_A,21,Green Single-Core Cable,12.01--GSC-10,"Flexible green wire, single-core, typically used for grounding or low-voltage signal wiring in control systems."
-C4_1_I_B,21,4-Core Grey Control Cable,12.01--4GC-10,"Multi-strand flexible cable with 4 insulated conductors, commonly used for control circuits in automation and gate systems. Marked ""UL2464 4x0.75mm²"" or similar."
+C4_1_I_B,21,4-Core Grey Control Cable,12.01--4GC-10,"Multi-strand flexible cable with 4 insulated conductors, commonly used for control circuits in automation and gate systems. Marked ""UL2464 4x0.75mmÂ²"" or similar."
 C4_1_II,21,Mounting Plate LBA,12.01--MPL-10,"Galvanized steel base plate with square cutout and pre-drilled holes, used for securing LBA manual post systems."
 C4_1_III,21,Manual Latch Support Arm,12.01--MLS-10,"Galvanized rotating support arm with welded base plate, used for manually securing removable boom gates or barriers in parking systems."
 C4_1_IV,21,Altivar ATV12H037M2,12.01--AAT-10,"0.37 kW variable frequency drive (VFD), 200-240V input, for controlling three-phase motors in automation systems"
@@ -169,7 +169,7 @@ C4_2_III_B,21,Aluminium Spacer Block,12.01--ASE-10,"Rectangular aluminium block 
 C4_2_III_C,21,Metal Mounting Bracket,12.01--MMB-10,Steel bracket for mounting components onto vertical or horizontal surfaces. Commonly used in access control or signage systems.
 C4_2_IV_A,21,Metal Spacer + Plastic End Cap,12.01--MS+-10,"Metal Spacer: Precision-cut tubular sleeve made of stainless steel or zinc-plated steel. Internally hollow to allow bolt insertion.
 Plastic End Cap: Push-fit cap made from durable white plastic (typically PP or PVC), shaped to fit snugly over the spacer or bolt head."
-C4_2_IV_B,21,Allen Bolt + Nyloc Nut – Stainless Steel,12.01--AB+-10,Inoxidable M8 bolt with nyloc nut.
+C4_2_IV_B,21,Allen Bolt + Nyloc Nut â€“ Stainless Steel,12.01--AB+-10,Inoxidable M8 bolt with nyloc nut.
 C4_2_IV_C,21,Stainless Steel Bolt + Nyloc Nut,12.01--SSA-10,Allen bolt with matching stainless steel nyloc nut.
 C4_2_V_A,21,Threaded Mounting Base LBA,12.01--TMO-10,Threaded metal mounting base with 4 holes and welded reinforcement.
 C4_2_V_B,21,Metal Mounting Bracket Flat LBA,12.01--MMA-10,"Flat metal bracket with 4 holes, LBA mounting accessory."
@@ -311,9 +311,9 @@ E2_1_V_B,21,Commend C-EEDK9 Module,#SPILL!,"Commend intercom module, model C-EED
 E2_1_VI,21,0,#SPILL!,0
 E2_1_VII,21,0,#SPILL!,0
 E2_2_I,21,120mm LED Traffic Signal - RED/GREEN Combo,19.02-RRS-1LA-10,ASF50L-1RV-01 Apollo 120mm LED Traffic Signal - Single Red/Green
-E2_2_II,21,Stagnoli Traffic Light – Green Module,19.02-RRS-STL-10,"Green light signal module from the Italian brand Stagnoli, typically used in access control systems to indicate vehicle passage authorization. Can be integrated with boom gates or barrier systems, and housed within a full traffic light enclosure."
+E2_2_II,21,Stagnoli Traffic Light â€“ Green Module,19.02-RRS-STL-10,"Green light signal module from the Italian brand Stagnoli, typically used in access control systems to indicate vehicle passage authorization. Can be integrated with boom gates or barrier systems, and housed within a full traffic light enclosure."
 E2_2_III,21,140mm LED Traffic Signal - Red/Green,19.02-RRS-1LB-10,CHR2LRV Chronos 140mm LED Traffic Signal - Red/Green
-E2_2_IV,21,Stagnoli PRAP Radar Sensor,19.02-RRS-SPR-10,"Radar sensor designed for motion or presence detection, manufactured by Stagnoli (Italy). Operates with a 12–24V power supply and is commonly used in gate automation, barrier systems, and controlled access points. It includes a compact housing, metal mounting bracket, and integrated cabling for connection. Suitable for industrial or commercial environments requiring reliable vehicle or pedestrian detection."
+E2_2_IV,21,Stagnoli PRAP Radar Sensor,19.02-RRS-SPR-10,"Radar sensor designed for motion or presence detection, manufactured by Stagnoli (Italy). Operates with a 12â€“24V power supply and is commonly used in gate automation, barrier systems, and controlled access points. It includes a compact housing, metal mounting bracket, and integrated cabling for connection. Suitable for industrial or commercial environments requiring reliable vehicle or pedestrian detection."
 E2_2_V,21,Rapid Ramp Traffic System - Master Control Board,19.02-RRS-RRT-10,85309000 Saturno-K Master Kit (Includes 2 x Slaves)
 E2_2_VI,21,Rapid Ramp Traffic System - Slave Control Board,19.02-RRS-RRA-10,Saturno-S 85309000 - Slave Control Board
 E2_3_I_A,21,KSENSOR for up to 6 Bays - LPR / RGB,3.01-PGS-KU6-10,460810 KSENSOR for up to 6 Bays - LPR / RGB
@@ -382,3 +382,4 @@ F_VIC_1,--,--,--,--
 F_VIC_2,--,--,--,--
 F_VIC_3,--,--,--,--
 F_VIC_4,--,--,--,--
+,--,--,--,NaN
