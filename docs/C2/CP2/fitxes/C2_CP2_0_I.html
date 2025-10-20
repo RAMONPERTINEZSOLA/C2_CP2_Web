@@ -47,9 +47,26 @@
     .stock-ui input[type="number"]{width:120px;padding:8px 10px;border:1px solid #ccc;border-radius:8px}
     .stock-ui .save{background:#198754}
     .stock-ui .danger{background:#dc3545}
-    .stock-ui .warn{margin-top:12px;padding:10px 14px;border-radius:10px;background:#ffe3e3;color:#c1121f;font-weight:700;display:none}
+
+    /* Warning banner — pastel red + underline + animated exclamations */
+    .stock-ui .warn{
+      margin-top:12px;padding:10px 14px;border-radius:10px;
+      background:#ffe3e3;color:#b3261e;font-weight:700;display:none;
+      border:1px solid #f3b5b5;
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-decoration-color: #f0a0a0;
+    }
     .stock-ui .warn.pulse{display:block;animation:pulse 1s infinite}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,53,69,.7)}70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}}
+    .stock-ui .warn.pulse::before{
+      content:"❗❗"; margin-right:8px; display:inline-block; animation:wiggle .8s infinite;
+    }
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(220,53,69,.35)}
+      70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}
+      100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}
+    }
+    @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
   </style>
 </head>
 <body>
@@ -90,12 +107,13 @@
       <button class="secondary" id="resetBtn">Reset</button>
       <button class="save" id="saveBtn">Save</button>
     </div>
-    <div class="warn" id="minWarn">⚠️ Minimum stock reached!</div>
+    <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
   </div>
 
   <script>
     const drawerCode = "C2_CP2_0_I";
 
+    // C2/CP2/fitxes → 3 nivells per arribar a docs/stock.csv
     fetch(`../../../stock.csv?t=${Date.now()}`)
       .then(res => {
         if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
@@ -120,9 +138,8 @@
         document.getElementById("description-text").textContent = match.description;
         document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
 
-        // ✅ Initialize Stock UI after data is loaded
-        if (window.setupStockUI) window.setupStockUI(parseInt(match.stockQty || "0", 10), drawerCode);
-        else initStockUI(parseInt(match.stockQty || "0", 10), drawerCode);
+        // Initialize Stock UI after data is loaded
+        initStockUI(parseInt(match.stockQty || "0", 10), drawerCode);
       })
       .catch(err => {
         document.getElementById("stock-display").innerText =
@@ -153,12 +170,14 @@
         const nv = cur + delta;
         newEl.textContent = nv;
         exact.value = nv;
+
         const stockH2 = document.getElementById('stock-display');
-        if(stockH2){ stockH2.textContent = '📦 STOCK: ' + nv; }
-        if(nv < MIN_STOCK){
-          warn.classList.add('pulse');
+        if (stockH2) stockH2.textContent = '📦 STOCK: ' + nv;
+
+        if (nv < MIN_STOCK) {
+          warn.classList.add('pulse');     // show + animate
         } else {
-          warn.classList.remove('pulse');
+          warn.classList.remove('pulse');  // hide
           warn.style.display = 'none';
         }
       }
@@ -170,11 +189,13 @@
 
       save.addEventListener('click', async ()=> {
         const newVal = cur + delta;
-        const ok = confirm('Estàs modificant la quantitat de material. Segur que vols guardar?');
+        const ok = confirm('You are modifying the material quantity. Are you sure you want to save?');
         if(!ok) return;
         try{
+          // Local fallback (for demos/offline)
           localStorage.setItem('stock:'+drawerCode, String(newVal));
 
+          // Optional backend sync
           if(WEBHOOK_URL){
             await fetch(WEBHOOK_URL, {
               method: 'POST',
@@ -186,13 +207,13 @@
           cur = newVal;
           delta = 0;
           refresh();
-          alert('✔️ Quantitat actualitzada.' + (newVal < MIN_STOCK ? ' ⚠️ STOCK MÍNIM!' : ''));
+          alert('✔️ Quantity updated.' + (newVal < MIN_STOCK ? ' ⚠️ LOW STOCK!' : ''));
         } catch(e){
-          alert('❌ Error guardant: ' + e.message);
+          alert('❌ Error saving: ' + e.message);
         }
       });
 
-      // load stored value if exists
+      // Load stored value if exists (useful before backend wiring)
       const saved = localStorage.getItem('stock:'+drawerCode);
       if(saved !== null){ cur = parseInt(saved,10); }
       refresh();
