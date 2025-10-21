@@ -4,39 +4,12 @@
   <meta charset="UTF-8" />
   <title>C2_CP2_0_I</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 40px;
-      max-width: 800px;
-    }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-    a.button {
-      display: inline-block;
-      padding: 10px 20px;
-      margin-bottom: 30px;
-      background-color: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-    .images {
-      display: flex;
-      gap: 40px;
-      flex-wrap: wrap;
-    }
-    .images img {
-      max-width: 350px;
-      border: 1px solid #ddd;
-      padding: 5px;
-      background: #f9f9f9;
-    }
-    .description {
-      margin-top: 30px;
-      font-size: 16px;
-    }
+    body { font-family: sans-serif; margin: 40px; max-width: 800px; }
+    h1 { font-size: 24px; margin-bottom: 10px; }
+    a.button { display: inline-block; padding: 10px 20px; margin-bottom: 30px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+    .images { display: flex; gap: 40px; flex-wrap: wrap; }
+    .images img { max-width: 350px; border: 1px solid #ddd; padding: 5px; background: #f9f9f9; }
+    .description { margin-top: 30px; font-size: 16px; }
 
     /* --- Stock UI styles --- */
     .stock-ui{margin:20px 0;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fafafa}
@@ -57,29 +30,15 @@
       text-decoration-color: #f0a0a0;
     }
     .stock-ui .warn.pulse{display:block;animation:pulse 1s infinite}
-    .stock-ui .warn.pulse::before{
-      content:"❗❗"; margin-right:8px; display:inline-block; animation:wiggle .8s infinite;
-    }
-    @keyframes pulse{
-      0%{box-shadow:0 0 0 0 rgba(220,53,69,.35)}
-      70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}
-      100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}
-    }
+    .stock-ui .warn.pulse::before{content:"❗❗"; margin-right:8px; display:inline-block; animation:wiggle .8s infinite;}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,53,69,.35)}70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}}
     @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
 
     /* Toast */
     #toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #198754;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      display: none;
-      animation: fade 3s ease forwards;
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background-color: #198754; color: white; padding: 10px 20px; border-radius: 8px;
+      font-weight: 600; display: none; animation: fade 3s ease forwards;
     }
     @keyframes fade {
       0% { opacity: 0; transform: translate(-50%, 10px); }
@@ -149,21 +108,31 @@
             return o;
           }, {});
         });
+
         const match = data.find(r => r.drawerCode === drawerCode);
         if (!match) throw new Error("Drawer not found");
+
+        // Dades visibles
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName}`;
         document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode}`;
         document.getElementById("description-text").textContent = match.description;
+
+        // minStock (fallback 10)
+        const MIN_STOCK = parseInt(match.minStock || "10", 10);
+
+        // Stock actual + text d'avís amb el mínim real
         document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
-        initStockUI(parseInt(match.stockQty || "0", 10));
+        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
+
+        // Inicialitza UI amb mínim
+        initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
       })
       .catch(e => {
         document.getElementById("stock-display").innerText = "❌ Error: " + e.message;
       });
 
     // --- Stock UI logic ---
-    function initStockUI(initialQty) {
-      const MIN_STOCK = 10;
+    function initStockUI(initialQty, MIN_STOCK = 10) {
       const curEl = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
       const newEl = document.getElementById('newQty');
@@ -200,7 +169,7 @@
       exact.addEventListener('input', ()=>{ const v=parseInt(exact.value,10); if(!isNaN(v)){ delta=v-cur; refresh(); }});
       reset.addEventListener('click', ()=>{ delta=0; refresh(); });
 
-      // ✅ SAVE → direct update via Cloudflare Worker
+      // SAVE → update via API (el correu el farà GitHub Actions quan es commitegi el CSV)
       save.addEventListener('click', async ()=> {
         const newVal = cur + delta;
         if(!confirm(`Are you sure you want to update the stock to ${newVal}?`)) return;
