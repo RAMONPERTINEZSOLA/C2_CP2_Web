@@ -1,8 +1,10 @@
       - name: Detect low stock and build email body
         id: detect
-        shell: bash
         run: |
           set -euo pipefail
+          python3 scripts/gen_low_stock_email.py
+          COUNT=$(cat count.txt 2>/dev/null || echo 0)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
           CSV="${{ env.STOCK_PATH }}"
           if [ ! -f "$CSV" ]; then
