@@ -1,11 +1,36 @@
+name: Email on Low Stock
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/stock.csv'          # es dispara quan canvia aquest fitxer
+  workflow_dispatch:              # també es pot llançar manualment
+
+env:
+  STOCK_PATH: docs/stock.csv      # ruta correcta al CSV
+  DEFAULT_MIN_STOCK: "2"          # min per defecte si la columna no existeix
+
+jobs:
+  check-and-email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
       - name: Detect low stock and build email body
         id: detect
+        shell: bash
         run: |
           set -euo pipefail
-          python3 scripts/gen_low_stock_email.py
-          COUNT=$(cat count.txt 2>/dev/null || echo 0)
-          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
+          # 1) Comprova que existeix el CSV
           CSV="${{ env.STOCK_PATH }}"
           if [ ! -f "$CSV" ]; then
             echo "CSV not found at $CSV" >&2
@@ -14,56 +39,23 @@
             exit 0
           fi
 
-          # Genera cos del correu i recompte amb Python
-          python3 - <<'PY'
-import csv, os
+          # 2) Executa el script Python del repo (cap heredoc dins YAML)
+          python3 scripts/gen_low_stock_email.py
 
-csv_path = os.environ.get("STOCK_PATH", "docs/stock.csv")
-default_min = int(os.environ.get("DEFAULT_MIN_STOCK","2"))
-
-rows = []
-with open(csv_path, newline='', encoding='utf-8') as f:
-    sample = f.read(4096)
-    f.seek(0)
-    try:
-        has_header = csv.Sniffer().has_header(sample)
-    except Exception:
-        has_header = False
-    reader = csv.reader(f)
-    if has_header:
-        next(reader, None)
-    for r in reader:
-        if not r:
-            continue
-        r = (r + [""]*6)[:6]
-        drawer, qty, pname, pcode, desc, minsto = r
-        def to_int(x, fb=0):
-            try:
-                return int(str(x).strip())
-            except:
-                return fb
-        qty_i = to_int(qty, fb=-1)
-        min_i = to_int(minsto, fb=default_min)
-        if qty_i >= 0 and qty_i <= min_i:
-            rows.append((drawer.strip(), qty_i, min_i, pname.strip(), pcode.strip(), desc.strip()))
-
-with open("email_body.txt","w",encoding="utf-8") as out:
-    if not rows:
-        out.write("✅ No low-stock items detected.\n")
-    else:
-        out.write("⚠️ Low stock detected on the following items:\n\n")
-        for i, r in enumerate(rows, 1):
-            drawer, qty_i, min_i, pname, pcode, desc = r
-            out.write(f"{i}. {drawer} — qty: {qty_i} (min: {min_i})\n")
-            if pname: out.write(f"   name: {pname}\n")
-            if pcode: out.write(f"   code: {pcode}\n")
-            if desc:  out.write(f"   desc: {desc}\n")
-            out.write("\n")
-
-# desa recompte perquè el llegeixi el pas bash
-with open("count.txt","w",encoding="utf-8") as f:
-    f.write(str(len(rows)))
-PY
-
+          # 3) Publica el recompte perquè el següent pas pugui condicionar-se
           COUNT=$(cat count.txt 2>/dev/null || echo 0)
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Send email (SMTP)
+        if: steps.detect.outputs.count != '0'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "Low Stock Alert — ${{ github.repository }}"
+          from: ${{ secrets.FROM_EMAIL }}
+          to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
+          secure: ${{ secrets.SMTP_SECURE || 'false' }}  # 587→false, 465→true
+          body: file:email_body.txt
