@@ -1,25 +1,3 @@
-name: Email on Low Stock
-
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'docs/stock.csv'        # <-- ruta correcta del CSV
-  workflow_dispatch:
-
-env:
-  STOCK_PATH: docs/stock.csv    # <-- ruta correcta del CSV
-  # Opcional: llindar per defecte si el CSV no porta minStock
-  DEFAULT_MIN_STOCK: "2"
-
-jobs:
-  check-and-email:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Detect low stock and build email body
         id: detect
         shell: bash
@@ -34,88 +12,56 @@ jobs:
             exit 0
           fi
 
-          # Generem un informe simple interpretant 6 columnes:
-          # 0:drawerCode, 1:stockQty, 2:productName, 3:productCode, 4:description, 5:minStock(opcional)
-          # Si el CSV no té capçalera, igualment funciona.
-          python3 - << 'PY'
-import csv, os, sys
+          # Genera cos del correu i recompte amb Python
+          python3 - <<'PY'
+import csv, os
 
 csv_path = os.environ.get("STOCK_PATH", "docs/stock.csv")
 default_min = int(os.environ.get("DEFAULT_MIN_STOCK","2"))
 
 rows = []
 with open(csv_path, newline='', encoding='utf-8') as f:
-    sniffer = csv.Sniffer()
     sample = f.read(4096)
     f.seek(0)
-    has_header = sniffer.has_header(sample)
+    try:
+        has_header = csv.Sniffer().has_header(sample)
+    except Exception:
+        has_header = False
     reader = csv.reader(f)
     if has_header:
-        header = next(reader, [])
+        next(reader, None)
     for r in reader:
-        if not r: 
+        if not r:
             continue
-        # Normalitza longitud
         r = (r + [""]*6)[:6]
         drawer, qty, pname, pcode, desc, minsto = r
-        # Sanititza valors
-        def to_int(x, fallback=0):
+        def to_int(x, fb=0):
             try:
                 return int(str(x).strip())
             except:
-                return fallback
-        qty_i = to_int(qty, fallback=-1) # -1 si buit
-        min_i = to_int(minsto, fallback=default_min)
-
-        # Marca low-stock només si qty és >=0 i <= min
+                return fb
+        qty_i = to_int(qty, fb=-1)
+        min_i = to_int(minsto, fb=default_min)
         if qty_i >= 0 and qty_i <= min_i:
-            rows.append({
-                "drawerCode": drawer.strip(),
-                "stockQty": qty_i,
-                "minStock": min_i,
-                "productName": pname.strip(),
-                "productCode": pcode.strip(),
-                "description": desc.strip(),
-            })
+            rows.append((drawer.strip(), qty_i, min_i, pname.strip(), pcode.strip(), desc.strip()))
 
-# Escriu cos del correu
 with open("email_body.txt","w",encoding="utf-8") as out:
     if not rows:
         out.write("✅ No low-stock items detected.\n")
     else:
         out.write("⚠️ Low stock detected on the following items:\n\n")
         for i, r in enumerate(rows, 1):
-            out.write(f"{i}. {r['drawerCode']} — qty: {r['stockQty']} (min: {r['minStock']})\n")
-            if r['productName']:
-                out.write(f"   name: {r['productName']}\n")
-            if r['productCode']:
-                out.write(f"   code: {r['productCode']}\n")
-            if r['description']:
-                out.write(f"   desc: {r['description']}\n")
+            drawer, qty_i, min_i, pname, pcode, desc = r
+            out.write(f"{i}. {drawer} — qty: {qty_i} (min: {min_i})\n")
+            if pname: out.write(f"   name: {pname}\n")
+            if pcode: out.write(f"   code: {pcode}\n")
+            if desc:  out.write(f"   desc: {desc}\n")
             out.write("\n")
 
-# Exponeix recompte com a sortida del pas
-count = len(rows)
-print(f"::set-output name=count::{count}")  # compat retro, tot seguit fem GITHUB_OUTPUT
+# desa recompte perquè el llegeixi el pas bash
+with open("count.txt","w",encoding="utf-8") as f:
+    f.write(str(len(rows)))
 PY
 
-          # Exporta 'count' també a GITHUB_OUTPUT (mètode modern)
-          COUNT=$(grep -c '^⚠️\|^1\.' -n email_body.txt || true)
-          # Si el cos diu "No low-stock", forcem 0
-          if grep -q "No low-stock items detected" email_body.txt; then COUNT=0; fi
+          COUNT=$(cat count.txt 2>/dev/null || echo 0)
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
-
-      - name: Send email (SMTP)
-        if: steps.detect.outputs.count != '0'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "Low Stock Alert — ${{ github.repository }}"
-          from: ${{ secrets.FROM_EMAIL }}
-          to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
-          # Si el teu servidor és 587, posa 'secure: false'
-          secure: ${{ secrets.SMTP_SECURE || 'false' }}
-          body: file:email_body.txt
