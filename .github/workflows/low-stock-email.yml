@@ -4,12 +4,12 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'docs/stock.csv'          # es dispara quan canvia aquest fitxer
-  workflow_dispatch:              # també es pot llançar manualment
+      - 'docs/stock.csv'
+  workflow_dispatch:
 
 env:
-  STOCK_PATH: docs/stock.csv      # ruta correcta al CSV
-  DEFAULT_MIN_STOCK: "2"          # min per defecte si la columna no existeix
+  STOCK_PATH: docs/stock.csv
+  DEFAULT_MIN_STOCK: "2"
 
 jobs:
   check-and-email:
@@ -18,19 +18,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # <- NECESSARI per poder llegir HEAD^ (CSV anterior)
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Detect low stock and build email body
+      - name: Prepare previous CSV (if any)
+        id: prev
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Intenta extreure el CSV anterior a aquest commit
+          if git show HEAD^:${{ env.STOCK_PATH }} > prev.csv 2>/dev/null; then
+            echo "has_prev=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_prev=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Detect newly low-stock items and build email body
         id: detect
         shell: bash
         run: |
           set -euo pipefail
 
-          # 1) Comprova que existeix el CSV
           CSV="${{ env.STOCK_PATH }}"
           if [ ! -f "$CSV" ]; then
             echo "CSV not found at $CSV" >&2
@@ -39,10 +52,9 @@ jobs:
             exit 0
           fi
 
-          # 2) Executa el script Python del repo (cap heredoc dins YAML)
-          python3 scripts/gen_low_stock_email.py
+          # Executa l’script Python comparant present vs. anterior (si existeix prev.csv)
+          python3 scripts/gen_low_stock_email.py --current "$CSV" --prev prev.csv
 
-          # 3) Publica el recompte perquè el següent pas pugui condicionar-se
           COUNT=$(cat count.txt 2>/dev/null || echo 0)
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
@@ -57,5 +69,5 @@ jobs:
           subject: "Low Stock Alert — ${{ github.repository }}"
           from: ${{ secrets.FROM_EMAIL }}
           to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
-          secure: ${{ secrets.SMTP_SECURE || 'false' }}  # 587→false, 465→true
-          body: file:email_body.txt
+          secure: ${{ secrets.SMTP_SECURE || 'false' }}   # 587→false, 465→true
+          body: file://email_body.txt                    # <-- FIX: file://
