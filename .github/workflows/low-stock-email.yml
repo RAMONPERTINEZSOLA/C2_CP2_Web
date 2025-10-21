@@ -4,117 +4,106 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'stock.csv'            # canvia-ho si el CSV és a una altra ruta
+      - 'docs/stock.csv'        # <-- ruta correcta del CSV
   workflow_dispatch:
 
 env:
-  STOCK_PATH: stock.csv       # ← si el tens a docs/stock.csv, posa-ho aquí
+  STOCK_PATH: docs/stock.csv    # <-- ruta correcta del CSV
+  # Opcional: llindar per defecte si el CSV no porta minStock
+  DEFAULT_MIN_STOCK: "2"
 
 jobs:
   check-and-email:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout (full history)
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: "Debug: show changed files in this push"
-        run: |
-          echo "REF=$GITHUB_REF"
-          echo "SHA=$GITHUB_SHA"
-          echo "BEFORE=${{ github.event.before }}"
-          git diff --name-status "${{ github.event.before }}" "${{ github.sha }}" || true
-          ls -la
-
-      - name: Prepare before/after CSV
-        id: files
+      - name: Detect low stock and build email body
+        id: detect
         shell: bash
         run: |
-          set -e
-          BEFORE="${{ github.event.before }}"
-          AFTER="${{ github.sha }}"
-          PATH_CSV="${STOCK_PATH}"
+          set -euo pipefail
 
-          echo "Using CSV path: ${PATH_CSV}"
-
-          # AFTER → sempre des del commit actual
-          if git cat-file -e "$AFTER:${PATH_CSV}" 2>/dev/null; then
-            git show "$AFTER:${PATH_CSV}" > after.csv
-          else
-            echo "❌ ${PATH_CSV} no existeix al commit actual"; exit 1
+          CSV="${{ env.STOCK_PATH }}"
+          if [ ! -f "$CSV" ]; then
+            echo "CSV not found at $CSV" >&2
+            echo "count=0" >> "$GITHUB_OUTPUT"
+            printf "Stock file not found: %s\n" "$CSV" > email_body.txt
+            exit 0
           fi
 
-          # BEFORE → pot venir buit (workflow_dispatch) o el fitxer pot no existir
-          if [ -n "$BEFORE" ] && git cat-file -e "$BEFORE:${PATH_CSV}" 2>/dev/null; then
-            git show "$BEFORE:${PATH_CSV}" > before.csv
-          else
-            echo "ℹ️ No CSV al commit anterior (o BEFORE buit). Creant before.csv només amb capçalera."
-            head -n1 after.csv > before.csv || echo "drawerCode,productName,productCode,description,stockQty,minStock" > before.csv
-          fi
+          # Generem un informe simple interpretant 6 columnes:
+          # 0:drawerCode, 1:stockQty, 2:productName, 3:productCode, 4:description, 5:minStock(opcional)
+          # Si el CSV no té capçalera, igualment funciona.
+          python3 - << 'PY'
+import csv, os, sys
 
-          echo "✅ Prepared before.csv and after.csv"
+csv_path = os.environ.get("STOCK_PATH", "docs/stock.csv")
+default_min = int(os.environ.get("DEFAULT_MIN_STOCK","2"))
 
-      - name: Detect low-stock rows
-        id: detect
-        run: |
-          node <<'NODE'
-          const fs = require('fs');
+rows = []
+with open(csv_path, newline='', encoding='utf-8') as f:
+    sniffer = csv.Sniffer()
+    sample = f.read(4096)
+    f.seek(0)
+    has_header = sniffer.has_header(sample)
+    reader = csv.reader(f)
+    if has_header:
+        header = next(reader, [])
+    for r in reader:
+        if not r: 
+            continue
+        # Normalitza longitud
+        r = (r + [""]*6)[:6]
+        drawer, qty, pname, pcode, desc, minsto = r
+        # Sanititza valors
+        def to_int(x, fallback=0):
+            try:
+                return int(str(x).strip())
+            except:
+                return fallback
+        qty_i = to_int(qty, fallback=-1) # -1 si buit
+        min_i = to_int(minsto, fallback=default_min)
 
-          function parseCSV(path){
-            const raw = fs.readFileSync(path,'utf8').trim();
-            if (!raw) return {headers:[], rows:[]};
-            const lines = raw.split(/\r?\n/).filter(Boolean);
-            const headers = lines[0].split(',').map(h=>h.trim());
-            const rows = lines.slice(1).map(line=>{
-              const cols = line.split(',').map(v=>v.trim());
-              const obj = {};
-              headers.forEach((h,i)=>obj[h]=cols[i]??'');
-              obj.stockQty = Number(obj.stockQty ?? 0);
-              obj.minStock = obj.minStock !== undefined && obj.minStock !== '' ? Number(obj.minStock) : 10;
-              return obj;
-            });
-            return {headers, rows};
-          }
+        # Marca low-stock només si qty és >=0 i <= min
+        if qty_i >= 0 and qty_i <= min_i:
+            rows.append({
+                "drawerCode": drawer.strip(),
+                "stockQty": qty_i,
+                "minStock": min_i,
+                "productName": pname.strip(),
+                "productCode": pcode.strip(),
+                "description": desc.strip(),
+            })
 
-          const before = parseCSV('before.csv');
-          const after  = parseCSV('after.csv');
+# Escriu cos del correu
+with open("email_body.txt","w",encoding="utf-8") as out:
+    if not rows:
+        out.write("✅ No low-stock items detected.\n")
+    else:
+        out.write("⚠️ Low stock detected on the following items:\n\n")
+        for i, r in enumerate(rows, 1):
+            out.write(f"{i}. {r['drawerCode']} — qty: {r['stockQty']} (min: {r['minStock']})\n")
+            if r['productName']:
+                out.write(f"   name: {r['productName']}\n")
+            if r['productCode']:
+                out.write(f"   code: {r['productCode']}\n")
+            if r['description']:
+                out.write(f"   desc: {r['description']}\n")
+            out.write("\n")
 
-          const mapBefore = new Map(before.rows.map(r => [r.drawerCode, r]));
-          const offenders = [];
+# Exponeix recompte com a sortida del pas
+count = len(rows)
+print(f"::set-output name=count::{count}")  # compat retro, tot seguit fem GITHUB_OUTPUT
+PY
 
-          for (const row of after.rows){
-            const prev = mapBefore.get(row.drawerCode);
-            const prevQty = prev ? Number(prev.stockQty) : null;
-            const nowQty = Number(row.stockQty);
-            const min    = Number(row.minStock ?? 10);
-
-            const wasOk = prevQty === null ? true : prevQty >= min;
-            if (Number.isFinite(nowQty) && Number.isFinite(min) && nowQty < min && wasOk){
-              offenders.push({
-                drawerCode: row.drawerCode,
-                productName: row.productName || '(no name)',
-                productCode: row.productCode || '',
-                newQty: nowQty,
-                minStock: min
-              });
-            }
-          }
-
-          if (offenders.length){
-            let body = `Low Stock Alert\n\nThe following product(s) dropped below minimum:\n\n`;
-            for (const o of offenders){
-              body += `• ${o.drawerCode} — ${o.productName} (${o.productCode}) → ${o.newQty} (min ${o.minStock})\n`;
-            }
-            body += `\nRepo: ${process.env.GITHUB_REPOSITORY}\nCommit: ${process.env.GITHUB_SHA}\nBy: ${process.env.GITHUB_ACTOR}\n`;
-            fs.writeFileSync('email_body.txt', body, 'utf8');
-            console.log(body);
-          } else {
-            console.log("No low-stock offenders.");
-          }
-
-          require('fs').appendFileSync(process.env.GITHUB_OUTPUT, `count=${offenders.length}\n`);
-          NODE
+          # Exporta 'count' també a GITHUB_OUTPUT (mètode modern)
+          COUNT=$(grep -c '^⚠️\|^1\.' -n email_body.txt || true)
+          # Si el cos diu "No low-stock", forcem 0
+          if grep -q "No low-stock items detected" email_body.txt; then COUNT=0; fi
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
       - name: Send email (SMTP)
         if: steps.detect.outputs.count != '0'
@@ -127,5 +116,6 @@ jobs:
           subject: "Low Stock Alert — ${{ github.repository }}"
           from: ${{ secrets.FROM_EMAIL }}
           to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
-          secure: true
+          # Si el teu servidor és 587, posa 'secure: false'
+          secure: ${{ secrets.SMTP_SECURE || 'false' }}
           body: file:email_body.txt
