@@ -2,16 +2,17 @@ name: Email on Low Stock
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
     paths:
-      - 'stock.csv'          # ← ajusta a la teva ruta si no és a l'arrel
-  workflow_dispatch:          # ← per provar-lo manualment
+      - 'stock.csv'            # canvia-ho si el CSV és a una altra ruta
+  workflow_dispatch:
+
+env:
+  STOCK_PATH: stock.csv       # ← si el tens a docs/stock.csv, posa-ho aquí
 
 jobs:
   check-and-email:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout (full history)
         uses: actions/checkout@v4
@@ -24,25 +25,35 @@ jobs:
           echo "SHA=$GITHUB_SHA"
           echo "BEFORE=${{ github.event.before }}"
           git diff --name-status "${{ github.event.before }}" "${{ github.sha }}" || true
+          ls -la
 
-      - name: Extract before/after CSV
+      - name: Prepare before/after CSV
         id: files
+        shell: bash
         run: |
+          set -e
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
+          PATH_CSV="${STOCK_PATH}"
 
-          # Si el fitxer no existia abans, crea CSV amb només capçalera
-          if git cat-file -e "$BEFORE:stock.csv" 2>/dev/null; then
-            git show "$BEFORE:stock.csv" > before.csv
+          echo "Using CSV path: ${PATH_CSV}"
+
+          # AFTER → sempre des del commit actual
+          if git cat-file -e "$AFTER:${PATH_CSV}" 2>/dev/null; then
+            git show "$AFTER:${PATH_CSV}" > after.csv
           else
-            if [ -f stock.csv ]; then
-              head -n1 stock.csv > before.csv
-            else
-              echo "drawerCode,productName,productCode,description,stockQty,minStock" > before.csv
-            fi
+            echo "❌ ${PATH_CSV} no existeix al commit actual"; exit 1
           fi
 
-          git show "$AFTER:stock.csv" > after.csv
+          # BEFORE → pot venir buit (workflow_dispatch) o el fitxer pot no existir
+          if [ -n "$BEFORE" ] && git cat-file -e "$BEFORE:${PATH_CSV}" 2>/dev/null; then
+            git show "$BEFORE:${PATH_CSV}" > before.csv
+          else
+            echo "ℹ️ No CSV al commit anterior (o BEFORE buit). Creant before.csv només amb capçalera."
+            head -n1 after.csv > before.csv || echo "drawerCode,productName,productCode,description,stockQty,minStock" > before.csv
+          fi
+
+          echo "✅ Prepared before.csv and after.csv"
 
       - name: Detect low-stock rows
         id: detect
@@ -98,10 +109,11 @@ jobs:
             body += `\nRepo: ${process.env.GITHUB_REPOSITORY}\nCommit: ${process.env.GITHUB_SHA}\nBy: ${process.env.GITHUB_ACTOR}\n`;
             fs.writeFileSync('email_body.txt', body, 'utf8');
             console.log(body);
+          } else {
+            console.log("No low-stock offenders.");
           }
 
-          // ➜ passa la sortida al següent pas
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, `count=${offenders.length}\n`);
+          require('fs').appendFileSync(process.env.GITHUB_OUTPUT, `count=${offenders.length}\n`);
           NODE
 
       - name: Send email (SMTP)
