@@ -2,23 +2,27 @@ name: Email on Low Stock
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
     paths:
-      - 'stock.csv'        # <— ajusta si NO és a l'arrel
-  workflow_dispatch:        # <— per provar manualment
+      - 'stock.csv'          # ← ajusta a la teva ruta si no és a l'arrel
+  workflow_dispatch:          # ← per provar-lo manualment
 
 jobs:
   check-and-email:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout (full history)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Debug: show changed files in this push
+      - name: "Debug: show changed files in this push"
         run: |
-          echo "REF: $GITHUB_REF  SHA: $GITHUB_SHA  BEFORE: ${{ github.event.before }}"
+          echo "REF=$GITHUB_REF"
+          echo "SHA=$GITHUB_SHA"
+          echo "BEFORE=${{ github.event.before }}"
           git diff --name-status "${{ github.event.before }}" "${{ github.sha }}" || true
 
       - name: Extract before/after CSV
@@ -27,11 +31,15 @@ jobs:
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
 
-          # Si no existia abans, crea CSV buit amb només capçalera
+          # Si el fitxer no existia abans, crea CSV amb només capçalera
           if git cat-file -e "$BEFORE:stock.csv" 2>/dev/null; then
             git show "$BEFORE:stock.csv" > before.csv
           else
-            if [ -f stock.csv ]; then head -n1 stock.csv > before.csv; else echo "drawerCode,productName,productCode,description,stockQty,minStock" > before.csv; fi
+            if [ -f stock.csv ]; then
+              head -n1 stock.csv > before.csv
+            else
+              echo "drawerCode,productName,productCode,description,stockQty,minStock" > before.csv
+            fi
           fi
 
           git show "$AFTER:stock.csv" > after.csv
@@ -92,9 +100,8 @@ jobs:
             console.log(body);
           }
 
-          // ✅ escriu sortida a $GITHUB_OUTPUT (no ::set-output)
-          const out = process.env.GITHUB_OUTPUT;
-          fs.appendFileSync(out, `count=${offenders.length}\n`);
+          // ➜ passa la sortida al següent pas
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `count=${offenders.length}\n`);
           NODE
 
       - name: Send email (SMTP)
