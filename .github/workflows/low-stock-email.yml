@@ -4,7 +4,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'stock.csv'   # ajusta si el CSV està en una altra ruta
+      - 'stock.csv'        # <— ajusta si NO és a l'arrel
+  workflow_dispatch:        # <— per provar manualment
 
 jobs:
   check-and-email:
@@ -15,21 +16,25 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Debug: show changed files in this push
+        run: |
+          echo "REF: $GITHUB_REF  SHA: $GITHUB_SHA  BEFORE: ${{ github.event.before }}"
+          git diff --name-status "${{ github.event.before }}" "${{ github.sha }}" || true
+
       - name: Extract before/after CSV
         id: files
         run: |
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
-          # Si el fitxer no existia abans, crea un CSV buit amb només capçalera per evitar errors
-          if git cat-file -e "$BEFORE:stock.csv"; then
+
+          # Si no existia abans, crea CSV buit amb només capçalera
+          if git cat-file -e "$BEFORE:stock.csv" 2>/dev/null; then
             git show "$BEFORE:stock.csv" > before.csv
           else
-            # Intenta inferir capçalera des de l'actual per conservar columnes
-            head -n1 stock.csv > before.csv || echo "drawerCode,productName,productCode,description,stockQty,minStock" > before.csv
+            if [ -f stock.csv ]; then head -n1 stock.csv > before.csv; else echo "drawerCode,productName,productCode,description,stockQty,minStock" > before.csv; fi
           fi
+
           git show "$AFTER:stock.csv" > after.csv
-          echo "BEFORE=$BEFORE" >> $GITHUB_OUTPUT
-          echo "AFTER=$AFTER" >> $GITHUB_OUTPUT
 
       - name: Detect low-stock rows
         id: detect
@@ -39,25 +44,23 @@ jobs:
 
           function parseCSV(path){
             const raw = fs.readFileSync(path,'utf8').trim();
-            const lines = raw.split(/\r?\n/);
+            if (!raw) return {headers:[], rows:[]};
+            const lines = raw.split(/\r?\n/).filter(Boolean);
             const headers = lines[0].split(',').map(h=>h.trim());
-            const idx = Object.fromEntries(headers.map((h,i)=>[h,i]));
             const rows = lines.slice(1).map(line=>{
               const cols = line.split(',').map(v=>v.trim());
               const obj = {};
               headers.forEach((h,i)=>obj[h]=cols[i]??'');
-              // normalitza camps
               obj.stockQty = Number(obj.stockQty ?? 0);
               obj.minStock = obj.minStock !== undefined && obj.minStock !== '' ? Number(obj.minStock) : 10;
               return obj;
             });
-            return {headers, idx, rows};
+            return {headers, rows};
           }
 
           const before = parseCSV('before.csv');
           const after  = parseCSV('after.csv');
 
-          // Index per drawerCode (clau estable al teu sistema)
           const mapBefore = new Map(before.rows.map(r => [r.drawerCode, r]));
           const offenders = [];
 
@@ -67,9 +70,8 @@ jobs:
             const nowQty = Number(row.stockQty);
             const min    = Number(row.minStock ?? 10);
 
-            // Condició: ara < mínim, i (abans era ≥ mínim o no existia)
             const wasOk = prevQty === null ? true : prevQty >= min;
-            if (nowQty < min && wasOk){
+            if (Number.isFinite(nowQty) && Number.isFinite(min) && nowQty < min && wasOk){
               offenders.push({
                 drawerCode: row.drawerCode,
                 productName: row.productName || '(no name)',
@@ -80,7 +82,6 @@ jobs:
             }
           }
 
-          // Escriu cos del correu si cal
           if (offenders.length){
             let body = `Low Stock Alert\n\nThe following product(s) dropped below minimum:\n\n`;
             for (const o of offenders){
@@ -90,10 +91,11 @@ jobs:
             fs.writeFileSync('email_body.txt', body, 'utf8');
             console.log(body);
           }
-          // Output flag
-          console.log(`::set-output name=count::${offenders.length}`);
+
+          // ✅ escriu sortida a $GITHUB_OUTPUT (no ::set-output)
+          const out = process.env.GITHUB_OUTPUT;
+          fs.appendFileSync(out, `count=${offenders.length}\n`);
           NODE
-        shell: bash
 
       - name: Send email (SMTP)
         if: steps.detect.outputs.count != '0'
@@ -105,6 +107,6 @@ jobs:
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: "Low Stock Alert — ${{ github.repository }}"
           from: ${{ secrets.FROM_EMAIL }}
-          to: ${{ secrets.TO_EMAIL }}
+          to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
           secure: true
           body: file:email_body.txt
