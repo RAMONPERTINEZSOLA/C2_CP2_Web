@@ -1,0 +1,110 @@
+name: Email on Low Stock
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'stock.csv'   # ajusta si el CSV està en una altra ruta
+
+jobs:
+  check-and-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract before/after CSV
+        id: files
+        run: |
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+          # Si el fitxer no existia abans, crea un CSV buit amb només capçalera per evitar errors
+          if git cat-file -e "$BEFORE:stock.csv"; then
+            git show "$BEFORE:stock.csv" > before.csv
+          else
+            # Intenta inferir capçalera des de l'actual per conservar columnes
+            head -n1 stock.csv > before.csv || echo "drawerCode,productName,productCode,description,stockQty,minStock" > before.csv
+          fi
+          git show "$AFTER:stock.csv" > after.csv
+          echo "BEFORE=$BEFORE" >> $GITHUB_OUTPUT
+          echo "AFTER=$AFTER" >> $GITHUB_OUTPUT
+
+      - name: Detect low-stock rows
+        id: detect
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          function parseCSV(path){
+            const raw = fs.readFileSync(path,'utf8').trim();
+            const lines = raw.split(/\r?\n/);
+            const headers = lines[0].split(',').map(h=>h.trim());
+            const idx = Object.fromEntries(headers.map((h,i)=>[h,i]));
+            const rows = lines.slice(1).map(line=>{
+              const cols = line.split(',').map(v=>v.trim());
+              const obj = {};
+              headers.forEach((h,i)=>obj[h]=cols[i]??'');
+              // normalitza camps
+              obj.stockQty = Number(obj.stockQty ?? 0);
+              obj.minStock = obj.minStock !== undefined && obj.minStock !== '' ? Number(obj.minStock) : 10;
+              return obj;
+            });
+            return {headers, idx, rows};
+          }
+
+          const before = parseCSV('before.csv');
+          const after  = parseCSV('after.csv');
+
+          // Index per drawerCode (clau estable al teu sistema)
+          const mapBefore = new Map(before.rows.map(r => [r.drawerCode, r]));
+          const offenders = [];
+
+          for (const row of after.rows){
+            const prev = mapBefore.get(row.drawerCode);
+            const prevQty = prev ? Number(prev.stockQty) : null;
+            const nowQty = Number(row.stockQty);
+            const min    = Number(row.minStock ?? 10);
+
+            // Condició: ara < mínim, i (abans era ≥ mínim o no existia)
+            const wasOk = prevQty === null ? true : prevQty >= min;
+            if (nowQty < min && wasOk){
+              offenders.push({
+                drawerCode: row.drawerCode,
+                productName: row.productName || '(no name)',
+                productCode: row.productCode || '',
+                newQty: nowQty,
+                minStock: min
+              });
+            }
+          }
+
+          // Escriu cos del correu si cal
+          if (offenders.length){
+            let body = `Low Stock Alert\n\nThe following product(s) dropped below minimum:\n\n`;
+            for (const o of offenders){
+              body += `• ${o.drawerCode} — ${o.productName} (${o.productCode}) → ${o.newQty} (min ${o.minStock})\n`;
+            }
+            body += `\nRepo: ${process.env.GITHUB_REPOSITORY}\nCommit: ${process.env.GITHUB_SHA}\nBy: ${process.env.GITHUB_ACTOR}\n`;
+            fs.writeFileSync('email_body.txt', body, 'utf8');
+            console.log(body);
+          }
+          // Output flag
+          console.log(`::set-output name=count::${offenders.length}`);
+          NODE
+        shell: bash
+
+      - name: Send email (SMTP)
+        if: steps.detect.outputs.count != '0'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "Low Stock Alert — ${{ github.repository }}"
+          from: ${{ secrets.FROM_EMAIL }}
+          to: ${{ secrets.TO_EMAIL }}
+          secure: true
+          body: file:email_body.txt
