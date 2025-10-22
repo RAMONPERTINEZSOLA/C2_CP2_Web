@@ -5,12 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'docs/stock.csv'
-      - 'docs/**/*.html'       # <- també quan canvies els HTML
+      - 'docs/**/*.html'
   workflow_dispatch:
 
 env:
   STOCK_PATH: docs/stock.csv
-  DEFAULT_MIN_STOCK: "10"      # valor per defecte si no és al CSV ni a l'HTML
+  DEFAULT_MIN_STOCK: "10"          # per defecte si no és al CSV ni a l'HTML
   LOGO_PATH: docs/assets/parcsafe-logo.png
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2   # per comparar amb HEAD^
+          fetch-depth: 2            # imprescindible per poder llegir HEAD^
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -29,7 +29,7 @@ jobs:
           python-version: '3.x'
 
       - name: Prepare previous CSV (if any)
-        id: prev
+        id: prevcsv
         shell: bash
         run: |
           set -euo pipefail
@@ -38,6 +38,19 @@ jobs:
           else
             echo "has_prev=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Build previous docs/ HTML snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p prev_tree
+          # Llista tots els HTMLs de docs/ del commit anterior i desa els fitxers
+          mapfile -t FILES < <(git ls-tree -r --name-only HEAD^ -- docs | grep -E '\.html$' || true)
+          for f in "${FILES[@]}"; do
+            mkdir -p "prev_tree/$(dirname "$f")"
+            git show HEAD^:"$f" > "prev_tree/$f" || true
+          done
+          # Si no hi havia commit anterior, el directori queda buit (està bé)
 
       - name: Detect newly low-stock items and build HTML email
         id: detect
@@ -56,6 +69,7 @@ jobs:
           python3 scripts/gen_low_stock_email.py \
             --current "$CSV" \
             --prev prev.csv \
+            --prev-root prev_tree \
             --logo-path "${{ env.LOGO_PATH }}"
 
           COUNT=$(cat count.txt 2>/dev/null || echo 0)
@@ -69,9 +83,13 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
+
           subject: "LOW STOCK ALERT"
           from: "\"STOCK ALERT!!\" <${{ secrets.FROM_EMAIL }}>"
           to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
-          secure: ${{ secrets.SMTP_SECURE || 'false' }}   # 587→false, 465→true
+          secure: ${{ secrets.SMTP_SECURE || 'false' }}  # 587→false, 465→true
+
+          # Envia com HTML (renderitzat a Outlook/Gmail)
           html_body: file://email_body.html
+
           # attachments: docs/stock.csv   # opcional

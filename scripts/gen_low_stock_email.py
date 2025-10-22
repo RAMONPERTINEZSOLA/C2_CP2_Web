@@ -60,25 +60,27 @@ def find_product_image(drawer_code: str):
             return hits[0].replace("\\", "/")
     return None
 
-def find_html_for_code(drawer_code: str):
-    """Torna el primer HTML dins docs/** que contingui el drawer_code al nom."""
+def find_html_for_code(drawer_code: str, root_dir: str):
+    """Retorna el primer HTML dins root_dir/docs/** que contingui el drawer_code al nom del fitxer."""
     if not drawer_code:
         return None
-    pattern = f"docs/**/*.html"
+    pattern = os.path.join(root_dir, "docs", "**", "*.html").replace("\\", "/")
     for p in glob.glob(pattern, recursive=True):
         name = os.path.basename(p)
         if drawer_code in name:
             return p.replace("\\", "/")
     return None
 
+# Patrons per detectar min-stock dins HTML
 MIN_PATTERNS = [
     re.compile(r'data[-_]?min[-_]?stock\s*=\s*["\']?(\d+)', re.I),
     re.compile(r'id=["\']min[-_]?stock["\'][^>]*>\s*(\d+)\s*<', re.I),
+    re.compile(r'<!--\s*min\s*stock\s*:\s*(\d+)\s*-->', re.I),
+    re.compile(r'<meta\s+name=["\']min[-_]?stock["\']\s+content=["\'](\d+)["\']', re.I),
     re.compile(r'(?:min(?:imum)?\s*stock|stock\s*min(?:im)?)\D{0,20}(\d+)', re.I),
 ]
 
 def read_min_from_html(html_path):
-    """Intenta detectar minStock dins l'HTML amb diversos patrons."""
     try:
         with open(html_path, "r", encoding="utf-8") as f:
             text = f.read()
@@ -94,6 +96,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--current", default=os.environ.get("STOCK_PATH", "docs/stock.csv"))
     ap.add_argument("--prev", default="prev.csv")
+    ap.add_argument("--prev-root", default="prev_tree")   # <-- on hem buidat els HTMLs antics
     ap.add_argument("--default-min", type=int, default=int(os.environ.get("DEFAULT_MIN_STOCK", "10")))
     ap.add_argument("--logo-path", default=os.environ.get("LOGO_PATH", "docs/assets/parcsafe-logo.png"))
     ap.add_argument("--branch", default=os.environ.get("GITHUB_REF_NAME", "main"))
@@ -104,14 +107,13 @@ if __name__ == "__main__":
     cur_rows = load_csv(args.current)
     prev_rows = load_csv(args.prev) if os.path.isfile(args.prev) else []
 
-    # Mapes per codi
     cur = map_by_code(cur_rows)
     prev = map_by_code(prev_rows)
 
-    # Enriquir minStock des de HTML si no ve al CSV
+    # Enriquir minStock (ara distingint arrel actual vs arrel "previa")
     for code, r in cur.items():
         if r["minStock"] is None or r["minStock"] == "":
-            html_path = find_html_for_code(code)
+            html_path = find_html_for_code(code, root_dir=".")
             if html_path:
                 html_min = read_min_from_html(html_path)
                 if html_min is not None:
@@ -121,7 +123,7 @@ if __name__ == "__main__":
 
     for code, r in prev.items():
         if r["minStock"] is None or r["minStock"] == "":
-            html_path = find_html_for_code(code)
+            html_path = find_html_for_code(code, root_dir=args.prev_root)
             if html_path:
                 html_min = read_min_from_html(html_path)
                 if html_min is not None:
@@ -129,7 +131,7 @@ if __name__ == "__main__":
         if r["minStock"] is None:
             r["minStock"] = args.default_min
 
-    newly_low = []  # OK -> LOW en aquest commit
+    newly_low = []  # OK -> LOW en aquest commit (considerant canvis de mínim a l'HTML)
 
     for code, r in cur.items():
         qty_now = r["stockQty"]
@@ -223,7 +225,6 @@ if __name__ == "__main__":
   </body>
 </html>
 """
-
     with open("email_body.html", "w", encoding="utf-8") as f:
         f.write(html_doc)
 
