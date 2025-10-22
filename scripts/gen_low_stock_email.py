@@ -39,15 +39,11 @@ def map_by_code(rows):
     return {r["drawerCode"]: r for r in rows if r["drawerCode"]}
 
 def raw_github_url(repo: str, branch: str, path: str) -> str:
-    # Construeix un enllaç raw al fitxer per incrustar-lo com a <img src="...">
+    # URL raw per incrustar imatges al correu
     return f"https://raw.githubusercontent.com/{repo}/{branch}/{path}"
 
 def find_product_image(drawer_code: str):
-    """
-    Troba la primera imatge al repo que contingui el drawer_code al nom.
-    Busca a docs/**/img i docs/**/images amb jpg/jpeg/png/webp.
-    Retorna el path relatiu al repo o None.
-    """
+    """Cerca una imatge que contingui el drawer_code al nom dins docs/**/img o docs/**/images."""
     if not drawer_code:
         return None
     patterns = [
@@ -63,7 +59,6 @@ def find_product_image(drawer_code: str):
     for pat in patterns:
         hits = glob.glob(pat, recursive=True)
         if hits:
-            # torna el primer amb separador UNIX
             return hits[0].replace("\\", "/")
     return None
 
@@ -84,7 +79,7 @@ if __name__ == "__main__":
     cur = map_by_code(cur_rows)
     prev = map_by_code(prev_rows)
 
-    newly_low = []  # que han entrat en low stock ARA (abans no ho estaven)
+    newly_low = []  # ítems que han passat d'OK -> LOW en aquest commit
 
     for code, r in cur.items():
         qty_now = r["stockQty"]
@@ -114,12 +109,12 @@ if __name__ == "__main__":
                 "image_url": img_url,
             })
 
-    # Prepara el logo si existeix
+    # Logo Parcsafe si existeix al repo
     logo_url = None
     if args.logo_path and os.path.isfile(args.logo_path) and repo:
         logo_url = raw_github_url(repo, args.branch, args.logo_path.replace("\\", "/"))
 
-    # --- HTML minimalista però polit ---
+    # HTML polit
     def esc(x): return html.escape(str(x)) if x is not None else ""
 
     cards_html = []
