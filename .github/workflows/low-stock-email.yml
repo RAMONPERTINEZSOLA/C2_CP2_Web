@@ -4,13 +4,12 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'docs/stock.csv'
-      - 'docs/**/*.html'
+      - 'docs/stock.csv'       # es dispara quan es guarda el CSV
   workflow_dispatch:
 
 env:
   STOCK_PATH: docs/stock.csv
-  DEFAULT_MIN_STOCK: "10"          # per defecte si no és al CSV ni a l'HTML
+  DEFAULT_MIN_STOCK: "10"      # fallback si la columna minStock no ve al CSV
   LOGO_PATH: docs/assets/parcsafe-logo.png
 
 jobs:
@@ -20,58 +19,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2            # imprescindible per poder llegir HEAD^
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Prepare previous CSV (if any)
-        id: prevcsv
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git show HEAD^:${{ env.STOCK_PATH }} > prev.csv 2>/dev/null; then
-            echo "has_prev=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_prev=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Build previous docs/ HTML snapshot
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p prev_tree
-          # Llista tots els HTMLs de docs/ del commit anterior i desa els fitxers
-          mapfile -t FILES < <(git ls-tree -r --name-only HEAD^ -- docs | grep -E '\.html$' || true)
-          for f in "${FILES[@]}"; do
-            mkdir -p "prev_tree/$(dirname "$f")"
-            git show HEAD^:"$f" > "prev_tree/$f" || true
-          done
-          # Si no hi havia commit anterior, el directori queda buit (està bé)
-
-      - name: Detect newly low-stock items and build HTML email
+      - name: Build HTML email with all items where stockQty < minStock
         id: detect
         shell: bash
         run: |
           set -euo pipefail
-
-          CSV="${{ env.STOCK_PATH }}"
-          if [ ! -f "$CSV" ]; then
-            echo "CSV not found at $CSV" >&2
-            echo "count=0" >> "$GITHUB_OUTPUT"
-            printf '<html><body style="font-family:Arial,Helvetica,sans-serif;font-size:16px"><p>Stock file not found: <code>%s</code></p></body></html>\n' "$CSV" > email_body.html
-            exit 0
-          fi
-
-          python3 scripts/gen_low_stock_email.py \
-            --current "$CSV" \
-            --prev prev.csv \
-            --prev-root prev_tree \
-            --logo-path "${{ env.LOGO_PATH }}"
-
+          python3 scripts/gen_low_stock_email.py --current "${{ env.STOCK_PATH }}" --logo-path "${{ env.LOGO_PATH }}"
           COUNT=$(cat count.txt 2>/dev/null || echo 0)
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
@@ -83,13 +42,8 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-
           subject: "LOW STOCK ALERT"
           from: "\"STOCK ALERT!!\" <${{ secrets.FROM_EMAIL }}>"
           to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
-          secure: ${{ secrets.SMTP_SECURE || 'false' }}  # 587→false, 465→true
-
-          # Envia com HTML (renderitzat a Outlook/Gmail)
+          secure: ${{ secrets.SMTP_SECURE || 'false' }}   # 587→false, 465→true
           html_body: file://email_body.html
-
-          # attachments: docs/stock.csv   # opcional
