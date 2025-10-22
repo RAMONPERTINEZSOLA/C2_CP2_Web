@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2   # per tenir HEAD^ i poder comparar el CSV anterior
+          fetch-depth: 2   # per comparar amb HEAD^ el CSV anterior
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -49,11 +49,7 @@ jobs:
           if [ ! -f "$CSV" ]; then
             echo "CSV not found at $CSV" >&2
             echo "count=0" >> "$GITHUB_OUTPUT"
-            cat > email_body.html <<HTML
-            <html><body style="font-family:Arial,Helvetica,sans-serif;font-size:16px">
-              <p style="margin:0">Stock file not found: <code>${CSV}</code></p>
-            </body></html>
-HTML
+            printf '<html><body style="font-family:Arial,Helvetica,sans-serif;font-size:16px"><p style="margin:0">Stock file not found: <code>%s</code></p></body></html>\n' "$CSV" > email_body.html
             exit 0
           fi
 
@@ -81,5 +77,4 @@ HTML
           secure: ${{ secrets.SMTP_SECURE || 'false' }}   # 587→false, 465→true
           content_type: text/html
           body: file://email_body.html
-          # Pots adjuntar el CSV si vols:
-          # attachments: docs/stock.csv
+          # attachments: docs/stock.csv   # (opcional) adjuntar CSV
