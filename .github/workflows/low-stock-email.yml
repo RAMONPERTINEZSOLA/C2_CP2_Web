@@ -69,12 +69,21 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          # 1) Assumpte curt
+
+          # Assumpte curt
           subject: "LOW STOCK ALERT"
-          # 2) Remitent amb nom personalitzat
+
+          # Remitent personalitzat (nom visible)
           from: "\"STOCK ALERT!!\" <${{ secrets.FROM_EMAIL }}>"
+
+          # Destinataris
           to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
+
+          # TLS segons port
           secure: ${{ secrets.SMTP_SECURE || 'false' }}   # 587→false, 465→true
-          content_type: text/html
-          body: file://email_body.html
-          # attachments: docs/stock.csv   # (opcional) adjuntar CSV
+
+          # ✅ Cos HTML correcte (renderitzat)
+          html_body: file://email_body.html
+
+          # (opcional) per adjuntar el CSV original
+          # attachments: docs/stock.csv
