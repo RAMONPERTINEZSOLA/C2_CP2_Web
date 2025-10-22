@@ -10,6 +10,8 @@ on:
 env:
   STOCK_PATH: docs/stock.csv
   DEFAULT_MIN_STOCK: "2"
+  # Ruta (al repo) del logo. Si no existeix, el script el saltarà.
+  LOGO_PATH: docs/assets/parcsafe-logo.png
 
 jobs:
   check-and-email:
@@ -19,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2   # <- NECESSARI per poder llegir HEAD^ (CSV anterior)
+          fetch-depth: 2   # per tenir HEAD^ i poder comparar el CSV anterior
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -31,14 +33,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Intenta extreure el CSV anterior a aquest commit
           if git show HEAD^:${{ env.STOCK_PATH }} > prev.csv 2>/dev/null; then
             echo "has_prev=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_prev=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Detect newly low-stock items and build email body
+      - name: Detect newly low-stock items and build HTML email
         id: detect
         shell: bash
         run: |
@@ -48,12 +49,18 @@ jobs:
           if [ ! -f "$CSV" ]; then
             echo "CSV not found at $CSV" >&2
             echo "count=0" >> "$GITHUB_OUTPUT"
-            printf "Stock file not found: %s\n" "$CSV" > email_body.txt
+            cat > email_body.html <<HTML
+            <html><body style="font-family:Arial,Helvetica,sans-serif;font-size:16px">
+              <p style="margin:0">Stock file not found: <code>${CSV}</code></p>
+            </body></html>
+HTML
             exit 0
           fi
 
-          # Executa l’script Python comparant present vs. anterior (si existeix prev.csv)
-          python3 scripts/gen_low_stock_email.py --current "$CSV" --prev prev.csv
+          python3 scripts/gen_low_stock_email.py \
+            --current "$CSV" \
+            --prev prev.csv \
+            --logo-path "${{ env.LOGO_PATH }}"
 
           COUNT=$(cat count.txt 2>/dev/null || echo 0)
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
@@ -66,8 +73,13 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "Low Stock Alert — ${{ github.repository }}"
-          from: ${{ secrets.FROM_EMAIL }}
+          # 1) Assumpte curt
+          subject: "LOW STOCK ALERT"
+          # 2) Remitent amb nom personalitzat
+          from: "\"STOCK ALERT!!\" <${{ secrets.FROM_EMAIL }}>"
           to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
           secure: ${{ secrets.SMTP_SECURE || 'false' }}   # 587→false, 465→true
-          body: file://email_body.txt                    # <-- FIX: file://
+          content_type: text/html
+          body: file://email_body.html
+          # Pots adjuntar el CSV si vols:
+          # attachments: docs/stock.csv
