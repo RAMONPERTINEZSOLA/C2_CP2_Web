@@ -1,5 +1,5 @@
 # scripts/gen_low_stock_email.py
-import csv, os, argparse, glob, html
+import csv, os, argparse, glob, html, re
 
 def to_int(x, fb=None):
     try:
@@ -21,7 +21,7 @@ def load_csv(path):
         if has_header:
             next(reader, None)
         for r in reader:
-            if not r: 
+            if not r:
                 continue
             r = (r + [""]*6)[:6]
             drawer, qty, pname, pcode, desc, minsto = r
@@ -31,7 +31,7 @@ def load_csv(path):
                 "productName": str(pname).strip(),
                 "productCode": str(pcode).strip(),
                 "description": str(desc).strip(),
-                "minStock": to_int(minsto, fb=None),
+                "minStock": to_int(minsto, fb=None),  # pot venir buit
             })
     return rows
 
@@ -39,11 +39,9 @@ def map_by_code(rows):
     return {r["drawerCode"]: r for r in rows if r["drawerCode"]}
 
 def raw_github_url(repo: str, branch: str, path: str) -> str:
-    # URL raw per incrustar imatges al correu
     return f"https://raw.githubusercontent.com/{repo}/{branch}/{path}"
 
 def find_product_image(drawer_code: str):
-    """Cerca una imatge que contingui el drawer_code al nom dins docs/**/img o docs/**/images."""
     if not drawer_code:
         return None
     patterns = [
@@ -62,11 +60,41 @@ def find_product_image(drawer_code: str):
             return hits[0].replace("\\", "/")
     return None
 
+def find_html_for_code(drawer_code: str):
+    """Torna el primer HTML dins docs/** que contingui el drawer_code al nom."""
+    if not drawer_code:
+        return None
+    pattern = f"docs/**/*.html"
+    for p in glob.glob(pattern, recursive=True):
+        name = os.path.basename(p)
+        if drawer_code in name:
+            return p.replace("\\", "/")
+    return None
+
+MIN_PATTERNS = [
+    re.compile(r'data[-_]?min[-_]?stock\s*=\s*["\']?(\d+)', re.I),
+    re.compile(r'id=["\']min[-_]?stock["\'][^>]*>\s*(\d+)\s*<', re.I),
+    re.compile(r'(?:min(?:imum)?\s*stock|stock\s*min(?:im)?)\D{0,20}(\d+)', re.I),
+]
+
+def read_min_from_html(html_path):
+    """Intenta detectar minStock dins l'HTML amb diversos patrons."""
+    try:
+        with open(html_path, "r", encoding="utf-8") as f:
+            text = f.read()
+    except Exception:
+        return None
+    for rx in MIN_PATTERNS:
+        m = rx.search(text)
+        if m:
+            return to_int(m.group(1), fb=None)
+    return None
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--current", default=os.environ.get("STOCK_PATH", "docs/stock.csv"))
     ap.add_argument("--prev", default="prev.csv")
-    ap.add_argument("--default-min", type=int, default=int(os.environ.get("DEFAULT_MIN_STOCK", "2")))
+    ap.add_argument("--default-min", type=int, default=int(os.environ.get("DEFAULT_MIN_STOCK", "10")))
     ap.add_argument("--logo-path", default=os.environ.get("LOGO_PATH", "docs/assets/parcsafe-logo.png"))
     ap.add_argument("--branch", default=os.environ.get("GITHUB_REF_NAME", "main"))
     args = ap.parse_args()
@@ -76,14 +104,36 @@ if __name__ == "__main__":
     cur_rows = load_csv(args.current)
     prev_rows = load_csv(args.prev) if os.path.isfile(args.prev) else []
 
+    # Mapes per codi
     cur = map_by_code(cur_rows)
     prev = map_by_code(prev_rows)
 
-    newly_low = []  # ítems que han passat d'OK -> LOW en aquest commit
+    # Enriquir minStock des de HTML si no ve al CSV
+    for code, r in cur.items():
+        if r["minStock"] is None or r["minStock"] == "":
+            html_path = find_html_for_code(code)
+            if html_path:
+                html_min = read_min_from_html(html_path)
+                if html_min is not None:
+                    r["minStock"] = html_min
+        if r["minStock"] is None:
+            r["minStock"] = args.default_min
+
+    for code, r in prev.items():
+        if r["minStock"] is None or r["minStock"] == "":
+            html_path = find_html_for_code(code)
+            if html_path:
+                html_min = read_min_from_html(html_path)
+                if html_min is not None:
+                    r["minStock"] = html_min
+        if r["minStock"] is None:
+            r["minStock"] = args.default_min
+
+    newly_low = []  # OK -> LOW en aquest commit
 
     for code, r in cur.items():
         qty_now = r["stockQty"]
-        min_now = r["minStock"] if r["minStock"] is not None else args.default_min
+        min_now = r["minStock"]
         if qty_now is None:
             continue
         is_low_now = qty_now <= min_now
@@ -93,7 +143,7 @@ if __name__ == "__main__":
             was_low_before = False
         else:
             qty_prev = pr["stockQty"]
-            min_prev = pr["minStock"] if pr["minStock"] is not None else args.default_min
+            min_prev = pr["minStock"]
             was_low_before = (qty_prev is not None) and (qty_prev <= min_prev)
 
         if is_low_now and not was_low_before:
@@ -109,7 +159,7 @@ if __name__ == "__main__":
                 "image_url": img_url,
             })
 
-    # Logo Parcsafe si existeix al repo
+    # Logo Parcsafe si existeix
     logo_url = None
     if args.logo_path and os.path.isfile(args.logo_path) and repo:
         logo_url = raw_github_url(repo, args.branch, args.logo_path.replace("\\", "/"))
@@ -177,6 +227,5 @@ if __name__ == "__main__":
     with open("email_body.html", "w", encoding="utf-8") as f:
         f.write(html_doc)
 
-    # Recompte per al workflow
     with open("count.txt", "w", encoding="utf-8") as f:
         f.write(str(len(newly_low)))

@@ -5,12 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'docs/stock.csv'
+      - 'docs/**/*.html'       # <- també quan canvies els HTML
   workflow_dispatch:
 
 env:
   STOCK_PATH: docs/stock.csv
-  DEFAULT_MIN_STOCK: "2"
-  # Ruta (al repo) del logo. Si no existeix, el script el saltarà.
+  DEFAULT_MIN_STOCK: "10"      # valor per defecte si no és al CSV ni a l'HTML
   LOGO_PATH: docs/assets/parcsafe-logo.png
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2   # per comparar amb HEAD^ el CSV anterior
+          fetch-depth: 2   # per comparar amb HEAD^
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -49,7 +49,7 @@ jobs:
           if [ ! -f "$CSV" ]; then
             echo "CSV not found at $CSV" >&2
             echo "count=0" >> "$GITHUB_OUTPUT"
-            printf '<html><body style="font-family:Arial,Helvetica,sans-serif;font-size:16px"><p style="margin:0">Stock file not found: <code>%s</code></p></body></html>\n' "$CSV" > email_body.html
+            printf '<html><body style="font-family:Arial,Helvetica,sans-serif;font-size:16px"><p>Stock file not found: <code>%s</code></p></body></html>\n' "$CSV" > email_body.html
             exit 0
           fi
 
@@ -69,21 +69,9 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-
-          # Assumpte curt
           subject: "LOW STOCK ALERT"
-
-          # Remitent personalitzat (nom visible)
           from: "\"STOCK ALERT!!\" <${{ secrets.FROM_EMAIL }}>"
-
-          # Destinataris
           to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
-
-          # TLS segons port
           secure: ${{ secrets.SMTP_SECURE || 'false' }}   # 587→false, 465→true
-
-          # ✅ Cos HTML correcte (renderitzat)
           html_body: file://email_body.html
-
-          # (opcional) per adjuntar el CSV original
-          # attachments: docs/stock.csv
+          # attachments: docs/stock.csv   # opcional
