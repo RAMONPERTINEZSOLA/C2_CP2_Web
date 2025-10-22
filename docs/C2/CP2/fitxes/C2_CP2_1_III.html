@@ -4,38 +4,47 @@
   <meta charset="UTF-8" />
   <title>C2_CP2_1_III</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 40px;
-      max-width: 800px;
+    body { font-family: sans-serif; margin: 40px; max-width: 800px; }
+    h1 { font-size: 24px; margin-bottom: 10px; }
+    a.button { display: inline-block; padding: 10px 20px; margin-bottom: 30px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+    .images { display: flex; gap: 40px; flex-wrap: wrap; }
+    .images img { max-width: 350px; border: 1px solid #ddd; padding: 5px; background: #f9f9f9; }
+    .description { margin-top: 30px; font-size: 16px; }
+
+    /* --- Stock UI styles --- */
+    .stock-ui{margin:20px 0;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fafafa}
+    .stock-ui .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .stock-ui button{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;background:#0d6efd;color:#fff;font-weight:600}
+    .stock-ui button.secondary{background:#6c757d}
+    .stock-ui .pill{padding:6px 10px;border-radius:999px;background:#e9ecef;font-variant-numeric:tabular-nums}
+    .stock-ui input[type="number"]{width:120px;padding:8px 10px;border:1px solid #ccc;border-radius:8px}
+    .stock-ui .save{background:#198754}
+    .stock-ui .danger{background:#dc3545}
+
+    .stock-ui .warn{
+      margin-top:12px;padding:10px 14px;border-radius:10px;
+      background:#ffe3e3;color:#b3261e;font-weight:700;display:none;
+      border:1px solid #f3b5b5;
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-decoration-color: #f0a0a0;
     }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
+    .stock-ui .warn.pulse{display:block;animation:pulse 1s infinite}
+    .stock-ui .warn.pulse::before{content:"❗❗"; margin-right:8px; display:inline-block; animation:wiggle .8s infinite;}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,53,69,.35)}70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}}
+    @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background-color: #198754; color: white; padding: 10px 20px; border-radius: 8px;
+      font-weight: 600; display: none; animation: fade 3s ease forwards;
     }
-    a.button {
-      display: inline-block;
-      padding: 10px 20px;
-      margin-bottom: 30px;
-      background-color: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-    .images {
-      display: flex;
-      gap: 40px;
-      flex-wrap: wrap;
-    }
-    .images img {
-      max-width: 350px;
-      border: 1px solid #ddd;
-      padding: 5px;
-      background: #f9f9f9;
-    }
-    .description {
-      margin-top: 30px;
-      font-size: 16px;
+    @keyframes fade {
+      0% { opacity: 0; transform: translate(-50%, 10px); }
+      10% { opacity: 1; transform: translate(-50%, 0); }
+      90% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, 10px); }
     }
   </style>
 </head>
@@ -63,37 +72,124 @@
 
   <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
 
+  <!-- Stock UI -->
+  <div class="stock-ui" id="stockUI">
+    <div class="row">
+      <span class="pill">Current: <strong id="curQty">–</strong></span>
+      <span class="pill">Change: <strong id="delta">0</strong></span>
+      <span class="pill">New: <strong id="newQty">–</strong></span>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="minusBtn">−1</button>
+      <button id="plusBtn">+1</button>
+      <label>Exact: <input id="exactInput" type="number" min="0" step="1" /></label>
+      <button class="secondary" id="resetBtn">Reset</button>
+      <button class="save" id="saveBtn">Save</button>
+    </div>
+    <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
+  </div>
+
+  <div id="toast"></div>
+
   <script>
     const drawerCode = "C2_CP2_1_III";
+    const API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
 
-    fetch('../../../stock.csv')
-      .then(res => {
-        if (!res.ok) throw new Error("❌ Failed to load CSV file. Status: " + res.status);
-        return res.text();
-      })
+    // --- Load CSV and setup UI ---
+    fetch(`../../../stock.csv?t=${Date.now()}`)
+      .then(res => res.text())
       .then(csv => {
         const rows = csv.trim().split("\n");
         const headers = rows[0].split(",");
-        const data = rows.slice(1).map(row => {
-          const values = row.split(",");
-          return headers.reduce((obj, header, idx) => {
-            obj[header.trim()] = values[idx] ? values[idx].trim() : "";
-            return obj;
+        const data = rows.slice(1).map(r => {
+          const vals = r.split(",");
+          return headers.reduce((o, h, i) => {
+            o[h.trim()] = vals[i] ? vals[i].trim() : "";
+            return o;
           }, {});
         });
 
-        const match = data.find(row => row.drawerCode === drawerCode);
-        if (!match) throw new Error("❌ Drawer not found in CSV.");
+        const match = data.find(r => r.drawerCode === drawerCode);
+        if (!match) throw new Error("Drawer not found");
 
+        // Dades visibles
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName}`;
         document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode}`;
         document.getElementById("description-text").textContent = match.description;
+
+        // minStock (fallback 10)
+        const MIN_STOCK = parseInt(match.minStock || "10", 10);
+
+        // Stock actual + text d'avís amb el mínim real
         document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
+        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
+
+        // Inicialitza UI amb mínim
+        initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
       })
-      .catch(err => {
-        document.getElementById("stock-display").innerText =
-          "❌ Error loading stock: " + err.message;
+      .catch(e => {
+        document.getElementById("stock-display").innerText = "❌ Error: " + e.message;
       });
+
+    // --- Stock UI logic ---
+    function initStockUI(initialQty, MIN_STOCK = 10) {
+      const curEl = document.getElementById('curQty');
+      const deltaEl = document.getElementById('delta');
+      const newEl = document.getElementById('newQty');
+      const minus = document.getElementById('minusBtn');
+      const plus = document.getElementById('plusBtn');
+      const exact = document.getElementById('exactInput');
+      const reset = document.getElementById('resetBtn');
+      const save = document.getElementById('saveBtn');
+      const warn = document.getElementById('minWarn');
+      const toast = document.getElementById('toast');
+
+      let cur = initialQty, delta = 0;
+
+      function showToast(msg, color="#198754"){
+        toast.textContent = msg;
+        toast.style.backgroundColor = color;
+        toast.style.display = "block";
+        setTimeout(()=> toast.style.display="none", 2500);
+      }
+
+      function refresh(){
+        curEl.textContent = cur;
+        deltaEl.textContent = delta > 0 ? '+' + delta : delta;
+        const nv = cur + delta;
+        newEl.textContent = nv;
+        exact.value = nv;
+        document.getElementById('stock-display').textContent = '📦 STOCK: ' + nv;
+        if (nv < MIN_STOCK) { warn.classList.add('pulse'); warn.style.display='block'; }
+        else { warn.classList.remove('pulse'); warn.style.display='none'; }
+      }
+
+      minus.addEventListener('click', ()=>{ delta -= 1; refresh(); });
+      plus.addEventListener('click', ()=>{ delta += 1; refresh(); });
+      exact.addEventListener('input', ()=>{ const v=parseInt(exact.value,10); if(!isNaN(v)){ delta=v-cur; refresh(); }});
+      reset.addEventListener('click', ()=>{ delta=0; refresh(); });
+
+      // SAVE → update via API (el correu el farà GitHub Actions quan es commitegi el CSV)
+      save.addEventListener('click', async ()=> {
+        const newVal = cur + delta;
+        if(!confirm(`Are you sure you want to update the stock to ${newVal}?`)) return;
+        try{
+          const r = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ drawerCode, newQty: newVal })
+          });
+          if (!r.ok) throw new Error(await r.text());
+          cur = newVal; delta = 0; refresh();
+          showToast('✔️ Stock successfully updated');
+        }catch(e){
+          console.error(e);
+          showToast('❌ Error updating stock', '#b3261e');
+        }
+      });
+
+      refresh();
+    }
   </script>
 </body>
 </html>
