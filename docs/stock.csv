@@ -139,7 +139,7 @@ C3_3_III_C,21,0,20.03-ENT-----10,0,10
 C3_3_IV_A,21,Power & Signal Cable for Boom Gate System,20.03-ENT-P&S-10,"Custom harness with power terminals and RJ-style connector, typically used for wiring boom gate motors or controllers. Includes female spade connectors, a twisted pair for signal/data, and extra lines for sensors or auxiliary devices. Designed for quick installation and reliable field connections.",10
 C3_3_IV_B,21,VAUTEX VS7A-12,20.03-ENT-VVS-10,"12V 7Ah sealed rechargeable lead-acid battery (AGM type), designed for high-rate discharge applications such as backup systems, access control, alarms, and emergency power. Features voltage regulation for standby use (13.6–13.9V) and cyclic use (14.5–15.0V). Maintenance-free and leak-proof.",10
 C3_3_V_A,21,Motor 24 BLDC 100W,20.03-ENT-M2B-10,Motor 24 BLDC 100W,10
-C3_3_V_B,21,Power Switch ON - OFF,20.03-ENT-PSO-10,Power Switch ON - OFF,10
+C3_3_V_B,6,Power Switch ON - OFF,20.03-ENT-PSO-10,Power Switch ON - OFF,10
 C3_3_V_C,21,Switch Plate,20.03-ENT-SPL-10,Switch Plate,10
 C3_3_VI,21,0,20.03-ENT-----10,0,10
 C3_4_I,55555,0,#SPILL!,0,10
