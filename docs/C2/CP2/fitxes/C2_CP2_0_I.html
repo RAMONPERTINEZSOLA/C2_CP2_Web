@@ -5,22 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>C2_CP2_0_I — Parcsafe Drawer</title>
 
+  <!-- Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --green:#6dbd45;
-      --green-2:#5aa83a;
-      --ink:#222;
-      --muted:#667085;
-      --bg:#f5f7f8;
-      --card:#ffffff;
-      --line:#e6e8eb;
-      --danger:#b3261e;
-      --brand-shadow: 0 6px 24px rgba(109,189,69,0.18);
-      --radius:16px;
+      --green:#6dbd45; --green-2:#5aa83a; --ink:#222; --muted:#667085;
+      --bg:#f5f7f8; --card:#ffffff; --line:#e6e8eb; --danger:#b3261e;
+      --brand-shadow:0 6px 24px rgba(109,189,69,.18); --radius:16px;
     }
     *{box-sizing:border-box}
     body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0}
@@ -94,7 +88,7 @@
 
     <h1 class="title">
       Drawer details
-      <span class="drawer-code" id="drawerCodeBadge"></span>
+      <span class="drawer-code">C2_CP2_0_I</span>
     </h1>
 
     <div class="meta">
@@ -109,13 +103,13 @@
       <div class="card">
         <h3>Drawer Photo</h3>
         <div class="imgwrap">
-          <img id="drawerImg" alt="Drawer image" />
+          <img id="drawerImg" src="../images/C2_CP2_0_I.jpg" alt="Drawer image C2_CP2_0_I" />
         </div>
         <div class="spacer"></div>
         <div class="row">
           <button class="btn" id="uploadPhotoBtn">🖼️ Update Drawer Photo</button>
           <button class="btn ghost" id="refreshImgBtn">Refresh</button>
-          <span class="note">The new image will be renamed to <strong id="renameNote">CODE.jpg</strong> automatically.</span>
+          <span class="note">The new image will be renamed to <strong>C2_CP2_0_I.jpg</strong> automatically.</span>
         </div>
         <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display:none" />
       </div>
@@ -123,7 +117,7 @@
       <div class="card">
         <h3>Cabinet Highlight</h3>
         <div class="imgwrap">
-          <img id="cabImg" alt="Cabinet highlight" />
+          <img id="cabImg" src="../images/C2_CP2_cabinet_C2_CP2_0_I.png" alt="Cabinet highlight" />
         </div>
       </div>
     </div>
@@ -185,32 +179,14 @@
   </dialog>
 
   <script>
-    // ====== Resolve base paths from /docs/ root ======
-    const parts = location.pathname.split('/').filter(Boolean);
-    const docsIdx = parts.lastIndexOf('docs');
-    const baseDocs = '/' + parts.slice(0, docsIdx + 1).join('/');
-    const STOCK_CSV_URL = baseDocs + '/stock.csv';
-    const IMAGES_BASE  = baseDocs + '/images';
-
-    // ====== Drawer code from filename ======
-    const fileName = decodeURIComponent(parts[parts.length - 1] || '');
-    const drawerCode = fileName.replace(/\.html?$/i, '') || 'C2_CP2_0_I';
-    document.getElementById('drawerCodeBadge').textContent = drawerCode;
-    document.getElementById('renameNote').textContent = drawerCode + '.jpg';
-
-    // Image sources (depend on code)
-    const drawerImg = document.getElementById('drawerImg');
-    const cabImg = document.getElementById('cabImg');
-    drawerImg.src = IMAGES_BASE + '/' + drawerCode + '.jpg';
-    drawerImg.alt = 'Drawer image ' + drawerCode;
-    cabImg.src = IMAGES_BASE + '/C2_CP2_cabinet_' + drawerCode + '.png';
-
-    // ====== API endpoints (unchanged) ======
+    // --- CONSTANTS (like v9) ---
+    const drawerCode = "C2_CP2_0_I";
+    const STOCK_CSV = "../../../stock.csv"; // back to the original relative path
     const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
 
-    // ====== Toast helper ======
+    // Toast
     const toast = document.getElementById("toast");
     function showToast(msg, color="#198754"){
       toast.textContent = msg;
@@ -219,22 +195,26 @@
       setTimeout(()=> toast.style.display="none", 2600);
     }
 
-    // ====== LOAD CSV & SETUP UI ======
-    fetch(STOCK_CSV_URL + '?t=' + Date.now())
+    // --- Load CSV and setup UI (back to v9 logic) ---
+    fetch(STOCK_CSV + "?t=" + Date.now())
       .then(res => res.text())
       .then(csv => {
         const rows = csv.trim().split("\\n");
         const headers = rows[0].split(",");
         const data = rows.slice(1).map(r => {
           const vals = r.split(",");
-          return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
+          return headers.reduce((o, h, i) => {
+            o[h.trim()] = vals[i] ? vals[i].trim() : "";
+            return o;
+          }, {});
         });
-        const match = data.find(r => (r.drawerCode || '').trim() === drawerCode);
-        if (!match) throw new Error("Drawer not found in CSV: " + drawerCode);
 
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ''}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ''}`;
-        document.getElementById("description-text").textContent = match.description || '';
+        const match = data.find(r => r.drawerCode === drawerCode);
+        if (!match) throw new Error("Drawer not found");
+
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ""}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ""}`;
+        document.getElementById("description-text").textContent = match.description || "";
 
         const MIN_STOCK = parseInt(match.minStock || "10", 10);
         document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
@@ -251,7 +231,7 @@
         document.getElementById("stock-display").innerText = "❌ Error: " + e.message;
       });
 
-    // ====== STOCK UI LOGIC ======
+    // --- Stock UI logic ---
     function initStockUI(initialQty, MIN_STOCK = 10) {
       const curEl = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
@@ -303,14 +283,15 @@
       refresh();
     }
 
-    // ====== IMAGE UPLOAD ======
+    // --- Image upload (unchanged) ---
     const uploadBtn = document.getElementById('uploadPhotoBtn');
     const refreshImgBtn = document.getElementById('refreshImgBtn');
     const fileInput = document.getElementById('fileInput');
+    const drawerImg = document.getElementById('drawerImg');
 
     uploadBtn.addEventListener('click', ()=> fileInput.click());
     refreshImgBtn.addEventListener('click', ()=> {
-      drawerImg.src = IMAGES_BASE + '/' + drawerCode + '.jpg?t=' + Date.now();
+      drawerImg.src = `../images/${drawerCode}.jpg?t=${Date.now()}`;
       showToast('🔄 Image refreshed');
     });
 
@@ -328,7 +309,7 @@
         const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
-        drawerImg.src = IMAGES_BASE + '/' + drawerCode + '.jpg?t=' + Date.now();
+        drawerImg.src = `../images/${drawerCode}.jpg?t=${Date.now()}`;
       }catch(err){
         console.error(err);
         showToast('❌ Error uploading image', '#b3261e');
@@ -337,7 +318,7 @@
       }
     });
 
-    // ====== EDIT PRODUCT INFO (MODAL) ======
+    // --- Edit Product Info (modal) ---
     const editBtn = document.getElementById('editInfoBtn');
     const modal = document.getElementById('editModal');
     const saveInfoBtn = document.getElementById('saveInfoBtn');
