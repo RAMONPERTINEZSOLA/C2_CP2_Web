@@ -2,43 +2,117 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>C2_CP2_0_I</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>C2_CP2_0_I — Parcsafe Drawer</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: sans-serif; margin: 40px; max-width: 800px; }
-    h1 { font-size: 24px; margin-bottom: 10px; }
-    a.button { display: inline-block; padding: 10px 20px; margin-bottom: 30px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
-    .images { display: flex; gap: 40px; flex-wrap: wrap; }
-    .images img { max-width: 350px; border: 1px solid #ddd; padding: 5px; background: #f9f9f9; }
-    .description { margin-top: 30px; font-size: 16px; }
+    :root{
+      --green:#6dbd45;
+      --green-2:#5aa83a;
+      --ink:#222;
+      --muted:#667085;
+      --bg:#f5f7f8;
+      --card:#ffffff;
+      --line:#e6e8eb;
+      --danger:#b3261e;
+      --brand-shadow: 0 6px 24px rgba(109,189,69,0.18);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      margin:0;
+    }
+    .container{max-width:1100px;margin:40px auto;padding:0 20px}
 
-    /* --- Stock UI styles --- */
-    .stock-ui{margin:20px 0;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fafafa}
+    header.bar{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:16px;margin-bottom:20px;
+    }
+    .back{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:10px 14px;border-radius:999px;border:1px solid var(--line);
+      background:var(--card); text-decoration:none; color:var(--ink);
+      font-weight:600;
+    }
+    .logo{height:28px;object-fit:contain}
+    .brand{display:flex;align-items:center;gap:10px}
+
+    h1.title{
+      font-size:26px;margin:10px 0 6px 0;
+      display:flex;align-items:center;gap:10px;
+    }
+    .drawer-code{
+      font-size:12px;color:#475467;background:#eef4ff;border:1px solid #d6e4ff;
+      padding:4px 8px;border-radius:999px;font-weight:700;
+      letter-spacing:.3px;
+    }
+
+    .meta{
+      display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-bottom:6px;
+      color:var(--muted);
+    }
+    .meta strong{color:var(--ink)}
+
+    .cards{
+      display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:12px;
+    }
+    .card{
+      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+      padding:16px; box-shadow: var(--brand-shadow);
+    }
+    .card h3{margin:0 0 12px 0;font-size:16px}
+    .card .imgwrap{
+      border:1px dashed #cdd4d9; background:#fafafa;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;min-height:270px;overflow:hidden;
+    }
+    .card img{max-width:100%; height:auto; display:block}
+
+    .btn{
+      border:none;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer;
+      background:var(--green);color:#fff;box-shadow: var(--brand-shadow);
+      transition:transform .04s ease, background .2s ease;
+    }
+    .btn:hover{background:var(--green-2)}
+    .btn:active{transform:translateY(1px)}
+    .btn.secondary{background:#98a2b3}
+    .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+
+    .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .spacer{height:10px}
+
+    /* Stock UI (reused + refreshed) */
+    .stock-ui{margin:20px 0;padding:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--brand-shadow)}
     .stock-ui .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-    .stock-ui button{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;background:#0d6efd;color:#fff;font-weight:600}
+    .stock-ui button{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;background:var(--green);color:#fff;font-weight:600}
     .stock-ui button.secondary{background:#6c757d}
-    .stock-ui .pill{padding:6px 10px;border-radius:999px;background:#e9ecef;font-variant-numeric:tabular-nums}
-    .stock-ui input[type="number"]{width:120px;padding:8px 10px;border:1px solid #ccc;border-radius:8px}
+    .stock-ui .pill{padding:6px 10px;border-radius:999px;background:#eef2f6;border:1px solid #dde3ea;font-variant-numeric:tabular-nums}
+    .stock-ui input[type="number"]{width:120px;padding:8px 10px;border:1px solid #c9cfd6;border-radius:8px}
     .stock-ui .save{background:#198754}
-    .stock-ui .danger{background:#dc3545}
-
     .stock-ui .warn{
-      margin-top:12px;padding:10px 14px;border-radius:10px;
-      background:#ffe3e3;color:#b3261e;font-weight:700;display:none;
-      border:1px solid #f3b5b5;
-      text-decoration: underline;
-      text-decoration-thickness: 3px;
-      text-decoration-color: #f0a0a0;
+      margin-top:12px;padding:10px 14px;border-radius:10px;background:#ffe3e3;color:var(--danger);font-weight:700;display:none;border:1px solid #f3b5b5;
     }
     .stock-ui .warn.pulse{display:block;animation:pulse 1s infinite}
     .stock-ui .warn.pulse::before{content:"❗❗"; margin-right:8px; display:inline-block; animation:wiggle .8s infinite;}
     @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,53,69,.35)}70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}}
     @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
 
+    .stock-display{
+      font-size:40px;margin:24px 0;text-align:center;
+    }
+
     /* Toast */
     #toast {
       position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background-color: #198754; color: white; padding: 10px 20px; border-radius: 8px;
-      font-weight: 600; display: none; animation: fade 3s ease forwards;
+      background-color: #198754; color: white; padding: 10px 20px; border-radius: 10px;
+      font-weight: 700; display: none; animation: fade 3s ease forwards; z-index:1000;
     }
     @keyframes fade {
       0% { opacity: 0; transform: translate(-50%, 10px); }
@@ -46,92 +120,178 @@
       90% { opacity: 1; transform: translate(-50%, 0); }
       100% { opacity: 0; transform: translate(-50%, 10px); }
     }
+
+    /* Modal (product edit) */
+    dialog.modal{
+      border:none;border-radius:16px;padding:0;max-width:560px;width:96%;box-shadow:0 24px 60px rgba(16,24,40,.2);
+    }
+    .modal .hd{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+    .modal .bd{padding:16px 18px}
+    .modal .ft{padding:16px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
+    .fld{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    .fld label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+    .fld input,.fld textarea{
+      padding:10px 12px;border-radius:10px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:14px;
+    }
+    .fld textarea{min-height:100px;resize:vertical}
+    .close-x{background:transparent;border:none;font-size:20px;cursor:pointer}
+    .note{color:var(--muted);font-size:12px;margin-top:6px}
   </style>
 </head>
 <body>
-  <a href="../index.html" class="button">← Back to index</a>
+  <div class="container">
 
-  <h1>Drawer: C2_CP2_0_I</h1>
-  <p id="product-name"><strong>Product Name:</strong> loading...</p>
-  <p id="product-code"><strong>Product Code:</strong> loading...</p>
+    <header class="bar">
+      <a class="back" href="../index.html">← Back to index</a>
+      <div class="brand">
+        <img class="logo" src="../images/parcsafe-logo.png" alt="Parcsafe" onerror="this.style.display='none'">
+      </div>
+    </header>
 
-  <div class="images">
-    <div>
-      <p><strong>Drawer Photo:</strong></p>
-      <img src="../images/C2_CP2_0_I.jpg" alt="Drawer image C2_CP2_0_I" />
+    <h1 class="title">
+      Drawer details
+      <span class="drawer-code" id="drawerCodeBadge">C2_CP2_0_I</span>
+    </h1>
+
+    <div class="meta">
+      <div id="product-name"><strong>Product Name:</strong> loading...</div>
+      <div id="product-code"><strong>Product Code:</strong> loading...</div>
     </div>
-    <div>
-      <p><strong>Cabinet Highlight:</strong></p>
-      <img src="../images/C2_CP2_cabinet_C2_CP2_0_I.png" alt="Cabinet highlight" />
+
+    <div class="cards">
+      <div class="card">
+        <h3>Drawer Photo</h3>
+        <div class="imgwrap">
+          <img id="drawerImg" src="../images/C2_CP2_0_I.jpg" alt="Drawer image C2_CP2_0_I" />
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <button class="btn" id="uploadPhotoBtn">🖼️ Update Drawer Photo</button>
+          <button class="btn ghost" id="refreshImgBtn">Refresh</button>
+          <span class="note">The new image will be renamed to <strong>C2_CP2_0_I.jpg</strong> automatically.</span>
+        </div>
+        <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display:none" />
+      </div>
+
+      <div class="card">
+        <h3>Cabinet Highlight</h3>
+        <div class="imgwrap">
+          <img src="../images/C2_CP2_cabinet_C2_CP2_0_I.png" alt="Cabinet highlight" />
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <button class="btn secondary" id="editInfoBtn">✏️ Edit Product Info</button>
+        </div>
+      </div>
     </div>
+
+    <div class="card" style="margin-top:20px">
+      <h3>Description</h3>
+      <div id="description-text" style="line-height:1.6">loading...</div>
+    </div>
+
+    <div class="stock-display" id="stock-display">Loading stock...</div>
+
+    <!-- Stock UI -->
+    <div class="stock-ui" id="stockUI">
+      <div class="row">
+        <span class="pill">Current: <strong id="curQty">–</strong></span>
+        <span class="pill">Change: <strong id="delta">0</strong></span>
+        <span class="pill">New: <strong id="newQty">–</strong></span>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button id="minusBtn">−1</button>
+        <button id="plusBtn">+1</button>
+        <label>Exact: <input id="exactInput" type="number" min="0" step="1" /></label>
+        <button class="secondary" id="resetBtn">Reset</button>
+        <button class="save" id="saveBtn">Save</button>
+      </div>
+      <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
+    </div>
+
+    <div id="toast"></div>
   </div>
 
-  <div class="description">
-    <p><strong>Description:</strong> <span id="description-text">loading...</span></p>
-  </div>
-
-  <h2 id="stock-display" style="font-size: 40px; margin-top: 40px; text-align: center;">Loading stock...</h2>
-
-  <!-- Stock UI -->
-  <div class="stock-ui" id="stockUI">
-    <div class="row">
-      <span class="pill">Current: <strong id="curQty">–</strong></span>
-      <span class="pill">Change: <strong id="delta">0</strong></span>
-      <span class="pill">New: <strong id="newQty">–</strong></span>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button id="minusBtn">−1</button>
-      <button id="plusBtn">+1</button>
-      <label>Exact: <input id="exactInput" type="number" min="0" step="1" /></label>
-      <button class="secondary" id="resetBtn">Reset</button>
-      <button class="save" id="saveBtn">Save</button>
-    </div>
-    <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
-  </div>
-
-  <div id="toast"></div>
+  <!-- Modal (Edit Product Info) -->
+  <dialog class="modal" id="editModal">
+    <form method="dialog" id="editForm">
+      <div class="hd">
+        <strong>Edit product info</strong>
+        <button class="close-x" value="cancel" aria-label="Close">✕</button>
+      </div>
+      <div class="bd">
+        <div class="fld">
+          <label for="fldName">Product Name</label>
+          <input id="fldName" type="text" required />
+        </div>
+        <div class="fld">
+          <label for="fldCode">Product Code</label>
+          <input id="fldCode" type="text" required />
+        </div>
+        <div class="fld">
+          <label for="fldDesc">Description</label>
+          <textarea id="fldDesc" required></textarea>
+        </div>
+        <div class="note">All three fields are required. Changes will be logged by email.</div>
+      </div>
+      <div class="ft">
+        <button class="btn ghost" value="cancel">Cancel</button>
+        <button class="btn" id="saveInfoBtn" value="default">Save changes</button>
+      </div>
+    </form>
+  </dialog>
 
   <script>
-    const drawerCode = "C2_CP2_0_I";
-    const API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
+    // ====== CONFIG ======
+    const drawerCode = "C2_CP2_0_I"; // immutable
+    const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
+    const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image"; // expects: form-data { image: File, drawerCode }
+    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info"; // expects JSON { drawerCode, productName, productCode, description }
 
-    // --- Load CSV and setup UI ---
+    // ====== HELPERS ======
+    const toast = document.getElementById("toast");
+    function showToast(msg, color="#198754"){
+      toast.textContent = msg;
+      toast.style.backgroundColor = color;
+      toast.style.display = "block";
+      setTimeout(()=> toast.style.display="none", 2600);
+    }
+
+    // ====== LOAD CSV & SETUP UI ======
     fetch(`../../../stock.csv?t=${Date.now()}`)
       .then(res => res.text())
       .then(csv => {
-        const rows = csv.trim().split("\n");
+        const rows = csv.trim().split("\\n");
         const headers = rows[0].split(",");
         const data = rows.slice(1).map(r => {
           const vals = r.split(",");
-          return headers.reduce((o, h, i) => {
-            o[h.trim()] = vals[i] ? vals[i].trim() : "";
-            return o;
-          }, {});
+          return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
         });
-
         const match = data.find(r => r.drawerCode === drawerCode);
         if (!match) throw new Error("Drawer not found");
 
-        // Dades visibles
+        // Visible data
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName}`;
         document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode}`;
         document.getElementById("description-text").textContent = match.description;
 
-        // minStock (fallback 10)
+        // Stock + minimum
         const MIN_STOCK = parseInt(match.minStock || "10", 10);
+        document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
+        document.getElementById("minWarn").textContent = \`LOW STOCK — minimum \${MIN_STOCK}\`;
 
-        // Stock actual + text d'avís amb el mínim real
-        document.getElementById("stock-display").innerText = "📦 STOCK: " + match.stockQty;
-        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
-
-        // Inicialitza UI amb mínim
         initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
+
+        // Prefill modal
+        document.getElementById("fldName").value = match.productName || "";
+        document.getElementById("fldCode").value = match.productCode || "";
+        document.getElementById("fldDesc").value = match.description || "";
       })
       .catch(e => {
         document.getElementById("stock-display").innerText = "❌ Error: " + e.message;
       });
 
-    // --- Stock UI logic ---
+    // ====== STOCK UI LOGIC ======
     function initStockUI(initialQty, MIN_STOCK = 10) {
       const curEl = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
@@ -142,16 +302,8 @@
       const reset = document.getElementById('resetBtn');
       const save = document.getElementById('saveBtn');
       const warn = document.getElementById('minWarn');
-      const toast = document.getElementById('toast');
 
       let cur = initialQty, delta = 0;
-
-      function showToast(msg, color="#198754"){
-        toast.textContent = msg;
-        toast.style.backgroundColor = color;
-        toast.style.display = "block";
-        setTimeout(()=> toast.style.display="none", 2500);
-      }
 
       function refresh(){
         curEl.textContent = cur;
@@ -169,12 +321,12 @@
       exact.addEventListener('input', ()=>{ const v=parseInt(exact.value,10); if(!isNaN(v)){ delta=v-cur; refresh(); }});
       reset.addEventListener('click', ()=>{ delta=0; refresh(); });
 
-      // SAVE → update via API (el correu el farà GitHub Actions quan es commitegi el CSV)
+      // SAVE → update via API (email will be fired by CI on commit)
       save.addEventListener('click', async ()=> {
         const newVal = cur + delta;
-        if(!confirm(`Are you sure you want to update the stock to ${newVal}?`)) return;
+        if(!confirm(\`Are you sure you want to update the stock to \${newVal}?\`)) return;
         try{
-          const r = await fetch(API, {
+          const r = await fetch(STOCK_API, {
             method: 'POST',
             headers: { 'Content-Type':'application/json' },
             body: JSON.stringify({ drawerCode, newQty: newVal })
@@ -190,6 +342,77 @@
 
       refresh();
     }
+
+    // ====== IMAGE UPLOAD ======
+    const uploadBtn = document.getElementById('uploadPhotoBtn');
+    const refreshImgBtn = document.getElementById('refreshImgBtn');
+    const fileInput = document.getElementById('fileInput');
+    const drawerImg = document.getElementById('drawerImg');
+
+    uploadBtn.addEventListener('click', ()=> fileInput.click());
+    refreshImgBtn.addEventListener('click', ()=> {
+      drawerImg.src = \`../images/\${drawerCode}.jpg?t=\${Date.now()}\`;
+      showToast('🔄 Image refreshed');
+    });
+
+    fileInput.addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0];
+      if(!file) return;
+      if(!/image\\/(jpeg|png)/.test(file.type)) return showToast('Only JPG/PNG allowed', '#b3261e');
+      if(file.size > 8*1024*1024) return showToast('Max 8MB image', '#b3261e');
+
+      const fd = new FormData();
+      fd.append('image', file);
+      fd.append('drawerCode', drawerCode);
+
+      try{
+        const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
+        if(!r.ok) throw new Error(await r.text());
+        showToast('✔️ Image updated successfully');
+        drawerImg.src = \`../images/\${drawerCode}.jpg?t=\${Date.now()}\`;
+      }catch(err){
+        console.error(err);
+        showToast('❌ Error uploading image', '#b3261e');
+      }finally{
+        fileInput.value = '';
+      }
+    });
+
+    // ====== EDIT PRODUCT INFO (MODAL) ======
+    const editBtn = document.getElementById('editInfoBtn');
+    const modal = document.getElementById('editModal');
+    const saveInfoBtn = document.getElementById('saveInfoBtn');
+    const fldName = document.getElementById('fldName');
+    const fldCode = document.getElementById('fldCode');
+    const fldDesc = document.getElementById('fldDesc');
+
+    editBtn.addEventListener('click', ()=> modal.showModal());
+
+    saveInfoBtn.addEventListener('click', async (ev)=>{
+      ev.preventDefault();
+      const name = fldName.value.trim();
+      const code = fldCode.value.trim();
+      const desc = fldDesc.value.trim();
+      if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
+
+      try{
+        const r = await fetch(UPDATE_INFO_ENDPOINT, {
+          method:'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ drawerCode, productName:name, productCode:code, description:desc })
+        });
+        if(!r.ok) throw new Error(await r.text());
+        // Update DOM
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${name}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${code}`;
+        document.getElementById("description-text").textContent = desc;
+        modal.close();
+        showToast('✔️ Product info updated');
+      }catch(err){
+        console.error(err);
+        showToast('❌ Error updating info', '#b3261e');
+      }
+    });
   </script>
 </body>
 </html>
