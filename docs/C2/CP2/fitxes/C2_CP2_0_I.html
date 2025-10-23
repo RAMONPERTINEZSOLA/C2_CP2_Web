@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>C2_CP2_0_I — Parcsafe Drawer</title>
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -24,115 +23,60 @@
       --radius:16px;
     }
     *{box-sizing:border-box}
-    body{
-      font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-      margin:0;
-    }
+    body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0}
     .container{max-width:1100px;margin:40px auto;padding:0 20px}
 
-    header.bar{
-      display:flex;align-items:center;justify-content:space-between;
-      gap:16px;margin-bottom:20px;
-    }
-    .back{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:10px 14px;border-radius:999px;border:1px solid var(--line);
-      background:var(--card); text-decoration:none; color:var(--ink);
-      font-weight:600;
-    }
+    header.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+    .back{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);text-decoration:none;color:var(--ink);font-weight:600}
     .logo{height:28px;object-fit:contain}
     .brand{display:flex;align-items:center;gap:10px}
 
-    h1.title{
-      font-size:26px;margin:10px 0 6px 0;
-      display:flex;align-items:center;gap:10px;
-    }
-    .drawer-code{
-      font-size:12px;color:#475467;background:#eef4ff;border:1px solid #d6e4ff;
-      padding:4px 8px;border-radius:999px;font-weight:700;
-      letter-spacing:.3px;
-    }
+    h1.title{font-size:26px;margin:10px 0 6px 0;display:flex;align-items:center;gap:10px}
+    .drawer-code{font-size:12px;color:#475467;background:#eef4ff;border:1px solid #d6e4ff;padding:4px 8px;border-radius:999px;font-weight:700;letter-spacing:.3px}
 
-    .meta{
-      display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-bottom:6px;
-      color:var(--muted);
-    }
+    .meta{display:grid;grid-template-columns:1fr auto;gap:6px 18px;margin-bottom:6px;align-items:center}
+    .meta .codeWrap{display:flex;align-items:center;gap:10px}
     .meta strong{color:var(--ink)}
-
-    .cards{
-      display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:12px;
-    }
-    .card{
-      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-      padding:16px; box-shadow: var(--brand-shadow);
-    }
-    .card h3{margin:0 0 12px 0;font-size:16px}
-    .card .imgwrap{
-      border:1px dashed #cdd4d9; background:#fafafa;border-radius:12px;
-      display:flex;align-items:center;justify-content:center;min-height:270px;overflow:hidden;
-    }
-    .card img{max-width:100%; height:auto; display:block}
-
-    .btn{
-      border:none;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer;
-      background:var(--green);color:#fff;box-shadow: var(--brand-shadow);
-      transition:transform .04s ease, background .2s ease;
-    }
+    .btn{border:none;border-radius:12px;padding:8px 12px;font-weight:600;cursor:pointer;background:var(--green);color:#fff;box-shadow:var(--brand-shadow);transition:transform .04s ease, background .2s ease}
     .btn:hover{background:var(--green-2)}
     .btn:active{transform:translateY(1px)}
     .btn.secondary{background:#98a2b3}
     .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
 
+    .cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:12px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--brand-shadow)}
+    .card h3{margin:0 0 12px 0;font-size:16px}
+    .card .imgwrap{border:1px dashed #cdd4d9;background:#fafafa;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:270px;overflow:hidden}
+    .card img{max-width:100%;height:auto;display:block}
     .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     .spacer{height:10px}
 
-    /* Stock UI (reused + refreshed) */
+    /* Stock UI */
     .stock-ui{margin:20px 0;padding:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--brand-shadow)}
     .stock-ui .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
     .stock-ui button{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;background:var(--green);color:#fff;font-weight:600}
     .stock-ui button.secondary{background:#6c757d}
     .stock-ui .pill{padding:6px 10px;border-radius:999px;background:#eef2f6;border:1px solid #dde3ea;font-variant-numeric:tabular-nums}
     .stock-ui input[type="number"]{width:120px;padding:8px 10px;border:1px solid #c9cfd6;border-radius:8px}
-    .stock-ui .save{background:#198754}
-    .stock-ui .warn{
-      margin-top:12px;padding:10px 14px;border-radius:10px;background:#ffe3e3;color:var(--danger);font-weight:700;display:none;border:1px solid #f3b5b5;
-    }
+    .stock-display{font-size:40px;margin:24px 0;text-align:center}
+    .stock-ui .warn{margin-top:12px;padding:10px 14px;border-radius:10px;background:#ffe3e3;color:var(--danger);font-weight:700;display:none;border:1px solid #f3b5b5}
     .stock-ui .warn.pulse{display:block;animation:pulse 1s infinite}
     .stock-ui .warn.pulse::before{content:"❗❗"; margin-right:8px; display:inline-block; animation:wiggle .8s infinite;}
     @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,53,69,.35)}70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}}
     @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
 
-    .stock-display{
-      font-size:40px;margin:24px 0;text-align:center;
-    }
-
     /* Toast */
-    #toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background-color: #198754; color: white; padding: 10px 20px; border-radius: 10px;
-      font-weight: 700; display: none; animation: fade 3s ease forwards; z-index:1000;
-    }
-    @keyframes fade {
-      0% { opacity: 0; transform: translate(-50%, 10px); }
-      10% { opacity: 1; transform: translate(-50%, 0); }
-      90% { opacity: 1; transform: translate(-50%, 0); }
-      100% { opacity: 0; transform: translate(-50%, 10px); }
-    }
+    #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background-color:#198754;color:white;padding:10px 20px;border-radius:10px;font-weight:700;display:none;animation:fade 3s ease forwards;z-index:1000}
+    @keyframes fade{0%{opacity:0;transform:translate(-50%,10px)}10%{opacity:1;transform:translate(-50%,0)}90%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,10px)}}
 
-    /* Modal (product edit) */
-    dialog.modal{
-      border:none;border-radius:16px;padding:0;max-width:560px;width:96%;box-shadow:0 24px 60px rgba(16,24,40,.2);
-    }
+    /* Modal */
+    dialog.modal{border:none;border-radius:16px;padding:0;max-width:560px;width:96%;box-shadow:0 24px 60px rgba(16,24,40,.2)}
     .modal .hd{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
     .modal .bd{padding:16px 18px}
     .modal .ft{padding:16px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
     .fld{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
     .fld label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-    .fld input,.fld textarea{
-      padding:10px 12px;border-radius:10px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:14px;
-    }
+    .fld input,.fld textarea{padding:10px 12px;border-radius:10px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:14px}
     .fld textarea{min-height:100px;resize:vertical}
     .close-x{background:transparent;border:none;font-size:20px;cursor:pointer}
     .note{color:var(--muted);font-size:12px;margin-top:6px}
@@ -144,31 +88,34 @@
     <header class="bar">
       <a class="back" href="../index.html">← Back to index</a>
       <div class="brand">
-        <img class="logo" src="../images/parcsafe-logo.png" alt="Parcsafe" onerror="this.style.display='none'">
+        <img class="logo" src="../PARCsafe-[369]-BP-2022.png" alt="Parcsafe" onerror="this.style.display='none'">
       </div>
     </header>
 
     <h1 class="title">
       Drawer details
-      <span class="drawer-code" id="drawerCodeBadge">C2_CP2_0_I</span>
+      <span class="drawer-code" id="drawerCodeBadge"></span>
     </h1>
 
     <div class="meta">
       <div id="product-name"><strong>Product Name:</strong> loading...</div>
-      <div id="product-code"><strong>Product Code:</strong> loading...</div>
+      <div class="codeWrap">
+        <div id="product-code"><strong>Product Code:</strong> loading...</div>
+        <button class="btn secondary" id="editInfoBtn">✏️ Edit Product Info</button>
+      </div>
     </div>
 
     <div class="cards">
       <div class="card">
         <h3>Drawer Photo</h3>
         <div class="imgwrap">
-          <img id="drawerImg" src="../images/C2_CP2_0_I.jpg" alt="Drawer image C2_CP2_0_I" />
+          <img id="drawerImg" alt="Drawer image" />
         </div>
         <div class="spacer"></div>
         <div class="row">
           <button class="btn" id="uploadPhotoBtn">🖼️ Update Drawer Photo</button>
           <button class="btn ghost" id="refreshImgBtn">Refresh</button>
-          <span class="note">The new image will be renamed to <strong>C2_CP2_0_I.jpg</strong> automatically.</span>
+          <span class="note">The new image will be renamed to <strong id="renameNote">CODE.jpg</strong> automatically.</span>
         </div>
         <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display:none" />
       </div>
@@ -176,11 +123,7 @@
       <div class="card">
         <h3>Cabinet Highlight</h3>
         <div class="imgwrap">
-          <img src="../images/C2_CP2_cabinet_C2_CP2_0_I.png" alt="Cabinet highlight" />
-        </div>
-        <div class="spacer"></div>
-        <div class="row">
-          <button class="btn secondary" id="editInfoBtn">✏️ Edit Product Info</button>
+          <img id="cabImg" alt="Cabinet highlight" />
         </div>
       </div>
     </div>
@@ -242,13 +185,32 @@
   </dialog>
 
   <script>
-    // ====== CONFIG ======
-    const drawerCode = "C2_CP2_0_I"; // immutable
-    const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
-    const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image"; // expects: form-data { image: File, drawerCode }
-    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info"; // expects JSON { drawerCode, productName, productCode, description }
+    // ====== Resolve base paths from /docs/ root ======
+    const parts = location.pathname.split('/').filter(Boolean);
+    const docsIdx = parts.lastIndexOf('docs');
+    const baseDocs = '/' + parts.slice(0, docsIdx + 1).join('/');
+    const STOCK_CSV_URL = baseDocs + '/stock.csv';
+    const IMAGES_BASE  = baseDocs + '/images';
 
-    // ====== HELPERS ======
+    // ====== Drawer code from filename ======
+    const fileName = decodeURIComponent(parts[parts.length - 1] || '');
+    const drawerCode = fileName.replace(/\.html?$/i, '') || 'C2_CP2_0_I';
+    document.getElementById('drawerCodeBadge').textContent = drawerCode;
+    document.getElementById('renameNote').textContent = drawerCode + '.jpg';
+
+    // Image sources (depend on code)
+    const drawerImg = document.getElementById('drawerImg');
+    const cabImg = document.getElementById('cabImg');
+    drawerImg.src = IMAGES_BASE + '/' + drawerCode + '.jpg';
+    drawerImg.alt = 'Drawer image ' + drawerCode;
+    cabImg.src = IMAGES_BASE + '/C2_CP2_cabinet_' + drawerCode + '.png';
+
+    // ====== API endpoints (unchanged) ======
+    const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
+    const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
+    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
+
+    // ====== Toast helper ======
     const toast = document.getElementById("toast");
     function showToast(msg, color="#198754"){
       toast.textContent = msg;
@@ -258,7 +220,7 @@
     }
 
     // ====== LOAD CSV & SETUP UI ======
-    fetch(`../../../stock.csv?t=${Date.now()}`)
+    fetch(STOCK_CSV_URL + '?t=' + Date.now())
       .then(res => res.text())
       .then(csv => {
         const rows = csv.trim().split("\\n");
@@ -267,18 +229,16 @@
           const vals = r.split(",");
           return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
         });
-        const match = data.find(r => r.drawerCode === drawerCode);
-        if (!match) throw new Error("Drawer not found");
+        const match = data.find(r => (r.drawerCode || '').trim() === drawerCode);
+        if (!match) throw new Error("Drawer not found in CSV: " + drawerCode);
 
-        // Visible data
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode}`;
-        document.getElementById("description-text").textContent = match.description;
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ''}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ''}`;
+        document.getElementById("description-text").textContent = match.description || '';
 
-        // Stock + minimum
         const MIN_STOCK = parseInt(match.minStock || "10", 10);
         document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
-        document.getElementById("minWarn").textContent = \`LOW STOCK — minimum \${MIN_STOCK}\`;
+        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
 
         initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
 
@@ -321,10 +281,10 @@
       exact.addEventListener('input', ()=>{ const v=parseInt(exact.value,10); if(!isNaN(v)){ delta=v-cur; refresh(); }});
       reset.addEventListener('click', ()=>{ delta=0; refresh(); });
 
-      // SAVE → update via API (email will be fired by CI on commit)
+      // SAVE → update via API
       save.addEventListener('click', async ()=> {
         const newVal = cur + delta;
-        if(!confirm(\`Are you sure you want to update the stock to \${newVal}?\`)) return;
+        if(!confirm(`Are you sure you want to update the stock to ${newVal}?`)) return;
         try{
           const r = await fetch(STOCK_API, {
             method: 'POST',
@@ -347,18 +307,17 @@
     const uploadBtn = document.getElementById('uploadPhotoBtn');
     const refreshImgBtn = document.getElementById('refreshImgBtn');
     const fileInput = document.getElementById('fileInput');
-    const drawerImg = document.getElementById('drawerImg');
 
     uploadBtn.addEventListener('click', ()=> fileInput.click());
     refreshImgBtn.addEventListener('click', ()=> {
-      drawerImg.src = \`../images/\${drawerCode}.jpg?t=\${Date.now()}\`;
+      drawerImg.src = IMAGES_BASE + '/' + drawerCode + '.jpg?t=' + Date.now();
       showToast('🔄 Image refreshed');
     });
 
     fileInput.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0];
       if(!file) return;
-      if(!/image\\/(jpeg|png)/.test(file.type)) return showToast('Only JPG/PNG allowed', '#b3261e');
+      if(!/image\/(jpeg|png)/.test(file.type)) return showToast('Only JPG/PNG allowed', '#b3261e');
       if(file.size > 8*1024*1024) return showToast('Max 8MB image', '#b3261e');
 
       const fd = new FormData();
@@ -369,7 +328,7 @@
         const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
-        drawerImg.src = \`../images/\${drawerCode}.jpg?t=\${Date.now()}\`;
+        drawerImg.src = IMAGES_BASE + '/' + drawerCode + '.jpg?t=' + Date.now();
       }catch(err){
         console.error(err);
         showToast('❌ Error uploading image', '#b3261e');
@@ -402,7 +361,6 @@
           body: JSON.stringify({ drawerCode, productName:name, productCode:code, description:desc })
         });
         if(!r.ok) throw new Error(await r.text());
-        // Update DOM
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${name}`;
         document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${code}`;
         document.getElementById("description-text").textContent = desc;
