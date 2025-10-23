@@ -56,18 +56,24 @@
     @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
 
     #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background-color:#198754;color:white;padding:10px 20px;border-radius:10px;font-weight:700;display:none;animation:fade 3s ease forwards;z-index:1000}
-    @keyframes fade{0%{opacity:0;transform:translate(-50%,10px)}10%{opacity:1;transform:translate(-50%,0)}90%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,10px)})
+    @keyframes fade{0%{opacity:0;transform:translate(-50%,10px)}10%{opacity:1;transform:translate(-50%,0)}90%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,10px)}
 
-    dialog.modal{border:none;border-radius:16px;padding:0;max-width:560px;width:96%;box-shadow:0 24px 60px rgba(16,24,40,.2)}
-    .modal .hd{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-    .modal .bd{padding:16px 18px}
-    .modal .ft{padding:16px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
-    .fld{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    /* ===== Improved Modal Style ===== */
+    dialog.modal{border:none;border-radius:18px;padding:0;max-width:680px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
+    dialog.modal::backdrop{background:rgba(10,12,14,.45);backdrop-filter:blur(3px)}
+    .modal .hd{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#f0f7ec}
+    .modal .hd strong{font-size:16px}
+    .close-x{background:transparent;border:none;font-size:22px;cursor:pointer;line-height:1}
+    .modal .bd{padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+    .modal .bd .fld--wide{grid-column:1 / -1}
+    .fld{display:flex;flex-direction:column;gap:6px}
     .fld label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-    .fld input,.fld textarea{padding:10px 12px;border-radius:10px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:14px}
-    .fld textarea{min-height:100px;resize:vertical}
-    .close-x{background:transparent;border:none;font-size:20px;cursor:pointer}
-    .note{color:var(--muted);font-size:12px;margin-top:6px}
+    .fld input,.fld textarea{padding:12px 14px;border-radius:12px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:14px;outline:none}
+    .fld input:focus,.fld textarea:focus{border-color:#b7df9f; box-shadow:0 0 0 3px rgba(109,189,69,.18)}
+    .fld textarea{min-height:110px;resize:vertical}
+    .note{color:var(--muted);font-size:12px;margin-top:6px;grid-column:1 / -1}
+    .modal .ft{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:18px;border-bottom-right-radius:18px}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
   </style>
 </head>
 <body>
@@ -76,7 +82,7 @@
     <header class="bar">
       <a class="back" href="../index.html">← Back to index</a>
       <div class="brand">
-        <img class="logo" id="logo" src="../parcsafe-logo.png" alt="Parcsafe">
+        <img class="logo" id="logo" alt="Parcsafe">
       </div>
     </header>
 
@@ -142,6 +148,7 @@
     <div id="toast"></div>
   </div>
 
+  <!-- Improved Modal -->
   <dialog class="modal" id="editModal">
     <form method="dialog" id="editForm">
       <div class="hd">
@@ -157,11 +164,11 @@
           <label for="fldCode">Product Code</label>
           <input id="fldCode" type="text" required />
         </div>
-        <div class="fld">
+        <div class="fld fld--wide">
           <label for="fldDesc">Description</label>
           <textarea id="fldDesc" required></textarea>
         </div>
-        <div class="note">All three fields are required. Changes will be logged by email.</div>
+        <div class="note">Tip: press <span class="kbd">Esc</span> to close.</div>
       </div>
       <div class="ft">
         <button class="btn ghost" value="cancel">Cancel</button>
@@ -176,11 +183,25 @@
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
 
-    // Logo fallback (encoded → raw)
-    document.getElementById('logo').addEventListener('error', function(){
-      this.onerror=null;
-      this.src="../PARCsafe-[369]-BP-2022.png";
-    });
+    // ===== Robust logo loader (tries multiple paths & encodings) =====
+    (function loadLogo(){
+      const logo = document.getElementById('logo');
+      const candidates = [
+        "../PARCsafe-%5B369%5D-BP-2022.png",
+        "../../PARCsafe-%5B369%5D-BP-2022.png",
+        "../../../PARCsafe-%5B369%5D-BP-2022.png",
+        "../PARCsafe-[369]-BP-2022.png",
+        "../../PARCsafe-[369]-BP-2022.png",
+        "../../../PARCsafe-[369]-BP-2022.png"
+      ];
+      let i = 0;
+      const tryNext = () => {
+        if(i >= candidates.length){ logo.remove(); return; }
+        logo.src = candidates[i++];
+      };
+      logo.onerror = tryNext;
+      tryNext();
+    })();
 
     const toast = document.getElementById("toast");
     function showToast(msg, color="#198754"){
@@ -190,7 +211,6 @@
       setTimeout(()=> toast.style.display="none", 2600);
     }
 
-    // Try multiple relative locations for stock.csv
     async function loadCSVFromCandidates(){
       const candidates = ["../stock.csv", "../../stock.csv", "../../../stock.csv", "./stock.csv"];
       for (const url of candidates){
@@ -200,14 +220,14 @@
             const txt = await res.text();
             if (txt && txt.includes("drawerCode")) return txt;
           }
-        }catch(_e){ /* try next */ }
+        }catch(_e){}
       }
       throw new Error("stock.csv not found via relative paths");
     }
 
     loadCSVFromCandidates()
       .then(csv => {
-        const rows = csv.trim().split("\n");
+        const rows = csv.trim().split("\\n");
         const headers = rows[0].split(",");
         const data = rows.slice(1).map(r => {
           const vals = r.split(",");
@@ -226,7 +246,6 @@
 
         initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
 
-        // Prefill modal
         document.getElementById("fldName").value = match.productName || "";
         document.getElementById("fldCode").value = match.productCode || "";
         document.getElementById("fldDesc").value = match.description || "";
@@ -307,7 +326,7 @@
       fd.append('drawerCode', drawerCode);
 
       try{
-        const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
+        const r = await fetch("https://stock-api.ramonpertinez.workers.dev/upload-image", { method:'POST', body: fd });
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
         const el = document.getElementById('drawerImg');
@@ -320,7 +339,7 @@
       }
     });
 
-    // Edit modal
+    // Modal interactions
     const editBtn = document.getElementById('editInfoBtn');
     const modal = document.getElementById('editModal');
     const saveInfoBtn = document.getElementById('saveInfoBtn');
@@ -329,6 +348,11 @@
     const fldDesc = document.getElementById('fldDesc');
 
     editBtn.addEventListener('click', ()=> modal.showModal());
+    modal.addEventListener('click', (e)=>{
+      const rect = modal.getBoundingClientRect();
+      const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+      if(!inside) modal.close(); // click outside to close
+    });
 
     saveInfoBtn.addEventListener('click', async (ev)=>{
       ev.preventDefault();
