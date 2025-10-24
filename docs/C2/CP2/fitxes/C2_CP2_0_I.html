@@ -187,7 +187,7 @@
     </form>
   </dialog>
 
-  <!-- QR MODAL (mou-lo aquí, dins del body) -->
+  <!-- QR MODAL -->
   <dialog class="modal" id="qrModal">
     <div class="hd">
       <strong>QR del producte</strong>
@@ -200,6 +200,7 @@
       </div>
     </div>
     <div class="ft">
+      <button class="btn ghost" id="copyLinkBtn">Copiar enllaç</button>
       <button class="btn ghost" id="dlPngBtn">Descarrega PNG</button>
       <button class="btn" id="dlPdfBtn">Descarrega PDF</button>
     </div>
@@ -211,7 +212,7 @@
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
 
-    // ===== Robust logo loader =====
+    // ===== Robust logo loader (header) =====
     (function loadLogo(){
       const logo = document.getElementById('logo');
       const candidates = [
@@ -404,14 +405,19 @@
       }
     });
 
-    // ===== QR generator (separat, NO nested scripts) =====
+    // ===== QR generator with Parcsafe logo & copy link =====
     const qrBtn = document.getElementById('qrBtn');
     const qrModal = document.getElementById('qrModal');
     const qrClose = document.getElementById('qrClose');
     const qrCanvas = document.getElementById('qrCanvas');
     const dlPngBtn = document.getElementById('dlPngBtn');
     const dlPdfBtn = document.getElementById('dlPdfBtn');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
     const qrUrlNote = document.getElementById('qrUrlNote');
+
+    // Logo per al centre del QR (docs/parcsafe-logo.png)
+    const qrLogo = new Image();
+    qrLogo.src = "../../parcsafe-logo.png"; // corresponent a docs/parcsafe-logo.png
 
     function currentCleanUrl(){
       const u = window.location.href.split('#')[0].split('?')[0];
@@ -420,17 +426,55 @@
 
     async function drawQR(url){
       const size = 1024;
-      qrCanvas.width = size; qrCanvas.height = size;
-      const opts = {
-        errorCorrectionLevel: 'M',
-        margin: 2,
-        scale: 1,
-        color: { dark: '#000000', light: '#FFFFFF' }
-      };
       const ctx = qrCanvas.getContext('2d');
+      qrCanvas.width = size; qrCanvas.height = size;
+
+      // Fons blanc
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0,0,size,size);
-      await QRCode.toCanvas(qrCanvas, url, { ...opts, width: size, height: size });
+
+      // Dibuixa QR
+      await QRCode.toCanvas(qrCanvas, url, {
+        errorCorrectionLevel: 'H', // més robust per tapar centre amb logo
+        margin: 2,
+        scale: 1,
+        color: { dark: '#000000', light: '#FFFFFF' },
+        width: size,
+        height: size
+      });
+
+      // Dibuixa "medalló" blanc al centre i logo
+      const logoBox = Math.floor(size * 0.22); // ~22% del costat
+      const cx = size/2, cy = size/2;
+      const r = Math.floor(logoBox/2) + 14;     // cercle lleugerament més gran
+      // cercle blanc amb ombra suau
+      ctx.save();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+
+      // Dibuixa el logo centrat, amb padding intern
+      const pad = 18;
+      const w = logoBox - pad*2;
+      const h = logoBox - pad*2;
+
+      function drawLogo(){
+        const lw = qrLogo.width, lh = qrLogo.height;
+        if(!lw || !lh) return; // si no carregat, sortim
+        const aspect = lw / lh;
+        let drawW = w, drawH = w / aspect;
+        if(drawH > h){ drawH = h; drawW = h * aspect; }
+        ctx.drawImage(qrLogo, cx - drawW/2, cy - drawH/2, drawW, drawH);
+      }
+
+      if(qrLogo.complete){
+        drawLogo();
+      }else{
+        qrLogo.onload = drawLogo;
+        qrLogo.onerror = ()=>{}; // si falla, simply no-logo
+      }
     }
 
     qrBtn?.addEventListener('click', async () => {
@@ -447,6 +491,25 @@
       if(!inside) qrModal.close();
     });
 
+    // Copiar enllaç
+    copyLinkBtn?.addEventListener('click', async ()=>{
+      const url = currentCleanUrl();
+      try{
+        await navigator.clipboard.writeText(url);
+        showToast('🔗 Enllaç copiat al porta-retalls');
+      }catch{
+        // Fallback antic
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showToast('🔗 Enllaç copiat');
+      }
+    });
+
+    // Descarregar PNG
     dlPngBtn?.addEventListener('click', () => {
       const a = document.createElement('a');
       a.href = qrCanvas.toDataURL('image/png');
@@ -454,6 +517,7 @@
       a.click();
     });
 
+    // Descarregar PDF
     dlPdfBtn?.addEventListener('click', async () => {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'A4' });
