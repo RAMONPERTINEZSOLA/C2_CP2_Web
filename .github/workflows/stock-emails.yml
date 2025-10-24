@@ -8,6 +8,7 @@ on:
 jobs:
   diff-and-email:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout (need previous commit too)
         uses: actions/checkout@v4
@@ -19,119 +20,19 @@ jobs:
         with:
           python-version: "3.11"
 
+      # Calcula canvis i escriu:
+      #  - low_stock=true/false
+      #  - info_changed=true/false
+      #  - low_stock_email.txt (si cal)
+      #  - info_update_email.html (si cal)
       - name: Build email decision & bodies
         id: diff
         shell: bash
         run: |
           set -euo pipefail
-          # Get current and previous versions of docs/stock.csv
-          git show HEAD:docs/stock.csv > current.csv
+          git show HEAD:docs/stock.csv  > current.csv
           git show HEAD^:docs/stock.csv > previous.csv
-
-          python3 - << 'PY'
-          import csv, os
-
-          def read_csv(path):
-            with open(path, newline='', encoding='utf-8') as f:
-              r = csv.reader(f)
-              rows = list(r)
-            hdr = rows[0]
-            idx = {k:i for i,k in enumerate(hdr)}
-            need = ["drawerCode","stockQty","productName","productCode","description"]
-            for k in need:
-              if k not in idx:
-                raise SystemExit(f"CSV header missing {k}")
-            has_min = "minStock" in idx
-            data = {}
-            for line in rows[1:]:
-              if not line or all(not c.strip() for c in line): continue
-              while len(line) < len(hdr): line.append("")
-              d = {
-                "drawerCode": line[idx["drawerCode"]].strip(),
-                "stockQty":   int((line[idx["stockQty"]] or "0").strip()),
-                "productName": (line[idx["productName"]] or "").strip(),
-                "productCode": (line[idx["productCode"]] or "").strip(),
-                "description": (line[idx["description"]] or "").strip(),
-                "minStock":   int(((line[idx["minStock"]] if has_min else "10") or "10").strip()),
-              }
-              if d["drawerCode"]:
-                data[d["drawerCode"]] = d
-            return data
-
-          curr = read_csv("current.csv")
-          prev = read_csv("previous.csv")
-
-          low_events, info_changes = [], []
-
-          for dc, c in curr.items():
-            p = prev.get(dc)
-            if not p:
-              info_changes.append({"drawerCode": dc, "changes": {
-                "productName": ["", c["productName"]],
-                "productCode": ["", c["productCode"]],
-                "description": ["", c["description"]],
-              }})
-              continue
-
-            info_diff = {}
-            for k in ("productName","productCode","description"):
-              if (p.get(k,"") or "") != (c.get(k,"") or ""):
-                info_diff[k] = [p.get(k,"") or "", c.get(k,"") or ""]
-            if info_diff:
-              info_changes.append({"drawerCode": dc, "changes": info_diff})
-
-            stock_changed = p["stockQty"] != c["stockQty"]
-            crossed = (p["stockQty"] >= c["minStock"]) and (c["stockQty"] < c["minStock"])
-            only_stock = (
-              (p["productName"] == c["productName"]) and
-              (p["productCode"] == c["productCode"]) and
-              (p["description"] == c["description"])
-            )
-            if stock_changed and crossed and only_stock:
-              low_events.append({
-                "drawerCode": dc,
-                "from": p["stockQty"], "to": c["stockQty"],
-                "min": c["minStock"],
-                "productName": c["productName"], "productCode": c["productCode"],
-              })
-
-          low_flag  = "true" if low_events   else "false"
-          info_flag = "true" if info_changes else "false"
-
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
-            out.write(f"low_stock={low_flag}\n")
-            out.write(f"info_changed={info_flag}\n")
-
-          if low_events:
-            lines = ["LOW STOCK ALERTS", "================"]
-            for e in low_events:
-              lines.append(f"- {e['drawerCode']} — {e['productName']} ({e['productCode']}): {e['from']} → {e['to']}  [min {e['min']}]")
-            with open("low_stock_email.txt","w",encoding="utf-8") as f:
-              f.write("\n".join(lines))
-
-          if info_changes:
-            def esc(s):
-              return (s or "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
-            rows = []
-            for item in info_changes:
-              dc = item["drawerCode"]
-              for field,(old,new) in item["changes"].items():
-                rows.append(f"<tr><td>{esc(dc)}</td><td>{field}</td><td>{esc(old)}</td><td>{esc(new)}</td></tr>")
-            html = f"""<!doctype html><meta charset="utf-8">
-            <div style="font-family:Poppins,Arial,sans-serif">
-              <h2>Product Info Updated</h2>
-              <p>S'han registrat canvis a dades de producte:</p>
-              <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse">
-                <thead><tr><th>Drawer</th><th>Field</th><th>Old</th><th>New</th></tr></thead>
-                <tbody>{''.join(rows)}</tbody>
-              </table>
-            </div>"""
-            with open("info_update_email.html","w",encoding="utf-8") as f:
-              f.write(html)
-          PY
-
-          echo "low_stock=$(grep -E '^low_stock='  \"$GITHUB_OUTPUT\" | cut -d= -f2)"
-          echo "info_changed=$(grep -E '^info_changed=' \"$GITHUB_OUTPUT\" | cut -d= -f2)"
+          python3 scripts/diff_mail.py
 
       - name: Debug SMTP connectivity
         if: always()
@@ -140,6 +41,7 @@ jobs:
           nc -vz smtp.office365.com 587 || true
           echo | openssl s_client -connect smtp.office365.com:587 -starttls smtp -servername smtp.office365.com -brief || true
 
+      # LOW STOCK (text)
       - name: Send LOW STOCK email (Office365)
         if: steps.diff.outputs.low_stock == 'true'
         uses: dawidd6/action-send-mail@v3
@@ -154,6 +56,7 @@ jobs:
           to: ${{ secrets.MAIL_TO }}
           body: file://low_stock_email.txt
 
+      # PRODUCT INFO UPDATED (HTML)
       - name: Send PRODUCT INFO UPDATED email (Office365)
         if: steps.diff.outputs.info_changed == 'true'
         uses: dawidd6/action-send-mail@v3
