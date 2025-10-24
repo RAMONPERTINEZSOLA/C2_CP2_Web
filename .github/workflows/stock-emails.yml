@@ -66,7 +66,6 @@ jobs:
           for dc, c in curr.items():
             p = prev.get(dc)
             if not p:
-              # New line → considera-ho “info change”
               info_changes.append({"drawerCode": dc, "changes": {
                 "productName": ["", c["productName"]],
                 "productCode": ["", c["productCode"]],
@@ -74,7 +73,6 @@ jobs:
               }})
               continue
 
-            # Detecció de canvis d'info
             info_diff = {}
             for k in ("productName","productCode","description"):
               if (p.get(k,"") or "") != (c.get(k,"") or ""):
@@ -82,7 +80,6 @@ jobs:
             if info_diff:
               info_changes.append({"drawerCode": dc, "changes": info_diff})
 
-            # Low-stock: només stock canvia i travessa el mínim
             stock_changed = p["stockQty"] != c["stockQty"]
             crossed = (p["stockQty"] >= c["minStock"]) and (c["stockQty"] < c["minStock"])
             only_stock = (
@@ -105,7 +102,6 @@ jobs:
             out.write(f"low_stock={low_flag}\n")
             out.write(f"info_changed={info_flag}\n")
 
-          # Cos del mail LOW STOCK (text pla)
           if low_events:
             lines = ["LOW STOCK ALERTS", "================"]
             for e in low_events:
@@ -113,9 +109,8 @@ jobs:
             with open("low_stock_email.txt","w",encoding="utf-8") as f:
               f.write("\n".join(lines))
 
-          # Cos del mail INFO UPDATED (HTML)
           if info_changes:
-            def esc(s): 
+            def esc(s):
               return (s or "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
             rows = []
             for item in info_changes:
@@ -135,15 +130,16 @@ jobs:
               f.write(html)
           PY
 
-          echo "low_stock=$(cat $GITHUB_OUTPUT | grep -E '^low_stock=' | cut -d= -f2)"
-          echo "info_changed=$(cat $GITHUB_OUTPUT | grep -E '^info_changed=' | cut -d= -f2)"
-       - name: Debug SMTP connectivity
+          echo "low_stock=$(grep -E '^low_stock='  \"$GITHUB_OUTPUT\" | cut -d= -f2)"
+          echo "info_changed=$(grep -E '^info_changed=' \"$GITHUB_OUTPUT\" | cut -d= -f2)"
+
+      - name: Debug SMTP connectivity
+        if: always()
         run: |
           echo "Testing smtp.office365.com:587"
           nc -vz smtp.office365.com 587 || true
           echo | openssl s_client -connect smtp.office365.com:587 -starttls smtp -servername smtp.office365.com -brief || true
 
-      # LOW STOCK (text)
       - name: Send LOW STOCK email (Office365)
         if: steps.diff.outputs.low_stock == 'true'
         uses: dawidd6/action-send-mail@v3
@@ -154,11 +150,10 @@ jobs:
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: "LOW STOCK — Parcsafe Warehouse"
-          from: ${{ secrets.SMTP_USERNAME }}   # <- a O365, FROM = compte autenticat
+          from: ${{ secrets.SMTP_USERNAME }}
           to: ${{ secrets.MAIL_TO }}
           body: file://low_stock_email.txt
 
-      # PRODUCT INFO UPDATED (HTML)
       - name: Send PRODUCT INFO UPDATED email (Office365)
         if: steps.diff.outputs.info_changed == 'true'
         uses: dawidd6/action-send-mail@v3
@@ -172,4 +167,3 @@ jobs:
           from: ${{ secrets.SMTP_USERNAME }}
           to: ${{ secrets.MAIL_TO }}
           html_body: file://info_update_email.html
-
