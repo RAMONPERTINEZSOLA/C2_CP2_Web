@@ -21,7 +21,7 @@
 
     header.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
     .back{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);text-decoration:none;color:var(--ink);font-weight:600}
-    .logo{height:28px;object-fit:contain}
+    .logo{height:64px;object-fit:contain}
     .brand{display:flex;align-items:center;gap:10px}
 
     h1.title{font-size:26px;margin:10px 0 6px 0;display:flex;align-items:center;gap:10px}
@@ -59,42 +59,21 @@
     @keyframes fade{0%{opacity:0;transform:translate(-50%,10px)}10%{opacity:1;transform:translate(-50%,0)}90%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,10px)}
 
     /* ===== Improved Modal Style ===== */
-    dialog.modal{border:none;border-radius:18px;padding:0;max-width:680px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
+    dialog.modal{border:none;border-radius:22px;padding:0;max-width:760px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
     dialog.modal::backdrop{background:rgba(10,12,14,.45);backdrop-filter:blur(3px)}
-    .modal .hd{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#f0f7ec}
-    .modal .hd strong{font-size:16px}
-    .close-x{background:transparent;border:none;font-size:22px;cursor:pointer;line-height:1}
-    .modal .bd{padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+    .modal .hd{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#f0f7ec}
+    .modal .hd strong{font-size:18px}
+    .close-x{background:transparent;border:none;font-size:24px;cursor:pointer;line-height:1}
+    .modal .bd{padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px 22px}
     .modal .bd .fld--wide{grid-column:1 / -1}
     .fld{display:flex;flex-direction:column;gap:6px}
     .fld label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-    .fld input,.fld textarea{padding:12px 14px;border-radius:12px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:14px;outline:none}
+    .fld input,.fld textarea{padding:14px 16px;border-radius:14px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:16px;outline:none}
     .fld input:focus,.fld textarea:focus{border-color:#b7df9f; box-shadow:0 0 0 3px rgba(109,189,69,.18)}
-    .fld textarea{min-height:110px;resize:vertical}
+    .fld textarea{min-height:140px;resize:vertical}
     .note{color:var(--muted);font-size:12px;margin-top:6px;grid-column:1 / -1}
-    .modal .ft{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:18px;border-bottom-right-radius:18px}
-    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
-
-    /* === UI tweaks requested === */
-.logo{ height:64px }                /* abans 28px → ara molt més visible */
-
-dialog.modal{ max-width:760px; border-radius:22px }
-.modal .hd{ padding:22px 24px }
-.modal .bd{
-  padding:22px 24px;
-  grid-template-columns:1fr 1fr;
-  gap:20px 22px;
-}
-.fld label{ font-size:12px; letter-spacing:.5px }
-.fld input,.fld textarea{
-  padding:14px 16px;
-  border-radius:14px;
-  font-size:16px;                  /* camps més grans */
-}
-.fld textarea{ min-height:140px }
-.modal .ft{ padding:18px 24px }
-.btn{ padding:10px 16px; border-radius:14px } /* botons una mica més grans */
-
+    .modal .ft{padding:18px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
   </style>
 </head>
 <body>
@@ -169,7 +148,7 @@ dialog.modal{ max-width:760px; border-radius:22px }
     <div id="toast"></div>
   </div>
 
-  <!-- Improved Modal -->
+  <!-- Modal -->
   <dialog class="modal" id="editModal">
     <form method="dialog" id="editForm">
       <div class="hd">
@@ -204,16 +183,16 @@ dialog.modal{ max-width:760px; border-radius:22px }
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
 
-    // ===== Robust logo loader (tries multiple paths & encodings) =====
+    // ===== Robust logo loader =====
     (function loadLogo(){
       const logo = document.getElementById('logo');
       const candidates = [
-        "../PARCsafe-%5B369%5D-BP-2022.png",
-        "../../PARCsafe-%5B369%5D-BP-2022.png",
-        "../../../PARCsafe-%5B369%5D-BP-2022.png",
-        "../PARCsafe-[369]-BP-2022.png",
         "../../PARCsafe-[369]-BP-2022.png",
-        "../../../PARCsafe-[369]-BP-2022.png"
+        "../PARCsafe-[369]-BP-2022.png",
+        "../../../PARCsafe-[369]-BP-2022.png",
+        "../../parcsafe-logo.png",
+        "../parcsafe-logo.png",
+        "../../../parcsafe-logo.png"
       ];
       let i = 0;
       const tryNext = () => {
@@ -232,39 +211,33 @@ dialog.modal{ max-width:760px; border-radius:22px }
       setTimeout(()=> toast.style.display="none", 2600);
     }
 
-    async function loadCSVFromCandidates(){
-  const origin = location.origin;
-  const rootDocs =
-    location.pathname.includes('/docs/')
-      ? origin + location.pathname.split('/docs/')[0] + '/docs/stock.csv'
-      : origin + '/docs/stock.csv';
-
-  const candidates = [
-    "../stock.csv",
-    "../../stock.csv",
-    "../../../stock.csv",
-    "./stock.csv",
-    rootDocs,                                // /…/docs/stock.csv segons on sigui la pàgina
-    origin + "/docs/stock.csv",              // /docs/stock.csv (arrel del site)
-    origin + "/C2_CP2_Web/docs/stock.csv"    // si el repo es publica com /C2_CP2_Web/
-  ];
-
-  for (const url of candidates){
-    try{
-      const res = await fetch(url + "?t=" + Date.now());
-      if(res.ok){
-        const txt = await res.text();
-        if (txt && txt.includes("drawerCode")) return txt;
+    async function loadCSVFromCandidates() {
+      const candidates = [
+        "../../stock.csv",
+        "../stock.csv",
+        "../../../stock.csv",
+        "./stock.csv",
+        "/docs/stock.csv",
+        window.location.origin + "/docs/stock.csv",
+      ];
+      for (const url of candidates) {
+        try {
+          const res = await fetch(url + "?t=" + Date.now());
+          if (res.ok) {
+            const txt = await res.text();
+            if (txt.includes("drawerCode")) {
+              console.log("✅ CSV found at:", url);
+              return txt;
+            }
+          }
+        } catch (err) { console.warn("❌ Not found:", url); }
       }
-    }catch(_) {}
-  }
-  throw new Error("stock.csv not found via any path");
-}
-
+      throw new Error("stock.csv not found via any path");
+    }
 
     loadCSVFromCandidates()
       .then(csv => {
-        const rows = csv.trim().split("\\n");
+        const rows = csv.trim().split("\n");
         const headers = rows[0].split(",");
         const data = rows.slice(1).map(r => {
           const vals = r.split(",");
@@ -280,16 +253,13 @@ dialog.modal{ max-width:760px; border-radius:22px }
         const MIN_STOCK = parseInt(match.minStock || "10", 10);
         document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
-
         initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
 
         document.getElementById("fldName").value = match.productName || "";
         document.getElementById("fldCode").value = match.productCode || "";
         document.getElementById("fldDesc").value = match.description || "";
       })
-      .catch(e => {
-        document.getElementById("stock-display").innerText = "❌ Error: " + e.message;
-      });
+      .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
 
     function initStockUI(initialQty, MIN_STOCK = 10) {
       const curEl = document.getElementById('curQty');
@@ -301,7 +271,6 @@ dialog.modal{ max-width:760px; border-radius:22px }
       const reset = document.getElementById('resetBtn');
       const save = document.getElementById('saveBtn');
       const warn = document.getElementById('minWarn');
-
       let cur = initialQty, delta = 0;
 
       function refresh(){
@@ -337,33 +306,28 @@ dialog.modal{ max-width:760px; border-radius:22px }
           showToast('❌ Error updating stock', '#b3261e');
         }
       });
-
       refresh();
     }
 
-    // Image upload
+    // === Upload image ===
     const uploadBtn = document.getElementById('uploadPhotoBtn');
     const refreshImgBtn = document.getElementById('refreshImgBtn');
     const fileInput = document.getElementById('fileInput');
-
     uploadBtn.addEventListener('click', ()=> fileInput.click());
     refreshImgBtn.addEventListener('click', ()=> {
       const el = document.getElementById('drawerImg');
       el.src = `../images/${drawerCode}.jpg?t=${Date.now()}`;
     });
-
     fileInput.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0];
       if(!file) return;
       if(!/image\/(jpeg|png)/.test(file.type)) return showToast('Only JPG/PNG allowed', '#b3261e');
       if(file.size > 8*1024*1024) return showToast('Max 8MB image', '#b3261e');
-
       const fd = new FormData();
       fd.append('image', file);
       fd.append('drawerCode', drawerCode);
-
       try{
-        const r = await fetch("https://stock-api.ramonpertinez.workers.dev/upload-image", { method:'POST', body: fd });
+        const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
         const el = document.getElementById('drawerImg');
@@ -371,12 +335,10 @@ dialog.modal{ max-width:760px; border-radius:22px }
       }catch(err){
         console.error(err);
         showToast('❌ Error uploading image', '#b3261e');
-      }finally{
-        fileInput.value = '';
-      }
+      }finally{ fileInput.value = ''; }
     });
 
-    // Modal interactions
+    // === Modal ===
     const editBtn = document.getElementById('editInfoBtn');
     const modal = document.getElementById('editModal');
     const saveInfoBtn = document.getElementById('saveInfoBtn');
@@ -388,16 +350,14 @@ dialog.modal{ max-width:760px; border-radius:22px }
     modal.addEventListener('click', (e)=>{
       const rect = modal.getBoundingClientRect();
       const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-      if(!inside) modal.close(); // click outside to close
+      if(!inside) modal.close();
     });
-
     saveInfoBtn.addEventListener('click', async (ev)=>{
       ev.preventDefault();
       const name = fldName.value.trim();
       const code = fldCode.value.trim();
       const desc = fldDesc.value.trim();
       if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
-
       try{
         const r = await fetch(UPDATE_INFO_ENDPOINT, {
           method:'POST',
