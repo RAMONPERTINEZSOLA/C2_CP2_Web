@@ -63,16 +63,31 @@
       100%{opacity:0;transform:translate(-50%,10px)}
     }
 
+    /* ===== Improved Modal Style ===== */
     dialog.modal{border:none;border-radius:22px;padding:0;max-width:760px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
     dialog.modal::backdrop{background:rgba(10,12,14,.45);backdrop-filter:blur(3px)}
+    .modal .hd{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#f0f7ec}
+    .modal .hd strong{font-size:18px}
+    .close-x{background:transparent;border:none;font-size:24px;cursor:pointer;line-height:1}
+    .modal .bd{padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px 22px}
+    .modal .bd .fld--wide{grid-column:1 / -1}
+    .fld{display:flex;flex-direction:column;gap:6px}
+    .fld label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+    .fld input,.fld textarea{padding:14px 16px;border-radius:14px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:16px;outline:none}
+    .fld input:focus,.fld textarea:focus{border-color:#b7df9f; box-shadow:0 0 0 3px rgba(109,189,69,.18)}
+    .fld textarea{min-height:140px;resize:vertical}
+    .note{color:var(--muted);font-size:12px;margin-top:6px;grid-column:1 / -1}
+    .modal .ft{padding:18px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
   </style>
 
+  <!-- 🔧 Override petit per assegurar el diàleg al davant -->
   <style>
     dialog.modal{ z-index: 10010 !important; }
     dialog.modal::backdrop{ z-index: 10000 !important; }
   </style>
 
-  <!-- PDF + QR Local Library -->
+  <!-- PDF (CDN) + QR (LOCAL) -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="../../lib/qrcodegen.js"></script>
 </head>
@@ -81,126 +96,426 @@
 
     <header class="bar">
       <a class="back" href="../index.html">← Back to index</a>
-      <div class="brand"><img class="logo" id="logo" alt="Parcsafe"></div>
+      <div class="brand">
+        <img class="logo" id="logo" alt="Parcsafe">
+      </div>
     </header>
 
-    <h1 class="title">Drawer details <span class="drawer-code">C2_CP2_0_I</span></h1>
+    <h1 class="title">
+      Drawer details
+      <span class="drawer-code">C2_CP2_0_I</span>
+    </h1>
 
-    <!-- ✅ (Manté tota la secció de producte, imatges i stock exactament igual) -->
-
-    <!-- QR MODAL -->
-    <dialog class="modal" id="qrModal">
-      <div class="hd">
-        <strong>QR del producte</strong>
-        <button class="close-x" value="cancel" aria-label="Close" id="qrClose">✕</button>
+    <div class="meta">
+      <div id="product-name"><strong>Product Name:</strong> loading...</div>
+      <div class="codeWrap">
+        <div id="product-code"><strong>Product Code:</strong> loading...</div>
+        <button class="btn secondary" id="editInfoBtn">✏️ Edit Product Info</button>
+        <button class="btn ghost" id="qrBtn" type="button">📎 QR</button>
       </div>
-      <div class="bd">
-        <div class="fld fld--wide" style="align-items:center">
-          <canvas id="qrCanvas" width="1024" height="1024" style="max-width:320px;width:100%;height:auto;border:1px dashed #d0d5d0;border-radius:12px;background:#fff"></canvas>
-          <div class="note" id="qrUrlNote" style="text-align:center;word-break:break-all"></div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Drawer Photo</h3>
+        <div class="imgwrap">
+          <img id="drawerImg" src="../images/C2_CP2_0_I.jpg" alt="Drawer image C2_CP2_0_I" onerror="this.onerror=null; this.src='../../images/C2_CP2_0_I.jpg';" />
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <button class="btn" id="uploadPhotoBtn">🖼️ Update Drawer Photo</button>
+          <button class="btn ghost" id="refreshImgBtn">Refresh</button>
+          <span class="note">The new image will be renamed to <strong>C2_CP2_0_I.jpg</strong> automatically.</span>
+        </div>
+        <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display:none" />
+      </div>
+
+      <div class="card">
+        <h3>Cabinet Highlight</h3>
+        <div class="imgwrap">
+          <img id="cabImg" src="../images/C2_CP2_cabinet_C2_CP2_0_I.png" alt="Cabinet highlight" onerror="this.onerror=null; this.src='../../images/C2_CP2_cabinet_C2_CP2_0_I.png';" />
         </div>
       </div>
-      <div class="ft">
-        <button class="btn ghost" id="copyLinkBtn" type="button">Copiar enllaç</button>
-        <button class="btn ghost" id="dlPngBtn" type="button">Descarrega PNG</button>
-        <button class="btn" id="dlPdfBtn" type="button">Descarrega PDF</button>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <h3>Description</h3>
+      <div id="description-text" style="line-height:1.6">loading...</div>
+    </div>
+
+    <div class="stock-display" id="stock-display">Loading stock...</div>
+
+    <div class="stock-ui" id="stockUI">
+      <div class="row">
+        <span class="pill">Current: <strong id="curQty">–</strong></span>
+        <span class="pill">Change: <strong id="delta">0</strong></span>
+        <span class="pill">New: <strong id="newQty">–</strong></span>
       </div>
-    </dialog>
+      <div class="row" style="margin-top:10px">
+        <button id="minusBtn">−1</button>
+        <button id="plusBtn">+1</button>
+        <label>Exact: <input id="exactInput" type="number" min="0" step="1" /></label>
+        <button class="secondary" id="resetBtn">Reset</button>
+        <button class="save" id="saveBtn">Save</button>
+      </div>
+      <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
+    </div>
 
-<script>
-const qrBtn = document.getElementById('qrBtn');
-const qrModal = document.getElementById('qrModal');
-const qrCanvas = document.getElementById('qrCanvas');
-const qrClose = document.getElementById('qrClose');
-const qrUrlNote = document.getElementById('qrUrlNote');
-const dlPngBtn = document.getElementById('dlPngBtn');
-const dlPdfBtn = document.getElementById('dlPdfBtn');
-const copyLinkBtn = document.getElementById('copyLinkBtn');
-const qrLogo = new Image();
-qrLogo.crossOrigin = 'anonymous';
-qrLogo.src = "../../parcsafe-logo.png";
+    <div id="toast"></div>
+  </div>
 
-function currentCleanUrl(){ return window.location.href.split('#')[0].split('?')[0]; }
+  <!-- Edit Info Modal -->
+  <dialog class="modal" id="editModal">
+    <form method="dialog" id="editForm">
+      <div class="hd">
+        <strong>Edit product info</strong>
+        <button class="close-x" value="cancel" aria-label="Close">✕</button>
+      </div>
+      <div class="bd">
+        <div class="fld">
+          <label for="fldName">Product Name</label>
+          <input id="fldName" type="text" required />
+        </div>
+        <div class="fld">
+          <label for="fldCode">Product Code</label>
+          <input id="fldCode" type="text" required />
+        </div>
+        <div class="fld fld--wide">
+          <label for="fldDesc">Description</label>
+          <textarea id="fldDesc" required></textarea>
+        </div>
+        <div class="note">Tip: press <span class="kbd">Esc</span> to close.</div>
+      </div>
+      <div class="ft">
+        <button class="btn ghost" value="cancel">Cancel</button>
+        <button class="btn" id="saveInfoBtn" value="default">Save changes</button>
+      </div>
+    </form>
+  </dialog>
 
-// --- Generar i dibuixar QR amb Nayuki QRCodegen ---
-async function drawQR(url){
-  const size = 1024;
-  const ctx = qrCanvas.getContext('2d');
-  qrCanvas.width = size; qrCanvas.height = size;
-  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,size,size);
+  <!-- QR MODAL -->
+  <dialog class="modal" id="qrModal">
+    <div class="hd">
+      <strong>QR del producte</strong>
+      <button class="close-x" value="cancel" aria-label="Close" id="qrClose">✕</button>
+    </div>
+    <div class="bd">
+      <div class="fld fld--wide" style="align-items:center">
+        <canvas id="qrCanvas" width="1024" height="1024" style="max-width:320px; width:100%; height:auto; border:1px dashed #d0d5d0; border-radius:12px; background:#fff"></canvas>
+        <div class="note" id="qrUrlNote" style="text-align:center; word-break:break-all"></div>
+      </div>
+    </div>
+    <div class="ft">
+      <button class="btn ghost" id="copyLinkBtn" type="button">Copiar enllaç</button>
+      <button class="btn ghost" id="dlPngBtn" type="button">Descarrega PNG</button>
+      <button class="btn" id="dlPdfBtn" type="button">Descarrega PDF</button>
+    </div>
+  </dialog>
 
-  // Generar QR (nivell H)
-  const qr = qrcodegen.QrCode.encodeText(url, qrcodegen.QrCode.Ecc.H);
-  const modules = qr.size, border = 2;
-  const pixelsPerModule = Math.floor(size / (modules + border*2));
-  const qrSize = pixelsPerModule * (modules + border*2);
-  const offset = Math.floor((size - qrSize)/2);
+  <script>
+    const drawerCode = "C2_CP2_0_I";
+    const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
+    const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
+    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
 
-  ctx.fillStyle = '#000000';
-  for(let y=0;y<modules;y++){
-    for(let x=0;x<modules;x++){
-      if(qr.getModule(x,y)){
-        const px = offset + (x+border)*pixelsPerModule;
-        const py = offset + (y+border)*pixelsPerModule;
-        ctx.fillRect(px,py,pixelsPerModule,pixelsPerModule);
-      }
+    // ===== Robust logo loader (header) =====
+    (function loadLogo(){
+      const logo = document.getElementById('logo');
+      const candidates = [
+        "../../PARCsafe-[369]-BP-2022.png",
+        "../PARCsafe-[369]-BP-2022.png",
+        "../../../PARCsafe-[369]-BP-2022.png",
+        "../../parcsafe-logo.png",
+        "../parcsafe-logo.png",
+        "../../../parcsafe-logo.png"
+      ];
+      let i = 0;
+      const tryNext = () => {
+        if(i >= candidates.length){ logo.remove(); return; }
+        logo.src = candidates[i++];
+      };
+      logo.onerror = tryNext;
+      tryNext();
+    })();
+
+    const toast = document.getElementById("toast");
+    function showToast(msg, color="#198754"){
+      toast.textContent = msg;
+      toast.style.backgroundColor = color;
+      toast.style.display = "block";
+      setTimeout(()=> toast.style.display="none", 2600);
     }
-  }
 
-  // --- Logo central ---
-  const logoBox = Math.floor(size * 0.22);
-  const cx = size/2, cy = size/2;
-  const r = Math.floor(logoBox/2)+14;
-  ctx.save(); ctx.fillStyle='#FFF'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); ctx.restore();
+    async function loadCSVFromCandidates() {
+      const candidates = [
+        "../../stock.csv",
+        "../stock.csv",
+        "../../../stock.csv",
+        "./stock.csv",
+        "/docs/stock.csv",
+        window.location.origin + "/docs/stock.csv",
+      ];
+      for (const url of candidates) {
+        try {
+          const res = await fetch(url + "?t=" + Date.now());
+          if (res.ok) {
+            const txt = await res.text();
+            if (txt.includes("drawerCode")) {
+              console.log("✅ CSV found at:", url);
+              return txt;
+            }
+          }
+        } catch (err) { console.warn("❌ Not found:", url); }
+      }
+      throw new Error("stock.csv not found via any path");
+    }
 
-  const pad = 18; const w = logoBox - pad*2; const h = logoBox - pad*2;
-  function drawLogo(){
-    const lw=qrLogo.width, lh=qrLogo.height; if(!lw||!lh)return;
-    const aspect=lw/lh; let drawW=w, drawH=w/aspect;
-    if(drawH>h){drawH=h;drawW=h*aspect;}
-    ctx.drawImage(qrLogo,cx-drawW/2,cy-drawH/2,drawW,drawH);
-  }
-  if(qrLogo.complete) drawLogo(); else qrLogo.onload=drawLogo;
-}
+    loadCSVFromCandidates()
+      .then(csv => {
+        const rows = csv.trim().split("\n");
+        const headers = rows[0].split(",");
+        const data = rows.slice(1).map(r => {
+          const vals = r.split(",");
+          return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
+        });
+        const match = data.find(r => (r.drawerCode || "").trim() === drawerCode);
+        if (!match) throw new Error("Drawer not found");
 
-// --- Obrir i tancar modal ---
-function safeOpenDialog(dlg){try{dlg.showModal();}catch{dlg.setAttribute('open','');}}
-async function openQrModal(){
-  const url=currentCleanUrl();
-  qrUrlNote.textContent=url;
-  safeOpenDialog(qrModal);
-  await new Promise(r=>requestAnimationFrame(r));
-  await drawQR(url);
-}
-qrBtn?.addEventListener('click',e=>{e.preventDefault();openQrModal();});
-qrClose?.addEventListener('click',()=>qrModal.close());
-qrModal?.addEventListener('click',e=>{
-  const r=qrModal.getBoundingClientRect();
-  if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)qrModal.close();
-});
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ""}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ""}`;
+        document.getElementById("description-text").textContent = match.description || "";
 
-// --- Botons QR ---
-copyLinkBtn.addEventListener('click',async()=>{
-  const url=currentCleanUrl();
-  try{await navigator.clipboard.writeText(url);alert('🔗 Enllaç copiat!');}
-  catch{alert(url);}
-});
-dlPngBtn.addEventListener('click',()=>{
-  const a=document.createElement('a');
-  a.href=qrCanvas.toDataURL('image/png');
-  a.download=`${drawerCode}_QR.png`; a.click();
-});
-dlPdfBtn.addEventListener('click',()=>{
-  const { jsPDF } = window.jspdf;
-  const pdf=new jsPDF({unit:'mm',format:'A4'});
-  const png=qrCanvas.toDataURL('image/png');
-  const w=pdf.internal.pageSize.getWidth(), h=pdf.internal.pageSize.getHeight();
-  const m=20, box=w-m*2;
-  pdf.addImage(png,'PNG',m,m,box,box);
-  pdf.text(currentCleanUrl(),m,h-m/2);
-  pdf.save(`${drawerCode}_QR.pdf`);
-});
-</script>
+        const MIN_STOCK = parseInt(match.minStock || "10", 10);
+        document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
+        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
+        initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
 
+        document.getElementById("fldName").value = match.productName || "";
+        document.getElementById("fldCode").value = match.productCode || "";
+        document.getElementById("fldDesc").value = match.description || "";
+      })
+      .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
+
+    function initStockUI(initialQty, MIN_STOCK = 10) {
+      const curEl = document.getElementById('curQty');
+      const deltaEl = document.getElementById('delta');
+      const newEl = document.getElementById('newQty');
+      const minus = document.getElementById('minusBtn');
+      const plus = document.getElementById('plusBtn');
+      const exact = document.getElementById('exactInput');
+      const reset = document.getElementById('resetBtn');
+      const save = document.getElementById('saveBtn');
+      const warn = document.getElementById('minWarn');
+      let cur = initialQty, delta = 0;
+
+      function refresh(){
+        curEl.textContent = cur;
+        deltaEl.textContent = delta > 0 ? '+' + delta : delta;
+        const nv = cur + delta;
+        newEl.textContent = nv;
+        exact.value = nv;
+        document.getElementById('stock-display').textContent = '📦 STOCK: ' + nv;
+        if (nv < MIN_STOCK) { warn.classList.add('pulse'); warn.style.display='block'; }
+        else { warn.classList.remove('pulse'); warn.style.display='none'; }
+      }
+
+      minus.addEventListener('click', ()=>{ delta -= 1; refresh(); });
+      plus.addEventListener('click', ()=>{ delta += 1; refresh(); });
+      exact.addEventListener('input', ()=>{ const v=parseInt(exact.value,10); if(!isNaN(v)){ delta=v-cur; refresh(); }});
+      reset.addEventListener('click', ()=>{ delta=0; refresh(); });
+
+      save.addEventListener('click', async ()=> {
+        const newVal = cur + delta;
+        if(!confirm(`Are you sure you want to update the stock to ${newVal}?`)) return;
+        try{
+          const r = await fetch(STOCK_API, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ drawerCode, newQty: newVal })
+          });
+          if (!r.ok) throw new Error(await r.text());
+          cur = newVal; delta = 0; refresh();
+          showToast('✔️ Stock successfully updated');
+        }catch(e){
+          console.error(e);
+          showToast('❌ Error updating stock', '#b3261e');
+        }
+      });
+      refresh();
+    }
+
+    // === Upload image ===
+    const uploadBtn = document.getElementById('uploadPhotoBtn');
+    const refreshImgBtn = document.getElementById('refreshImgBtn');
+    const fileInput = document.getElementById('fileInput');
+    uploadBtn.addEventListener('click', ()=> fileInput.click());
+    refreshImgBtn.addEventListener('click', ()=> {
+      const el = document.getElementById('drawerImg');
+      el.src = `../images/${drawerCode}.jpg?t=${Date.now()}`;
+    });
+    fileInput.addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0];
+      if(!file) return;
+      if(!/image\/(jpeg|png)/.test(file.type)) return showToast('Only JPG/PNG allowed', '#b3261e');
+      if(file.size > 8*1024*1024) return showToast('Max 8MB image', '#b3261e');
+      const fd = new FormData();
+      fd.append('image', file);
+      fd.append('drawerCode', drawerCode);
+      try{
+        const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
+        if(!r.ok) throw new Error(await r.text());
+        showToast('✔️ Image updated successfully');
+        const el = document.getElementById('drawerImg');
+        el.src = `../images/${drawerCode}.jpg?t=${Date.now()}`;
+      }catch(err){
+        console.error(err);
+        showToast('❌ Error uploading image', '#b3261e');
+      }finally{ fileInput.value = ''; }
+    });
+
+    // === Edit info modal ===
+    const editBtn = document.getElementById('editInfoBtn');
+    const modal = document.getElementById('editModal');
+    const saveInfoBtn = document.getElementById('saveInfoBtn');
+    const fldName = document.getElementById('fldName');
+    const fldCode = document.getElementById('fldCode');
+    const fldDesc = document.getElementById('fldDesc');
+
+    editBtn.addEventListener('click', ()=> modal.showModal());
+    modal.addEventListener('click', (e)=>{
+      const rect = modal.getBoundingClientRect();
+      const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+      if(!inside) modal.close();
+    });
+    saveInfoBtn.addEventListener('click', async (ev)=>{
+      ev.preventDefault();
+      const name = fldName.value.trim();
+      const code = fldCode.value.trim();
+      const desc = fldDesc.value.trim();
+      if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
+      try{
+        const r = await fetch(UPDATE_INFO_ENDPOINT, {
+          method:'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ drawerCode, productName:name, productCode:code, description:desc })
+        });
+        if(!r.ok) throw new Error(await r.text());
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${name}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${code}`;
+        document.getElementById("description-text").textContent = desc;
+        modal.close();
+        showToast('✔️ Product info updated');
+      }catch(err){
+        console.error(err);
+        showToast('❌ Error updating info', '#b3261e');
+      }
+    });
+
+    // ===== QR (qrcodegen local) =====
+    const qrBtn = document.getElementById('qrBtn');
+    const qrModal = document.getElementById('qrModal');
+    const qrClose = document.getElementById('qrClose');
+    const qrCanvas = document.getElementById('qrCanvas');
+    const dlPngBtn = document.getElementById('dlPngBtn');
+    const dlPdfBtn = document.getElementById('dlPdfBtn');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    const qrUrlNote = document.getElementById('qrUrlNote');
+
+    const qrLogo = new Image();
+    qrLogo.crossOrigin = 'anonymous';
+    qrLogo.src = "../../parcsafe-logo.png";
+
+    function currentCleanUrl(){
+      return window.location.href.split('#')[0].split('?')[0];
+    }
+
+    async function drawQR(url){
+      const size = 1024;
+      const ctx = qrCanvas.getContext('2d');
+      qrCanvas.width = size; qrCanvas.height = size;
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,size,size);
+
+      // Genera QR amb la llibreria local
+      const qr = qrcodegen.QrCode.encodeText(url, qrcodegen.QrCode.Ecc.H);
+      const modules = qr.size, border = 2;
+      const ppm = Math.floor(size / (modules + border*2));
+      const qrPix = ppm * (modules + border*2);
+      const offset = Math.floor((size - qrPix)/2);
+
+      ctx.fillStyle = '#000000';
+      for(let y=0;y<modules;y++){
+        for(let x=0;x<modules;x++){
+          if(qr.getModule(x,y)){
+            const px = offset + (x+border)*ppm;
+            const py = offset + (y+border)*ppm;
+            ctx.fillRect(px,py,ppm,ppm);
+          }
+        }
+      }
+
+      // Logo central
+      const logoBox = Math.floor(size * 0.22);
+      const cx = size/2, cy = size/2;
+      const r = Math.floor(logoBox/2)+14;
+      ctx.save(); ctx.fillStyle='#FFF'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); ctx.restore();
+
+      const pad = 18; const w = logoBox - pad*2; const h = logoBox - pad*2;
+      function drawLogo(){
+        const lw=qrLogo.width, lh=qrLogo.height; if(!lw||!lh)return;
+        const aspect=lw/lh; let drawW=w, drawH=w/aspect;
+        if(drawH>h){drawH=h;drawW=h*aspect;}
+        ctx.drawImage(qrLogo,cx-drawW/2,cy-drawH/2,drawW,drawH);
+      }
+      if(qrLogo.complete) drawLogo(); else qrLogo.onload=drawLogo;
+    }
+
+    function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
+
+    async function openQrModal(){
+      const url = currentCleanUrl();
+      qrUrlNote.textContent = url;
+      safeOpenDialog(qrModal);
+      await new Promise(r=>requestAnimationFrame(r));
+      await drawQR(url);
+    }
+
+    qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
+    qrClose?.addEventListener('click', ()=> qrModal.close());
+    qrModal?.addEventListener('click', (e)=>{
+      const r = qrModal.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if(!inside) qrModal.close();
+    });
+
+    // Copiar enllaç
+    copyLinkBtn?.addEventListener('click', async ()=>{
+      const url = currentCleanUrl();
+      try{ await navigator.clipboard.writeText(url); showToast('🔗 Enllaç copiat'); }
+      catch{ const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('🔗 Enllaç copiat'); }
+    });
+
+    // Descarregar PNG
+    dlPngBtn?.addEventListener('click', ()=>{
+      const a = document.createElement('a');
+      a.href = qrCanvas.toDataURL('image/png');
+      a.download = `${drawerCode}_QR.png`;
+      a.click();
+    });
+
+    // Descarregar PDF
+    dlPdfBtn?.addEventListener('click', ()=>{
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit:'mm', format:'A4' });
+      const png = qrCanvas.toDataURL('image/png');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const box = pageW - margin*2;
+      pdf.addImage(png, 'PNG', margin, margin, box, box);
+      pdf.setFontSize(11);
+      pdf.text(currentCleanUrl(), margin, pageH - margin/2);
+      pdf.save(`${drawerCode}_QR.pdf`);
+    });
+  </script>
 </body>
 </html>
