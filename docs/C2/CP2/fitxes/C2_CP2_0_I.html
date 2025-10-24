@@ -56,7 +56,12 @@
     @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
 
     #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background-color:#198754;color:white;padding:10px 20px;border-radius:10px;font-weight:700;display:none;animation:fade 3s ease forwards;z-index:1000}
-    @keyframes fade{0%{opacity:0;transform:translate(-50%,10px)}10%{opacity:1;transform:translate(-50%,0)}90%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,10px)}
+    @keyframes fade{
+      0%{opacity:0;transform:translate(-50%,10px)}
+      10%{opacity:1;transform:translate(-50%,0)}
+      90%{opacity:1;transform:translate(-50%,0)}
+      100%{opacity:0;transform:translate(-50%,10px)}
+    }
 
     /* ===== Improved Modal Style ===== */
     dialog.modal{border:none;border-radius:22px;padding:0;max-width:760px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
@@ -76,25 +81,9 @@
     .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
   </style>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<dialog class="modal" id="qrModal">
-  <div class="hd">
-    <strong>QR del producte</strong>
-    <button class="close-x" value="cancel" aria-label="Close" id="qrClose">✕</button>
-  </div>
-  <div class="bd">
-    <div class="fld fld--wide" style="align-items:center">
-      <canvas id="qrCanvas" width="1024" height="1024" style="max-width:320px; width:100%; height:auto; border:1px dashed #d0d5dd; border-radius:12px; background:#fff"></canvas>
-      <div class="note" id="qrUrlNote" style="text-align:center; word-break:break-all"></div>
-    </div>
-  </div>
-  <div class="ft">
-    <button class="btn ghost" id="dlPngBtn">Descarrega PNG</button>
-    <button class="btn" id="dlPdfBtn">Descarrega PDF</button>
-  </div>
-</dialog>
-
+  <!-- QR + PDF Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -117,7 +106,6 @@
         <div id="product-code"><strong>Product Code:</strong> loading...</div>
         <button class="btn secondary" id="editInfoBtn">✏️ Edit Product Info</button>
         <button class="btn ghost" id="qrBtn">📎 QR</button>
-
       </div>
     </div>
 
@@ -170,7 +158,7 @@
     <div id="toast"></div>
   </div>
 
-  <!-- Modal -->
+  <!-- Edit Info Modal -->
   <dialog class="modal" id="editModal">
     <form method="dialog" id="editForm">
       <div class="hd">
@@ -197,6 +185,24 @@
         <button class="btn" id="saveInfoBtn" value="default">Save changes</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- QR MODAL (mou-lo aquí, dins del body) -->
+  <dialog class="modal" id="qrModal">
+    <div class="hd">
+      <strong>QR del producte</strong>
+      <button class="close-x" value="cancel" aria-label="Close" id="qrClose">✕</button>
+    </div>
+    <div class="bd">
+      <div class="fld fld--wide" style="align-items:center">
+        <canvas id="qrCanvas" width="1024" height="1024" style="max-width:320px; width:100%; height:auto; border:1px dashed #d0d5dd; border-radius:12px; background:#fff"></canvas>
+        <div class="note" id="qrUrlNote" style="text-align:center; word-break:break-all"></div>
+      </div>
+    </div>
+    <div class="ft">
+      <button class="btn ghost" id="dlPngBtn">Descarrega PNG</button>
+      <button class="btn" id="dlPdfBtn">Descarrega PDF</button>
+    </div>
   </dialog>
 
   <script>
@@ -360,7 +366,7 @@
       }finally{ fileInput.value = ''; }
     });
 
-    // === Modal ===
+    // === Edit info modal ===
     const editBtn = document.getElementById('editInfoBtn');
     const modal = document.getElementById('editModal');
     const saveInfoBtn = document.getElementById('saveInfoBtn');
@@ -397,81 +403,74 @@
         showToast('❌ Error updating info', '#b3261e');
       }
     });
-    <script>
-  // ===== QR generator =====
-  const qrBtn = document.getElementById('qrBtn');
-  const qrModal = document.getElementById('qrModal');
-  const qrClose = document.getElementById('qrClose');
-  const qrCanvas = document.getElementById('qrCanvas');
-  const dlPngBtn = document.getElementById('dlPngBtn');
-  const dlPdfBtn = document.getElementById('dlPdfBtn');
-  const qrUrlNote = document.getElementById('qrUrlNote');
 
-  function currentCleanUrl(){
-    // URL fixa de la fitxa sense query ni hash
-    const u = window.location.href.split('#')[0].split('?')[0];
-    return u;
-  }
+    // ===== QR generator (separat, NO nested scripts) =====
+    const qrBtn = document.getElementById('qrBtn');
+    const qrModal = document.getElementById('qrModal');
+    const qrClose = document.getElementById('qrClose');
+    const qrCanvas = document.getElementById('qrCanvas');
+    const dlPngBtn = document.getElementById('dlPngBtn');
+    const dlPdfBtn = document.getElementById('dlPdfBtn');
+    const qrUrlNote = document.getElementById('qrUrlNote');
 
-  async function drawQR(url){
-    // mida alta per qualitat d’impressió
-    const size = 1024;
-    qrCanvas.width = size; qrCanvas.height = size;
-    const opts = {
-      errorCorrectionLevel: 'M',
-      margin: 2,            // marge blanc al voltant
-      scale: 1,             // no fem scale, ja establim width/height
-      color: { dark: '#000000', light: '#FFFFFF' }
-    };
-    const ctx = qrCanvas.getContext('2d');
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0,0,size,size);
-    await QRCode.toCanvas(qrCanvas, url, { ...opts, width: size, height: size });
-  }
+    function currentCleanUrl(){
+      const u = window.location.href.split('#')[0].split('?')[0];
+      return u;
+    }
 
-  qrBtn?.addEventListener('click', async () => {
-    const url = currentCleanUrl();
-    qrUrlNote.textContent = url;
-    await drawQR(url);
-    qrModal.showModal();
-  });
+    async function drawQR(url){
+      const size = 1024;
+      qrCanvas.width = size; qrCanvas.height = size;
+      const opts = {
+        errorCorrectionLevel: 'M',
+        margin: 2,
+        scale: 1,
+        color: { dark: '#000000', light: '#FFFFFF' }
+      };
+      const ctx = qrCanvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0,0,size,size);
+      await QRCode.toCanvas(qrCanvas, url, { ...opts, width: size, height: size });
+    }
 
-  qrClose?.addEventListener('click', () => qrModal.close());
-  qrModal?.addEventListener('click', (e)=>{
-    // tancar fent clic fora
-    const r = qrModal.getBoundingClientRect();
-    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-    if(!inside) qrModal.close();
-  });
+    qrBtn?.addEventListener('click', async () => {
+      const url = currentCleanUrl();
+      qrUrlNote.textContent = url;
+      await drawQR(url);
+      qrModal.showModal();
+    });
 
-  dlPngBtn?.addEventListener('click', () => {
-    const a = document.createElement('a');
-    a.href = qrCanvas.toDataURL('image/png');
-    a.download = `${drawerCode}_QR.png`;
-    a.click();
-  });
+    qrClose?.addEventListener('click', () => qrModal.close());
+    qrModal?.addEventListener('click', (e)=>{
+      const r = qrModal.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if(!inside) qrModal.close();
+    });
 
-  dlPdfBtn?.addEventListener('click', async () => {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'A4' });
+    dlPngBtn?.addEventListener('click', () => {
+      const a = document.createElement('a');
+      a.href = qrCanvas.toDataURL('image/png');
+      a.download = `${drawerCode}_QR.png`;
+      a.click();
+    });
 
-    const png = qrCanvas.toDataURL('image/png');
-    // Ajustem per deixar marges macos a A4
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const margin = 20; // mm
-    const box = pageW - margin*2;
-    pdf.addImage(png, 'PNG', margin, margin, box, box);
+    dlPdfBtn?.addEventListener('click', async () => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'A4' });
 
-    // Peu amb l’URL
-    pdf.setFontSize(11);
-    const url = currentCleanUrl();
-    pdf.text(url, margin, pageH - margin/2, { maxWidth: pageW - margin*2 });
+      const png = qrCanvas.toDataURL('image/png');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const box = pageW - margin*2;
+      pdf.addImage(png, 'PNG', margin, margin, box, box);
 
-    pdf.save(`${drawerCode}_QR.pdf`);
-  });
-</script>
+      pdf.setFontSize(11);
+      const url = currentCleanUrl();
+      pdf.text(url, margin, pageH - margin/2, { maxWidth: pageW - margin*2 });
 
+      pdf.save(`${drawerCode}_QR.pdf`);
+    });
   </script>
 </body>
 </html>
