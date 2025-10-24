@@ -1,0 +1,181 @@
+name: Stock & Info change emails
+
+on:
+  push:
+    paths:
+      - "docs/stock.csv"
+
+jobs:
+  diff-and-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (need previous commit too)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Ensure Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build email decision & bodies
+        id: diff
+        run: |
+          set -euo pipefail
+          # Get current and previous versions of docs/stock.csv
+          git show HEAD:docs/stock.csv > current.csv
+          git show HEAD^:docs/stock.csv > previous.csv
+
+          python3 - << 'PY'
+          import csv, sys, os, json
+
+          # Read CSVs into dict by drawerCode
+          def read_csv(path):
+            with open(path, newline='', encoding='utf-8') as f:
+              r = csv.reader(f)
+              rows = list(r)
+            hdr = rows[0]
+            # Normalize header length (minStock optional)
+            idx = {k:i for i,k in enumerate(hdr)}
+            need = ["drawerCode","stockQty","productName","productCode","description"]
+            for k in need:
+              if k not in idx: raise SystemExit(f"CSV header missing {k}")
+            has_min = "minStock" in idx
+            data = {}
+            for line in rows[1:]:
+              if not line or all(not c.strip() for c in line): continue
+              # pad line
+              while len(line) < len(hdr): line.append("")
+              d = {
+                "drawerCode": line[idx["drawerCode"]].strip(),
+                "stockQty":   int((line[idx["stockQty"]] or "0").strip()),
+                "productName": (line[idx["productName"]] or "").strip(),
+                "productCode": (line[idx["productCode"]] or "").strip(),
+                "description": (line[idx["description"]] or "").strip(),
+                "minStock":   int((line[idx["minStock"]] if has_min else "10").strip() or "10"),
+              }
+              if d["drawerCode"]:
+                data[d["drawerCode"]] = d
+            return data
+
+          curr = read_csv("current.csv")
+          prev = read_csv("previous.csv")
+
+          low_events = []   # entries that crossed from >= min to < min AND only stock changed
+          info_changes = [] # entries where name/code/desc changed (show diffs)
+
+          for dc, c in curr.items():
+            p = prev.get(dc)
+            if not p: 
+              # New line added: treat as info change summary too (optional)
+              info_changes.append({
+                "drawerCode": dc,
+                "changes": {"productName":[p["productName"] if p else "", c["productName"]],
+                            "productCode":[p["productCode"] if p else "", c["productCode"]],
+                            "description":[p["description"] if p else "", c["description"]]}
+              })
+              continue
+
+            # Detect info field changes
+            info_diff = {}
+            for k in ("productName","productCode","description"):
+              if (p.get(k,"") or "") != (c.get(k,"") or ""):
+                info_diff[k] = [p.get(k,"") or "", c.get(k,"") or ""]
+            if info_diff:
+              info_changes.append({"drawerCode": dc, "changes": info_diff})
+
+            # Detect "only stock changed" crossing below min
+            stock_changed = p["stockQty"] != c["stockQty"]
+            crossed = (p["stockQty"] >= c["minStock"]) and (c["stockQty"] < c["minStock"])
+            only_stock = (
+              (p["productName"] == c["productName"]) and
+              (p["productCode"] == c["productCode"]) and
+              (p["description"] == c["description"])
+            )
+            if stock_changed and crossed and only_stock:
+              low_events.append({
+                "drawerCode": dc,
+                "from": p["stockQty"],
+                "to": c["stockQty"],
+                "min": c["minStock"],
+                "productName": c["productName"],
+                "productCode": c["productCode"],
+              })
+
+          # Write outputs for workflow conditions
+          low_flag = "true" if low_events else "false"
+          info_flag = "true" if info_changes else "false"
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+            out.write(f"low_stock={low_flag}\n")
+            out.write(f"info_changed={info_flag}\n")
+
+          # Build email bodies
+          # Low stock (text)
+          if low_events:
+            lines = []
+            lines.append("LOW STOCK ALERTS")
+            lines.append("================")
+            for e in low_events:
+              lines.append(f"- {e['drawerCode']} — {e['productName']} ({e['productCode']}): "
+                           f"{e['from']} → {e['to']}  [min {e['min']}]")
+            with open("low_stock_email.txt","w",encoding="utf-8") as f:
+              f.write("\n".join(lines))
+
+          # Info update (HTML)
+          if info_changes:
+            def esc(s): 
+              return (s or "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+            rows = []
+            for item in info_changes:
+              dc = item["drawerCode"]
+              ch = item["changes"]
+              for k,(old,new) in ch.items():
+                rows.append(f"<tr><td>{esc(dc)}</td><td>{k}</td><td>{esc(old)}</td><td>{esc(new)}</td></tr>")
+            html = f"""<!doctype html>
+            <meta charset="utf-8">
+            <div style="font-family:Poppins,Arial,sans-serif">
+              <h2>Product Info Updated</h2>
+              <p>S'han registrat canvis a dades de producte:</p>
+              <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse">
+                <thead><tr><th>Drawer</th><th>Field</th><th>Old</th><th>New</th></tr></thead>
+                <tbody>
+                  {''.join(rows)}
+                </tbody>
+              </table>
+            </div>"""
+            with open("info_update_email.html","w",encoding="utf-8") as f:
+              f.write(html)
+          PY
+
+          # Small debug
+          echo "low_stock=$(cat $GITHUB_OUTPUT | grep low_stock | cut -d= -f2)"
+          echo "info_changed=$(cat $GITHUB_OUTPUT | grep info_changed | cut -d= -f2)"
+
+      - name: Send LOW STOCK email
+        if: steps.diff.outputs.low_stock == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port:    ${{ secrets.SMTP_PORT }}
+          username:       ${{ secrets.SMTP_USERNAME }}
+          password:       ${{ secrets.SMTP_PASSWORD }}
+          subject: "LOW STOCK — Parcsafe Warehouse"
+          to:      ${{ secrets.MAIL_TO }}
+          from:    ${{ secrets.MAIL_FROM }}
+          secure:  true
+          body:    file://low_stock_email.txt
+
+      - name: Send PRODUCT INFO UPDATED email
+        if: steps.diff.outputs.info_changed == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port:    ${{ secrets.SMTP_PORT }}
+          username:       ${{ secrets.SMTP_USERNAME }}
+          password:       ${{ secrets.SMTP_PASSWORD }}
+          subject: "PRODUCT INFO UPDATED — Parcsafe Warehouse"
+          to:      ${{ secrets.MAIL_TO }}
+          from:    ${{ secrets.MAIL_FROM }}
+          secure:  true
+          html_body: file://info_update_email.html
