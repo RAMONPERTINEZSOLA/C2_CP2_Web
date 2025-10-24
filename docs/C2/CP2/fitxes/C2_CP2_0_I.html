@@ -74,6 +74,27 @@
     .note{color:var(--muted);font-size:12px;margin-top:6px;grid-column:1 / -1}
     .modal .ft{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:18px;border-bottom-right-radius:18px}
     .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
+
+    /* === UI tweaks requested === */
+.logo{ height:64px }                /* abans 28px → ara molt més visible */
+
+dialog.modal{ max-width:760px; border-radius:22px }
+.modal .hd{ padding:22px 24px }
+.modal .bd{
+  padding:22px 24px;
+  grid-template-columns:1fr 1fr;
+  gap:20px 22px;
+}
+.fld label{ font-size:12px; letter-spacing:.5px }
+.fld input,.fld textarea{
+  padding:14px 16px;
+  border-radius:14px;
+  font-size:16px;                  /* camps més grans */
+}
+.fld textarea{ min-height:140px }
+.modal .ft{ padding:18px 24px }
+.btn{ padding:10px 16px; border-radius:14px } /* botons una mica més grans */
+
   </style>
 </head>
 <body>
@@ -212,18 +233,34 @@
     }
 
     async function loadCSVFromCandidates(){
-      const candidates = ["../stock.csv", "../../stock.csv", "../../../stock.csv", "./stock.csv"];
-      for (const url of candidates){
-        try{
-          const res = await fetch(url + "?t=" + Date.now());
-          if(res.ok){
-            const txt = await res.text();
-            if (txt && txt.includes("drawerCode")) return txt;
-          }
-        }catch(_e){}
+  const origin = location.origin;
+  const rootDocs =
+    location.pathname.includes('/docs/')
+      ? origin + location.pathname.split('/docs/')[0] + '/docs/stock.csv'
+      : origin + '/docs/stock.csv';
+
+  const candidates = [
+    "../stock.csv",
+    "../../stock.csv",
+    "../../../stock.csv",
+    "./stock.csv",
+    rootDocs,                                // /…/docs/stock.csv segons on sigui la pàgina
+    origin + "/docs/stock.csv",              // /docs/stock.csv (arrel del site)
+    origin + "/C2_CP2_Web/docs/stock.csv"    // si el repo es publica com /C2_CP2_Web/
+  ];
+
+  for (const url of candidates){
+    try{
+      const res = await fetch(url + "?t=" + Date.now());
+      if(res.ok){
+        const txt = await res.text();
+        if (txt && txt.includes("drawerCode")) return txt;
       }
-      throw new Error("stock.csv not found via relative paths");
-    }
+    }catch(_) {}
+  }
+  throw new Error("stock.csv not found via any path");
+}
+
 
     loadCSVFromCandidates()
       .then(csv => {
