@@ -36,7 +36,7 @@ jobs:
           echo "low_stock=${{ steps.diff.outputs.low_stock }}"
           echo "info_changed=${{ steps.diff.outputs.info_changed }}"
 
-      - name: Show computed flags
+            - name: Show computed flags
         run: |
           echo "LOW_STOCK  = ${{ steps.diff.outputs.low_stock }}"
           echo "INFO_CHANGE= ${{ steps.diff.outputs.info_changed }}"
@@ -50,6 +50,7 @@ jobs:
             low_stock_email.txt
             info_update_email.html
           if-no-files-found: ignore
+
 
 
       - name: Debug SMTP connectivity
