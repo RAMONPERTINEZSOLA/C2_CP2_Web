@@ -111,7 +111,7 @@
       <div class="codeWrap">
         <div id="product-code"><strong>Product Code:</strong> loading...</div>
         <button class="btn secondary" id="editInfoBtn">✏️ Edit Product Info</button>
-        <button class="btn ghost" id="qrBtn" type="button">📎 QR</button>
+        <button class="btn ghost" id="qrBtn" type="button" onclick="openQrModal()">📎 QR</button>
       </div>
     </div>
 
@@ -483,33 +483,37 @@
       }
     }
 
-    // 🔧 Fallback segur per obrir el <dialog>
+    // --- Fallback segur per obrir el <dialog>
     function safeOpenDialog(dlg){
-      try {
-        if (dlg.showModal) dlg.showModal();
-        else dlg.setAttribute('open','');
-      } catch {
-        dlg.setAttribute('open','');
+      try { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open',''); }
+      catch { dlg.setAttribute('open',''); }
+    }
+
+    // --- Obrir modal robust (per onclick i per listener)
+    async function openQrModal(){
+      try{
+        const url = currentCleanUrl();
+        qrUrlNote.textContent = url;
+        // Obrim primer: així veus el modal encara que el dibuix falli
+        safeOpenDialog(qrModal);
+        await drawQR(url);
+      }catch(err){
+        console.error('QR open/draw error:', err);
+        showToast('⚠️ No s’ha pogut generar el QR', '#b3261e');
       }
     }
 
-    // 🔧 Listener amb fallback de diàleg
-    qrBtn?.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const url = currentCleanUrl();
-      qrUrlNote.textContent = url;
-      await drawQR(url);
-      safeOpenDialog(qrModal);
-    });
+    // Listener (backup a l'onclick)
+    qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
 
-    // 🔧 Tancar amb fallback
+    // Tancar amb fallback
     qrClose?.addEventListener('click', (e) => {
       e.preventDefault();
       if (qrModal.close) qrModal.close();
       else qrModal.removeAttribute('open');
     });
 
-    // 🔧 Tancar clicant fora (compatible amb fallback)
+    // Tancar clicant fora (compatible amb fallback)
     qrModal?.addEventListener('click', (e)=>{
       const r = qrModal.getBoundingClientRect();
       const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
