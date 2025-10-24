@@ -66,50 +66,61 @@ def main():
             }})
             continue
 
+        # --- Detecta canvis de nom, codi o descripció ---
         info_diff = {}
-        for k in ("productName","productCode","description"):
-            if (p.get(k,"") or "") != (c.get(k,"") or ""):
-                info_diff[k] = [p.get(k,"") or "", c.get(k,"") or ""]
+        for k in ("productName", "productCode", "description"):
+            if (p.get(k, "") or "") != (c.get(k, "") or ""):
+                info_diff[k] = [p.get(k, "") or "", c.get(k, "") or ""]
         if info_diff:
             info_changes.append({"drawerCode": dc, "changes": info_diff})
 
-            stock_changed = p["stockQty"] != c["stockQty"]
+        # --- Detecta canvis de stock ---
+        stock_changed = p["stockQty"] != c["stockQty"]
+        now_below = c["stockQty"] < c["minStock"]
 
-    # Nou criteri: qualsevol canvi amb stock actual per sota del mínim.
-    # (Això cobreix "travessar" i també canvis mentre segueix per sota.)
-    now_below = c["stockQty"] < c["minStock"]
+        # Envia alerta si hi ha canvi i el stock actual és menor que el mínim
+        if stock_changed and now_below:
+            low_events.append({
+                "drawerCode": dc,
+                "from": p["stockQty"],
+                "to": c["stockQty"],
+                "min": c["minStock"],
+                "productName": c["productName"],
+                "productCode": c["productCode"],
+            })
 
-    if stock_changed and now_below:
-        low_events.append({
-            "drawerCode": dc,
-            "from": p["stockQty"], "to": c["stockQty"],
-            "min": c["minStock"],
-            "productName": c["productName"], "productCode": c["productCode"],
-        })
-
-
-    low_flag  = "true" if low_events   else "false"
+    # --- Escriu resultats per al workflow ---
+    low_flag = "true" if low_events else "false"
     info_flag = "true" if info_changes else "false"
 
     with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
         out.write(f"low_stock={low_flag}\n")
         out.write(f"info_changed={info_flag}\n")
 
+    # --- Crea fitxers de correu ---
     if low_events:
         lines = ["LOW STOCK ALERTS", "================"]
         for e in low_events:
-            lines.append(f"- {e['drawerCode']} — {e['productName']} ({e['productCode']}): {e['from']} → {e['to']}  [min {e['min']}]")
-        with open("low_stock_email.txt","w",encoding="utf-8") as f:
+            lines.append(
+                f"- {e['drawerCode']} — {e['productName']} ({e['productCode']}): "
+                f"{e['from']} → {e['to']}  [min {e['min']}]"
+            )
+        with open("low_stock_email.txt", "w", encoding="utf-8") as f:
             f.write("\n".join(lines))
 
     if info_changes:
         def esc(s):
-            return (s or "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+            return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
         rows = []
         for item in info_changes:
             dc = item["drawerCode"]
-            for field,(old,new) in item["changes"].items():
-                rows.append(f"<tr><td>{esc(dc)}</td><td>{field}</td><td>{esc(old)}</td><td>{esc(new)}</td></tr>")
+            for field, (old, new) in item["changes"].items():
+                rows.append(
+                    f"<tr><td>{esc(dc)}</td><td>{field}</td>"
+                    f"<td>{esc(old)}</td><td>{esc(new)}</td></tr>"
+                )
+
         html = f"""<!doctype html><meta charset="utf-8">
 <div style="font-family:Poppins,Arial,sans-serif">
   <h2>Product Info Updated</h2>
@@ -119,8 +130,5 @@ def main():
     <tbody>{''.join(rows)}</tbody>
   </table>
 </div>"""
-        with open("info_update_email.html","w",encoding="utf-8") as f:
+        with open("info_update_email.html", "w", encoding="utf-8") as f:
             f.write(html)
-
-if __name__ == "__main__":
-    main()
