@@ -430,6 +430,34 @@
       const u = window.location.href.split('#')[0].split('?')[0];
       return u;
     }
+    <script>
+    // Carregador amb fallbacks per a la llibreria QR
+    async function ensureQrLib(){
+      // Si ja hi és, no fem res
+      if (typeof QRCode !== 'undefined' && QRCode.toCanvas) return;
+
+      const fallbacks = [
+        'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
+        'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js'
+      ];
+
+      for (const src of fallbacks){
+        try{
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.async = true;
+            s.onload = () => (typeof QRCode !== 'undefined' ? resolve() : reject());
+            s.onerror = reject;
+            document.head.appendChild(s);
+          });
+          if (typeof QRCode !== 'undefined' && QRCode.toCanvas) return; // ja carregada
+        }catch(_){}
+      }
+      throw new Error('No s’ha pogut carregar la llibreria del QR');
+    }
+    </script>
 
     // --- DIBUIX DEL QR (robust) ---
     async function drawQR(url){
@@ -501,18 +529,30 @@
       catch { dlg.setAttribute('open',''); }
     }
 
-    async function openQrModal(){
-      try {
-        const url = currentCleanUrl();
-        qrUrlNote.textContent = url;
-        safeOpenDialog(qrModal);               // obrim primer
-        await new Promise(requestAnimationFrame);
-        await drawQR(url);                     // dibuixem després
-      } catch (e) {
-        console.error('QR open/draw error:', e);
-        showToast('⚠️ No s’ha pogut generar el QR', '#b3261e');
-      }
-    }
+    <script>
+async function openQrModal(){
+  try{
+    const url = currentCleanUrl();
+    qrUrlNote.textContent = url;
+
+    // Obrim el diàleg primer
+    try { qrModal.showModal(); } catch { qrModal.setAttribute('open',''); }
+
+    // 🔒 Assegura que la llibreria QR estigui disponible (amb fallbacks)
+    await ensureQrLib();
+
+    // Espera un frame perquè el dialog es pinti
+    await new Promise(requestAnimationFrame);
+
+    // Ara sí, dibuixa el QR (funció drawQR que ja tens)
+    await drawQR(url);
+  }catch(e){
+    console.error(e);
+    showToast('⚠️ No s’ha pogut carregar la llibreria del QR', '#b3261e');
+  }
+}
+</script>
+
 
     // Listener (backup a l'onclick inline)
     qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
