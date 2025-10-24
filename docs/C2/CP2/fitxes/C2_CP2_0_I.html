@@ -82,16 +82,15 @@
   </style>
 
   <!-- 🔧 Override petit per assegurar el diàleg al davant -->
-  <style>
+ <style>
     dialog.modal{ z-index: 10010 !important; }
     dialog.modal::backdrop{ z-index: 10000 !important; }
   </style>
-
+  
 <!-- PDF (CDN) + QR (LOCAL COMPILAT) -->
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="../../../lib/qrcodegen.js"></script>
-
-
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- ✅ QR UMD per navegador (substitueix l'script local) -->
+  <script src="https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js"></script>
 </head>
 <body>
   <div class="container">
