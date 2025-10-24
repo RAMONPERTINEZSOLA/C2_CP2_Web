@@ -73,20 +73,20 @@ def main():
         if info_diff:
             info_changes.append({"drawerCode": dc, "changes": info_diff})
 
-        stock_changed = p["stockQty"] != c["stockQty"]
-        crossed = (p["stockQty"] >= c["minStock"]) and (c["stockQty"] < c["minStock"])
-        only_stock = (
-            (p["productName"] == c["productName"]) and
-            (p["productCode"] == c["productCode"]) and
-            (p["description"] == c["description"])
-        )
-        if stock_changed and crossed and only_stock:
-            low_events.append({
-                "drawerCode": dc,
-                "from": p["stockQty"], "to": c["stockQty"],
-                "min": c["minStock"],
-                "productName": c["productName"], "productCode": c["productCode"],
-            })
+            stock_changed = p["stockQty"] != c["stockQty"]
+
+    # Nou criteri: qualsevol canvi amb stock actual per sota del mínim.
+    # (Això cobreix "travessar" i també canvis mentre segueix per sota.)
+    now_below = c["stockQty"] < c["minStock"]
+
+    if stock_changed and now_below:
+        low_events.append({
+            "drawerCode": dc,
+            "from": p["stockQty"], "to": c["stockQty"],
+            "min": c["minStock"],
+            "productName": c["productName"], "productCode": c["productCode"],
+        })
+
 
     low_flag  = "true" if low_events   else "false"
     info_flag = "true" if info_changes else "false"

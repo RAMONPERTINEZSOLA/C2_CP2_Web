@@ -33,6 +33,24 @@ jobs:
           git show HEAD:docs/stock.csv  > current.csv
           git show HEAD^:docs/stock.csv > previous.csv
           python3 scripts/diff_mail.py
+          echo "low_stock=${{ steps.diff.outputs.low_stock }}"
+          echo "info_changed=${{ steps.diff.outputs.info_changed }}"
+
+      - name: Show computed flags
+        run: |
+          echo "LOW_STOCK  = ${{ steps.diff.outputs.low_stock }}"
+          echo "INFO_CHANGE= ${{ steps.diff.outputs.info_changed }}"
+
+      - name: Upload email previews (if any)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: email-previews
+          path: |
+            low_stock_email.txt
+            info_update_email.html
+          if-no-files-found: ignore
+
 
       - name: Debug SMTP connectivity
         if: always()
