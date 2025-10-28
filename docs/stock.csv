@@ -29,11 +29,15 @@ C2_1,21,--,--,--,10
 C2_2,21,--,--,--,10
 C2_3,21,--,--,--,10
 C2_4,21,--,--,--,10
+<<<<<<< HEAD
+C2_CP2_0_I,15,POWER RELAY + INTERFACE RELAY_2,0.1-ELE-PRB-10,yes,10
+=======
 C2_CP2_0_I,9,POWER RELAY + INTERFACE RELAY_2,0.1-ELE-PRB-10,yes,10
+>>>>>>> 61b92efc74b0fd68246d6ca09e305b1b680d6395
 C2_CP2_0_II,54,TEST1,--,--,20
 C2_CP2_0_III,54,TEST2,--,--,30
 C2_CP2_0_IV,200,NAILS,0.1-FIX-NAI-10,NAILS,55
-C2_CP2_0_V,2,RIVETS,0.1-FIX-RIV-10,RIVETS,110
+C2_CP2_0_V,222,RIVETS,0.1-FIX-RIV-10,RIVETS,110
 C2_CP2_0_I,255,POWER RELAY + INTERFACE RELAY_2,0.1-ELE-PRB-10,POWER RELAY + INTERFACE RELAY_2,10
 C2_CP2_0_II,200,--,--,--,10
 C2_CP2_0_III,200,--,--,--,10
@@ -71,7 +75,7 @@ C2_CP2_6_IV,252,SQUARE WASHERS M8,0.1-FIX-SWM-10,SQUARE WASHERS M8,10
 C2_CP2_6_V,200,--,--,--,10
 C2_CP2_7_I,36,M10x100 mm HEX COACH SCREWS,0.1-FIX-MMI-10,M10x100 mm HEX COACH SCREWS,10
 C2_CP2_7_II,63,M10x75 mm HEX COACH SCREWS,0.1-FIX-MMG-10,M10x75 mm HEX COACH SCREWS,10
-C2_CP2_7_III,8,M12x60 mm NYLON FRAME FIXING PLUG,0.1-FIX-MMN-10,M12x60 mm NYLON FRAME FIXING PLUG,10
+C2_CP2_7_III,82,M12x60 mm NYLON FRAME FIXING PLUG,0.1-FIX-MMN-10,M12x60 mm NYLON FRAME FIXING PLUG,10
 C2_CP2_7_IV,80,M10 WASHERS,0.1-FIX-MWB-10,M10 WASHERS,10
 C2_CP2_7_V,45,STAINLESS COACH SCREWS M10x75 mm,0.1-FIX-SCS-10,STAINLESS COACH SCREWS M10x75 mm,10
 C2_CP2_8_I,12,NYLON CABLE GLANDS 16mm,0.1-ELE-NCA-10,NYLON CABLE GLANDS 16mm,10
@@ -91,16 +95,16 @@ C2_CP2_10_IV,200,TIME SWITCH,0.1-ELE-TSW-10,TIME SWITCH,10
 C2_CP2_10_V,200,--,--,--,10
 C2_CP2_11_I,200,KEYS,0.1-OTH-KEY-10,KEYS,10
 C2_CP2_11_II,200,Codex 9000 Key (EN_EX550 & BI550),15.01-CMS-C9K-10,XCLE94099 - Codex Key Code 9000,10
-C2_CP2_11_III,5,LBA 6000 Key,0.1-ENT-L6K-10,LBA 6000 Key,10
+C2_CP2_11_III,50,LBA 6000 Key,0.1-ENT-L6K-10,LBA 6000 Key,10
 C2_CP2_11_IV,200,MIX BATTERIES,0.1-ELE-MBA-10,MIX BATTERIES,10
 C2_CP2_11_V,12,--,--,--,10
-C3_0_I,2,Velocity Vehicle Barriers - Spring White,20.03-ENT-VVW-10,Velocity Vehicle Barriers - Spring White,10
+C3_0_I,20,Velocity Vehicle Barriers - Spring White,20.03-ENT-VVW-10,Velocity Vehicle Barriers - Spring White,10
 C3_0_II,6655447,Compression Spring Black,20.03-ENT-CSJ-10,VLSPRGB - Velocity Compression Spring Gold/Black,10
 C3_0_III,696585,Compression Spring Gold,20.03-ENT-CSI-10,VLSPRG - Velocity Compression Spring Gold,10
 C3_0_IV,4444,ENTA Compression Spring Yellow,20.03-ENT-ECY-10,VLSPRY - Velocity Compression Spring Yellow,10
 C3_0_V,21,0,20.03-ENT-----10,0,10
 C3_0_VI,21,0,20.03-ENT-----10,0,10
-C3_1_I_A,9,Spring Cylinder Housing,20.03-ENT-SCH-10,Spring Cylinder Housing,10
+C3_1_I_A,90,Spring Cylinder Housing,20.03-ENT-SCH-10,Spring Cylinder Housing,10
 C3_1_I_B,21,Spring Seat Housing,20.03-ENT-SSH-10,Spring Seat Housing,10
 C3_1_II,21,0,20.03-ENT-----10,0,10
 C3_1_III,21,50m Roller Cable Turnstar,20.03-ENT-5RC-10,50m Roller Cable Turnstar,10
@@ -139,7 +143,7 @@ C3_3_III_C,21,0,20.03-ENT-----10,0,10
 C3_3_IV_A,21,Power & Signal Cable for Boom Gate System,20.03-ENT-P&S-10,"Custom harness with power terminals and RJ-style connector, typically used for wiring boom gate motors or controllers. Includes female spade connectors, a twisted pair for signal/data, and extra lines for sensors or auxiliary devices. Designed for quick installation and reliable field connections.",10
 C3_3_IV_B,21,VAUTEX VS7A-12,20.03-ENT-VVS-10,"12V 7Ah sealed rechargeable lead-acid battery (AGM type), designed for high-rate discharge applications such as backup systems, access control, alarms, and emergency power. Features voltage regulation for standby use (13.6–13.9V) and cyclic use (14.5–15.0V). Maintenance-free and leak-proof.",10
 C3_3_V_A,21,Motor 24 BLDC 100W,20.03-ENT-M2B-10,Motor 24 BLDC 100W,10
-C3_3_V_B,6,Power Switch ON - OFF,20.03-ENT-PSO-10,Power Switch ON - OFF,10
+C3_3_V_B,600,Power Switch ON - OFF,20.03-ENT-PSO-10,Power Switch ON - OFF,10
 C3_3_V_C,21,Switch Plate,20.03-ENT-SPL-10,Switch Plate,10
 C3_3_VI,21,0,20.03-ENT-----10,0,10
 C3_4_I,55555,0,#SPILL!,0,10
