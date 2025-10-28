@@ -460,7 +460,8 @@
       ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,size,size);
 
       // Genera QR amb la llibreria local
-      const qr = qrcodegen.QrCode.encodeText(url, qrcodegen.QrCode.Ecc.H);
+      const ecc = qrcodegen.QrCode.Ecc.HIGH || qrcodegen.QrCode.Ecc.H; // compat
+      const qr  = qrcodegen.QrCode.encodeText(url, ecc);
       const modules = qr.size, border = 2;
       const ppm = Math.floor(size / (modules + border*2));
       const qrPix = ppm * (modules + border*2);
