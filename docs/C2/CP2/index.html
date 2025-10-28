@@ -229,7 +229,6 @@
 
             <div class="search">
               <input id="searchBox" type="text" placeholder="Enter drawer code (e.g. C2_CP2_3_IV)" />
-              <span class="kbd">Enter</span>
             </div>
 
             <button class="button" onclick="goToDrawer()">🔎 Search</button>
@@ -240,8 +239,10 @@
           <p class="hint">Click on a drawer to view the product</p>
 
           <!-- IMAGE MAP -->
-          <img class="rack" src="C2_CP2.jpg" alt="Armari 12x5" usemap="#image-map">
 
+          <div class="cabinet-wrap">
+            <img id="cabinetImg" class="cabinet" src="C2_CP2.jpg" alt="Cabinet C2_CP2" usemap="#image-map">
+          </div>
           <map name="image-map">
             <!-- 🔁 Mantinc totes les teves àrees exactes -->
             <area target="" alt="C2_CP2_0_I"   title="C2_CP2_0_I"   href="fitxes/C2_CP2_0_I.html"   coords="89,1587,233,1698"   onmouseover="showTooltip(event, 'C2_CP2_0_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
@@ -376,6 +377,55 @@
       tt.style.top  = curY + "px";
       rafId = requestAnimationFrame(animateTooltip);
     }
+      // Guarda coords originals i re-escala en resize segons grandària real de la imatge
+  function setupResponsiveMap(imgId, mapName){
+    const img = document.getElementById(imgId);
+    const map = document.querySelector(`map[name="${mapName}"]`);
+    const areas = Array.from(map.querySelectorAll('area'));
+
+    // Desa una còpia de les coords originals a data-*
+    areas.forEach(a => {
+      a.dataset.coordsOriginal = a.coords;
+    });
+
+    function rescale(){
+      const natW = img.naturalWidth;
+      const natH = img.naturalHeight;
+      if (!natW || !natH) return;
+
+      const curW = img.clientWidth;
+      const curH = img.clientHeight;
+      const scaleX = curW / natW;
+      const scaleY = curH / natH;
+
+      areas.forEach(a => {
+        const orig = a.dataset.coordsOriginal.split(',').map(Number);
+        // Escala per parelles (x,y)
+        const scaled = orig.map((v,i)=> (i%2===0 ? Math.round(v*scaleX) : Math.round(v*scaleY)));
+        a.coords = scaled.join(',');
+      });
+    }
+
+    if (img.complete) rescale();
+    img.addEventListener('load', rescale);
+    window.addEventListener('resize', rescale);
+  }
+
+  // Inicialitza
+  document.addEventListener('DOMContentLoaded', ()=>{
+    setupResponsiveMap('cabinetImg', 'image-map');
+  });
+
+  // Cercador (sense “Enter” addicional)
+  function goToDrawer(){
+    const code = document.getElementById("searchBox").value.trim();
+    if(!code){ alert("Write a valid code, e.g. C2_CP2_3_IV"); return; }
+    if(code.startsWith("C2_CP2_")) window.location.href = "fitxes/" + code + ".html";
+    else alert("Invalid format. Use C2_CP2_X_Y (e.g. C2_CP2_3_IV).");
+  }
+  document.getElementById("searchBox").addEventListener("keypress", e=>{
+    if(e.key === "Enter") goToDrawer();
+  });
   </script>
 </body>
 </html>
