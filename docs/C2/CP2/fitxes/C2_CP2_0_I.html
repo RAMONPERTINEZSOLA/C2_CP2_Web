@@ -445,9 +445,34 @@
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     const qrUrlNote = document.getElementById('qrUrlNote');
 
-    const qrLogo = new Image();
-    qrLogo.crossOrigin = 'anonymous';
-    qrLogo.src = "../../parcsafe-logo.png";
+    // Prova diverses rutes de logo fins que una funcioni
+    const LOGO_CANDIDATES = [
+      "../../PARCsafe-[369]-BP-2022.png",
+      "../PARCsafe-[369]-BP-2022.png",
+      "../../../PARCsafe-[369]-BP-2022.png",
+      "../../parcsafe-logo.png",
+      "../parcsafe-logo.png",
+      "../../../parcsafe-logo.png"
+    ];
+
+    let qrLogoPromise; // cache perquè només es provi una vegada
+    function loadQrLogo() {
+      if (qrLogoPromise) return qrLogoPromise;
+      qrLogoPromise = new Promise((resolve) => {
+        let i = 0;
+        const tryNext = () => {
+          if (i >= LOGO_CANDIDATES.length) return resolve(null);
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => { i++; tryNext(); };
+          img.src = LOGO_CANDIDATES[i];
+        };
+        tryNext();
+      });
+      return qrLogoPromise;
+    }
+
 
     function currentCleanUrl(){
       return window.location.href.split('#')[0].split('?')[0];
@@ -478,22 +503,31 @@
         }
       }
 
-      // Logo central
+      // Logo central (només si hi ha logo)
+    const logoImg = await loadQrLogo();
+    if (logoImg) {
       const logoBox = Math.floor(size * 0.22);
       const cx = size/2, cy = size/2;
-      const r = Math.floor(logoBox/2)+14;
-      ctx.save(); ctx.fillStyle='#FFF'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); ctx.restore();
+      const r = Math.floor(logoBox/2) + 14;
 
-      const pad = 18; const w = logoBox - pad*2; const h = logoBox - pad*2;
-      function drawLogo(){
-        const lw=qrLogo.width, lh=qrLogo.height; if(!lw||!lh)return;
-        const aspect=lw/lh; let drawW=w, drawH=w/aspect;
-        if(drawH>h){drawH=h;drawW=h*aspect;}
-        ctx.drawImage(qrLogo,cx-drawW/2,cy-drawH/2,drawW,drawH);
-      }
-      if(qrLogo.complete) drawLogo(); else qrLogo.onload=drawLogo;
+      // disc blanc sota el logo (ara sí, només quan hi ha logo)
+      ctx.save();
+      ctx.fillStyle = '#FFF';
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+
+      const pad = 18;
+      const w = logoBox - pad*2;
+      const h = logoBox - pad*2;
+
+      const aspect = logoImg.width / logoImg.height;
+      let drawW = w, drawH = w / aspect;
+      if (drawH > h) { drawH = h; drawW = h * aspect; }
+
+      ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
     }
-
     function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function openQrModal(){
