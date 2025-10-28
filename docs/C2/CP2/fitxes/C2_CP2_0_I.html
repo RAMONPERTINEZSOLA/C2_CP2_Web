@@ -91,10 +91,17 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <!-- ✅ QR UMD per navegador (substitueix l'script local) -->
   <script type="module">
-    import * as qrcodegen from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
-    // Exposem al global perquè el teu codi antic (no-module) el pugui usar:
-    window.qrcodegen = qrcodegen;
+    import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
+
+    // 🔧 Shim robust: detecta on viu QrCode i exposa-ho a window.qrcodegen
+    const lib =
+      (m && m.QrCode) ? m :
+      (m && m.default && m.default.QrCode) ? m.default :
+      m;
+
+    window.qrcodegen = lib;
   </script>
+
 
 </head>
 <body>
@@ -219,6 +226,14 @@
   </dialog>
 
   <script>
+    async function ensureQrLib(timeoutMs = 1000) {
+  const t0 = performance.now();
+  while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
+    if (performance.now() - t0 > timeoutMs) throw new Error("QR lib not ready");
+    await new Promise(r => setTimeout(r, 20));
+    }
+  }
+
     const drawerCode = "C2_CP2_0_I";
     const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
@@ -481,12 +496,13 @@
     function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function openQrModal(){
-      // Mostra el valor estàtic
-      qrUrlNote.textContent = QR_STATIC_VALUE;
+      qrUrlNote.textContent = QR_STATIC_VALUE;   // (ja el tens estàtic)
       safeOpenDialog(qrModal);
       await new Promise(r=>requestAnimationFrame(r));
+      await ensureQrLib();                        // ✅ espera la llibreria
       await drawQR(QR_STATIC_VALUE);
     }
+
 
 
     qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
