@@ -90,7 +90,12 @@
 <!-- PDF (CDN) + QR (LOCAL COMPILAT) -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <!-- ✅ QR UMD per navegador (substitueix l'script local) -->
-  <script src="https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js"></script>
+  <script type="module">
+    import * as qrcodegen from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
+    // Exposem al global perquè el teu codi antic (no-module) el pugui usar:
+    window.qrcodegen = qrcodegen;
+  </script>
+
 </head>
 <body>
   <div class="container">
@@ -218,6 +223,9 @@
     const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
+    // === QR ESTÀTIC (canvia-ho si vols un altre text/URL) ===
+    const QR_STATIC_VALUE = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP2/fitxes/C2_CP2_0_I.html";
+
 
     // ===== Robust logo loader (header) =====
     (function loadLogo(){
@@ -473,12 +481,13 @@
     function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function openQrModal(){
-      const url = currentCleanUrl();
-      qrUrlNote.textContent = url;
+      // Mostra el valor estàtic
+      qrUrlNote.textContent = QR_STATIC_VALUE;
       safeOpenDialog(qrModal);
       await new Promise(r=>requestAnimationFrame(r));
-      await drawQR(url);
+      await drawQR(QR_STATIC_VALUE);
     }
+
 
     qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
     qrClose?.addEventListener('click', ()=> qrModal.close());
@@ -490,10 +499,11 @@
 
     // Copiar enllaç
     copyLinkBtn?.addEventListener('click', async ()=>{
-      const url = currentCleanUrl();
+      const url = QR_STATIC_VALUE;
       try{ await navigator.clipboard.writeText(url); showToast('🔗 Enllaç copiat'); }
       catch{ const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('🔗 Enllaç copiat'); }
     });
+
 
     // Descarregar PNG
     dlPngBtn?.addEventListener('click', ()=>{
@@ -514,9 +524,10 @@
       const box = pageW - margin*2;
       pdf.addImage(png, 'PNG', margin, margin, box, box);
       pdf.setFontSize(11);
-      pdf.text(currentCleanUrl(), margin, pageH - margin/2);
+      pdf.text(QR_STATIC_VALUE, margin, pageH - margin/2);
       pdf.save(`${drawerCode}_QR.pdf`);
     });
+
   </script>
 </body>
 </html>
