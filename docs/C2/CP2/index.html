@@ -1,207 +1,381 @@
 <!DOCTYPE html>
-<html lang="eng">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Interactive Cabinet MAP C2_CP2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
+    :root{
+      /* Parcsafe palette */
+      --green: #6dbd45;
+      --green-2:#5aa83a;
+      --ink:#1f2937;
+      --muted:#6b7280;
+      --bg1:#0b1220;
+      --bg2:#0f182b;
+      --card: rgba(255,255,255,0.08);
+      --card-border: rgba(255,255,255,0.16);
+      --ring: rgba(109,189,69,0.45);
     }
-    img {
-      max-width: 90%;
-      height: auto;
+
+    /* Reset-ish */
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#eef2ff;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #19325f33, transparent 60%),
+        radial-gradient(1000px 600px at 110% 20%, #2a5a2a30, transparent 55%),
+        radial-gradient(800px 600px at 30% 120%, #255a9c26, transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
     }
-.top-bar {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
-}
 
-.back-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: #00796b;
-  font-weight: 600;
-  font-size: 16px;
-}
+    /* Subtle grid texture */
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background-image:
+        linear-gradient(#ffffff08 1px, transparent 1px),
+        linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events:none;
+      opacity:.25;
+    }
 
-.back-button img {
-  height: 40px;
-  width: auto;
-  cursor: pointer;
-}
+    .page{
+      min-height:100%;
+      display:flex;
+      flex-direction:column;
+    }
 
+    /* Top bar */
+    .top-bar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(10,16,28,.7), rgba(10,16,28,.35));
+      border-bottom:1px solid #ffffff14;
+    }
+    .top-inner{
+      max-width:1100px; margin:0 auto;
+      display:flex; align-items:center; gap:16px;
+      padding:12px 16px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      text-decoration:none; color:#fff;
+      font-weight:600;
+    }
+    .brand img.logo{
+      height:34px; width:auto; display:block;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+    }
+    .back-button{
+      margin-left:auto;
+      display:inline-flex; align-items:center; gap:8px;
+      text-decoration:none; color:#bfe3c3;
+      font-weight:600; font-size:14px;
+      padding:8px 12px; border-radius:999px;
+      border:1px solid #bfe3c322;
+      background: #ffffff08;
+      transition: .2s ease;
+    }
+    .back-button:hover{ transform: translateY(-1px); border-color:#bfe3c348; }
+
+    /* Card container */
+    .container{
+      max-width:1100px; margin:28px auto 40px;
+      padding:16px;
+      width:100%;
+    }
+    .card{
+      background: var(--card);
+      border:1px solid var(--card-border);
+      border-radius:20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .card-header{
+      display:flex; flex-wrap:wrap; gap:12px 16px;
+      align-items:center; justify-content:space-between;
+      padding:18px 20px;
+      border-bottom:1px solid #ffffff1a;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+    }
+    .title{
+      font-size:20px; font-weight:700; letter-spacing:.2px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .title .dot{ width:8px; height:8px; border-radius:999px; background:var(--green); box-shadow:0 0 0 6px var(--ring); }
+
+    /* Actions */
+    .actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+    }
+    .button{
+      appearance:none; border:0; cursor:pointer;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 14px; border-radius:12px; font-weight:600;
+      text-decoration:none; color:#04210f; background:linear-gradient(180deg, #a8e68b, #6ccc49);
+      box-shadow: inset 0 1px 0 #ffffff99, 0 6px 18px rgba(109,189,69,.35);
+      transition: transform .15s ease, box-shadow .2s ease;
+      white-space:nowrap;
+    }
+    .button:hover{ transform: translateY(-1px); box-shadow: inset 0 1px 0 #ffffffaa, 0 10px 22px rgba(109,189,69,.45); }
+    .button:active{ transform: translateY(0); }
+
+    .search{
+      position:relative;
+    }
+    .search input{
+      width:260px; max-width:60vw;
+      background: #ffffff10; color:#e7f5eb;
+      border:1px solid #ffffff2a; outline:none;
+      padding:10px 38px 10px 12px; border-radius:12px;
+      font-weight:500;
+      transition:border-color .2s ease, background .2s ease;
+    }
+    .search input::placeholder{ color:#cfe0d4; }
+    .search input:focus{ border-color:#bfe3c345; background:#ffffff14; }
+    .search .kbd{
+      position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      font-size:11px; color:#d7f0dc; opacity:.85;
+      padding:2px 6px; border-radius:6px; border:1px solid #d7f0dc55; background:#d7f0dc15;
+    }
+
+    .card-body{
+      padding:18px 20px 24px;
+    }
+    .hint{
+      color:#d5e7da; font-size:13px; margin:0 0 12px 2px;
+    }
+
+    /* Image map */
+    .rack{
+      display:block; width:100%; max-width:1000px; height:auto;
+      border-radius:14px; border:1px solid #ffffff1a;
+      background:#0b1626;
+      box-shadow: 0 10px 24px rgba(0,0,0,.35);
+      margin: 0 auto;
+    }
+
+    /* Tooltip */
+    #tooltip{
+      position:absolute; display:none; z-index:60;
+      background: #0f1b2f; color:#e8f3ff;
+      border:1px solid #cfe4ff33; border-radius:12px;
+      padding:10px; width:320px; pointer-events:none;
+      box-shadow: 0 12px 32px rgba(0,0,0,.5);
+    }
+    #tooltip strong{ font-size:13px; }
+    #tooltip img{
+      display:block; margin-top:8px; width:100%; height:auto; border-radius:10px;
+      border:1px solid #ffffff1a;
+      background:#00000050;
+    }
+
+    /* Footer */
+    .footer{
+      max-width:1100px; margin:18px auto 48px;
+      color:var(--muted); font-size:12px; padding:0 16px;
+      text-align:center;
+    }
+
+    @media (max-width:640px){
+      .title{ font-size:18px; }
+      .search input{ width:220px; }
+    }
   </style>
 </head>
 <body>
-<div class="top-bar">
-  <a class="back-button" href="../../index.html">
-    <img src="../../back_arrow.png" alt="Back to main" title="Back to main" />
-    <span>Back to main</span>
-  </a>
-</div>
+  <div class="page">
 
+    <!-- Top bar -->
+    <header class="top-bar">
+      <div class="top-inner">
+        <a class="brand" href="#">
+          <img class="logo" src="../../parcsafe_logo.png" alt="Parcsafe" />
+          <span>Parcsafe — C2 · CP2</span>
+        </a>
 
-  <h1>Interactive Cabinet C2_CP2</h1>
-<a href="https://parcsafe-my.sharepoint.com/:x:/g/personal/daniel_parker_parcsafe_com_au/EfLLWaLmpYdHoDA7pT-XOgoBpL9oPL_C1Xvk-ouX2qh9MQ?e=t7DhUm" target="_blank" class="button">📊 View Live Stock Excel</a>
-  <p>Click on a drawer to view the product</p>
+        <a class="back-button" href="../../index.html" title="Back to main">
+          <img src="../../back_arrow.png" alt="" style="height:20px;width:auto;filter:brightness(1.2)" />
+          Back to main
+        </a>
+      </div>
+    </header>
 
-<div style="margin: 20px;">
-  <input type="text" id="searchBox" placeholder="Enter drawer code (e.g. C2_CP2_5_III)" style="padding: 8px; width: 250px;">
-  <button onclick="goToDrawer()" style="padding: 8px;">Search</button>
-</div>
+    <!-- Card -->
+    <main class="container">
+      <section class="card">
+        <div class="card-header">
+          <div class="title">
+            <span class="dot" aria-hidden="true"></span>
+            <span>Interactive Cabinet — C2_CP2</span>
+          </div>
 
+          <div class="actions">
+            <a href="https://parcsafe-my.sharepoint.com/:x:/g/personal/daniel_parker_parcsafe_com_au/EfLLWaLmpYdHoDA7pT-XOgoBpL9oPL_C1Xvk-ouX2qh9MQ?e=t7DhUm"
+               target="_blank" rel="noopener" class="button">📊 View Live Stock Excel</a>
 
-  <img src="C2_CP2.jpg" alt="Armari 12x5" usemap="#image-map">
+            <div class="search">
+              <input id="searchBox" type="text" placeholder="Enter drawer code (e.g. C2_CP2_3_IV)" />
+              <span class="kbd">Enter</span>
+            </div>
 
-  <map name="image-map">
-    <area target="" alt="C2_CP2_0_I" title="C2_CP2_0_I" href="fitxes/C2_CP2_0_I.html" coords="89,1587,233,1698" onmouseover="showTooltip(event, 'C2_CP2_0_I', 'Description for C2_CP2_0_I', 'img/C2_CP2_0_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_0_II" title="C2_CP2_0_II" href="fitxes/C2_CP2_0_II.html" coords="237,1586,376,1696" onmouseover="showTooltip(event, 'C2_CP2_0_II', 'Description for C2_CP2_0_II', 'img/C2_CP2_0_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_0_III" title="C2_CP2_0_III" href="fitxes/C2_CP2_0_III.html" coords="381,1587,522,1698" onmouseover="showTooltip(event, 'C2_CP2_0_III', 'Description for C2_CP2_0_III', 'img/C2_CP2_0_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_0_IV" title="C2_CP2_0_IV" href="fitxes/C2_CP2_0_IV.html" coords="528,1588,664,1695" onmouseover="showTooltip(event, 'C2_CP2_0_IV', 'Description for C2_CP2_0_IV', 'img/C2_CP2_0_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_0_V" title="C2_CP2_0_V" href="fitxes/C2_CP2_0_V.html" coords="671,1588,809,1696" onmouseover="showTooltip(event, 'C2_CP2_0_V', 'Description for C2_CP2_0_V', 'img/C2_CP2_0_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_1_I" title="C2_CP2_1_I" href="fitxes/C2_CP2_1_I.html" coords="90,1445,232,1557" onmouseover="showTooltip(event, 'C2_CP2_1_I', 'Description for C2_CP2_1_I', 'img/C2_CP2_1_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_1_II" title="C2_CP2_1_II" href="fitxes/C2_CP2_1_II.html" coords="238,1448,378,1559" onmouseover="showTooltip(event, 'C2_CP2_1_II', 'Description for C2_CP2_1_II', 'img/C2_CP2_1_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_1_III" title="C2_CP2_1_III" href="fitxes/C2_CP2_1_III.html" coords="383,1448,524,1559" onmouseover="showTooltip(event, 'C2_CP2_1_III', 'Description for C2_CP2_1_III', 'img/C2_CP2_1_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_1_IV" title="C2_CP2_1_IV" href="fitxes/C2_CP2_1_IV.html" coords="529,1448,664,1557" onmouseover="showTooltip(event, 'C2_CP2_1_IV', 'Description for C2_CP2_1_IV', 'img/C2_CP2_1_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_1_V" title="C2_CP2_1_V" href="fitxes/C2_CP2_1_V.html" coords="671,1557,812,1446" onmouseover="showTooltip(event, 'C2_CP2_1_V', 'Description for C2_CP2_1_V', 'img/C2_CP2_1_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_2_I" title="C2_CP2_2_I" href="fitxes/C2_CP2_2_I.html" coords="93,1311,229,1418" onmouseover="showTooltip(event, 'C2_CP2_2_I', 'Description for C2_CP2_2_I', 'img/C2_CP2_2_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_2_II" title="C2_CP2_2_II" href="fitxes/C2_CP2_2_II.html" coords="238,1309,373,1418" onmouseover="showTooltip(event, 'C2_CP2_2_II', 'Description for C2_CP2_2_II', 'img/C2_CP2_2_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_2_III" title="C2_CP2_2_III" href="fitxes/C2_CP2_2_III.html" coords="381,1311,520,1421" onmouseover="showTooltip(event, 'C2_CP2_2_III', 'Description for C2_CP2_2_III', 'img/C2_CP2_2_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_2_IV" title="C2_CP2_2_IV" href="fitxes/C2_CP2_2_IV.html" coords="528,1311,666,1420" onmouseover="showTooltip(event, 'C2_CP2_2_IV', 'Description for C2_CP2_2_IV', 'img/C2_CP2_2_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_2_V" title="C2_CP2_2_V" href="fitxes/C2_CP2_2_V.html" coords="670,1308,810,1420" onmouseover="showTooltip(event, 'C2_CP2_2_V', 'Description for C2_CP2_2_V', 'img/C2_CP2_2_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_3_I" title="C2_CP2_3_I" href="fitxes/C2_CP2_3_I.html" coords="91,1171,230,1278" onmouseover="showTooltip(event, 'C2_CP2_3_I', 'Description for C2_CP2_3_I', 'img/C2_CP2_3_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_3_II" title="C2_CP2_3_II" href="fitxes/C2_CP2_3_II.html" coords="237,1171,375,1278" onmouseover="showTooltip(event, 'C2_CP2_3_II', 'Description for C2_CP2_3_II', 'img/C2_CP2_3_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_3_III" title="C2_CP2_3_III" href="fitxes/C2_CP2_3_III.html" coords="383,1171,521,1281" onmouseover="showTooltip(event, 'C2_CP2_3_III', 'Description for C2_CP2_3_III', 'img/C2_CP2_3_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_3_IV" title="C2_CP2_3_IV" href="fitxes/C2_CP2_3_IV.html" coords="527,1170,666,1280" onmouseover="showTooltip(event, 'C2_CP2_3_IV', 'Description for C2_CP2_3_IV', 'img/C2_CP2_3_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_3_V" title="C2_CP2_3_V" href="fitxes/C2_CP2_3_V.html" coords="669,1167,810,1281" onmouseover="showTooltip(event, 'C2_CP2_3_V', 'Description for C2_CP2_3_V', 'img/C2_CP2_3_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_4_I" title="C2_CP2_4_I" href="fitxes/C2_CP2_4_I.html" coords="91,1031,227,1140" onmouseover="showTooltip(event, 'C2_CP2_4_I', 'Description for C2_CP2_4_I', 'img/C2_CP2_4_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_4_II" title="C2_CP2_4_II" href="fitxes/C2_CP2_4_II.html" coords="238,1032,375,1140" onmouseover="showTooltip(event, 'C2_CP2_4_II', 'Description for C2_CP2_4_II', 'img/C2_CP2_4_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_4_III" title="C2_CP2_4_III" href="fitxes/C2_CP2_4_III.html" coords="383,1032,521,1139" onmouseover="showTooltip(event, 'C2_CP2_4_III', 'Description for C2_CP2_4_III', 'img/C2_CP2_4_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_4_IV" title="C2_CP2_4_IV" href="fitxes/C2_CP2_4_IV.html" coords="527,1031,665,1139" onmouseover="showTooltip(event, 'C2_CP2_4_IV', 'Description for C2_CP2_4_IV', 'img/C2_CP2_4_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_4_V" title="C2_CP2_4_V" href="fitxes/C2_CP2_4_V.html" coords="672,1032,809,1140" onmouseover="showTooltip(event, 'C2_CP2_4_V', 'Description for C2_CP2_4_V', 'img/C2_CP2_4_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_5_I" title="C2_CP2_5_I" href="fitxes/C2_CP2_5_I.html" coords="93,894,231,1001" onmouseover="showTooltip(event, 'C2_CP2_5_I', 'Description for C2_CP2_5_I', 'img/C2_CP2_5_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_5_II" title="C2_CP2_5_II" href="fitxes/C2_CP2_5_II.html" coords="239,894,374,1001" onmouseover="showTooltip(event, 'C2_CP2_5_II', 'Description for C2_CP2_5_II', 'img/C2_CP2_5_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_5_III" title="C2_CP2_5_III" href="fitxes/C2_CP2_5_III.html" coords="382,894,523,1005" onmouseover="showTooltip(event, 'C2_CP2_5_III', 'Description for C2_CP2_5_III', 'img/C2_CP2_5_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_5_IV" title="C2_CP2_5_IV" href="fitxes/C2_CP2_5_IV.html" coords="528,895,666,1001" onmouseover="showTooltip(event, 'C2_CP2_5_IV', 'Description for C2_CP2_5_IV', 'img/C2_CP2_5_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_5_V" title="C2_CP2_5_V" href="fitxes/C2_CP2_5_V.html" coords="672,890,808,1003" onmouseover="showTooltip(event, 'C2_CP2_5_V', 'Description for C2_CP2_5_V', 'img/C2_CP2_5_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_6_I" title="C2_CP2_6_I" href="fitxes/C2_CP2_6_I.html" coords="92,753,232,863" onmouseover="showTooltip(event, 'C2_CP2_6_I', 'Description for C2_CP2_6_I', 'img/C2_CP2_6_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_6_II" title="C2_CP2_6_II" href="fitxes/C2_CP2_6_II.html" coords="237,752,373,861" onmouseover="showTooltip(event, 'C2_CP2_6_II', 'Description for C2_CP2_6_II', 'img/C2_CP2_6_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_6_III" title="C2_CP2_6_III" href="fitxes/C2_CP2_6_III.html" coords="382,753,516,863" onmouseover="showTooltip(event, 'C2_CP2_6_III', 'Description for C2_CP2_6_III', 'img/C2_CP2_6_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_6_IV" title="C2_CP2_6_IV" href="fitxes/C2_CP2_6_IV.html" coords="526,753,665,863" onmouseover="showTooltip(event, 'C2_CP2_6_IV', 'Description for C2_CP2_6_IV', 'img/C2_CP2_6_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_6_V" title="C2_CP2_6_V" href="fitxes/C2_CP2_6_V.html" coords="672,753,808,860" onmouseover="showTooltip(event, 'C2_CP2_6_V', 'Description for C2_CP2_6_V', 'img/C2_CP2_6_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_7_I" title="C2_CP2_7_I" href="fitxes/C2_CP2_7_I.html" coords="93,615,227,722" onmouseover="showTooltip(event, 'C2_CP2_7_I', 'Description for C2_CP2_7_I', 'img/C2_CP2_7_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_7_II" title="C2_CP2_7_II" href="fitxes/C2_CP2_7_II.html" coords="235,613,373,722" onmouseover="showTooltip(event, 'C2_CP2_7_II', 'Description for C2_CP2_7_II', 'img/C2_CP2_7_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_7_III" title="C2_CP2_7_III" href="fitxes/C2_CP2_7_III.html" coords="382,611,520,727" onmouseover="showTooltip(event, 'C2_CP2_7_III', 'Description for C2_CP2_7_III', 'img/C2_CP2_7_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_7_IV" title="C2_CP2_7_IV" href="fitxes/C2_CP2_7_IV.html" coords="529,611,668,725" onmouseover="showTooltip(event, 'C2_CP2_7_IV', 'Description for C2_CP2_7_IV', 'img/C2_CP2_7_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_7_V" title="C2_CP2_7_V" href="fitxes/C2_CP2_7_V.html" coords="672,611,809,722" onmouseover="showTooltip(event, 'C2_CP2_7_V', 'Description for C2_CP2_7_V', 'img/C2_CP2_7_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_8_I" title="C2_CP2_8_I" href="fitxes/C2_CP2_8_I.html" coords="92,475,228,585" onmouseover="showTooltip(event, 'C2_CP2_8_I', 'Description for C2_CP2_8_I', 'img/C2_CP2_8_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_8_II" title="C2_CP2_8_II" href="fitxes/C2_CP2_8_II.html" coords="236,475,375,584" onmouseover="showTooltip(event, 'C2_CP2_8_II', 'Description for C2_CP2_8_II', 'img/C2_CP2_8_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_8_III" title="C2_CP2_8_III" href="fitxes/C2_CP2_8_III.html" coords="383,474,521,582" onmouseover="showTooltip(event, 'C2_CP2_8_III', 'Description for C2_CP2_8_III', 'img/C2_CP2_8_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_8_IV" title="C2_CP2_8_IV" href="fitxes/C2_CP2_8_IV.html" coords="527,476,663,583" onmouseover="showTooltip(event, 'C2_CP2_8_IV', 'Description for C2_CP2_8_IV', 'img/C2_CP2_8_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_8_V" title="C2_CP2_8_V" href="fitxes/C2_CP2_8_V.html" coords="672,477,807,584" onmouseover="showTooltip(event, 'C2_CP2_8_V', 'Description for C2_CP2_8_V', 'img/C2_CP2_8_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_9_I" title="C2_CP2_9_I" href="fitxes/C2_CP2_9_I.html" coords="94,341,229,444" onmouseover="showTooltip(event, 'C2_CP2_9_I', 'Description for C2_CP2_9_I', 'img/C2_CP2_9_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_9_II" title="C2_CP2_9_II" href="fitxes/C2_CP2_9_II.html" coords="240,342,372,445" onmouseover="showTooltip(event, 'C2_CP2_9_II', 'Description for C2_CP2_9_II', 'img/C2_CP2_9_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_9_III" title="C2_CP2_9_III" href="fitxes/C2_CP2_9_III.html" coords="382,338,518,441" onmouseover="showTooltip(event, 'C2_CP2_9_III', 'Description for C2_CP2_9_III', 'img/C2_CP2_9_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_9_IV" title="C2_CP2_9_IV" href="fitxes/C2_CP2_9_IV.html" coords="528,341,665,444" onmouseover="showTooltip(event, 'C2_CP2_9_IV', 'Description for C2_CP2_9_IV', 'img/C2_CP2_9_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_9_V" title="C2_CP2_9_V" href="fitxes/C2_CP2_9_V.html" coords="671,344,809,443" onmouseover="showTooltip(event, 'C2_CP2_9_V', 'Description for C2_CP2_9_V', 'img/C2_CP2_9_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_10_I" title="C2_CP2_10_I" href="fitxes/C2_CP2_10_I.html" coords="92,198,226,309" onmouseover="showTooltip(event, 'C2_CP2_10_I', 'Description for C2_CP2_10_I', 'img/C2_CP2_10_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_10_II" title="C2_CP2_10_II" href="fitxes/C2_CP2_10_II.html" coords="239,199,373,311" onmouseover="showTooltip(event, 'C2_CP2_10_II', 'Description for C2_CP2_10_II', 'img/C2_CP2_10_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_10_III" title="C2_CP2_10_III" href="fitxes/C2_CP2_10_III.html" coords="383,198,519,309" onmouseover="showTooltip(event, 'C2_CP2_10_III', 'Description for C2_CP2_10_III', 'img/C2_CP2_10_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_10_IV" title="C2_CP2_10_IV" href="fitxes/C2_CP2_10_IV.html" coords="528,198,662,310" onmouseover="showTooltip(event, 'C2_CP2_10_IV', 'Description for C2_CP2_10_IV', 'img/C2_CP2_10_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_10_V" title="C2_CP2_10_V" href="fitxes/C2_CP2_10_V.html" coords="672,200,809,312" onmouseover="showTooltip(event, 'C2_CP2_10_V', 'Description for C2_CP2_10_V', 'img/C2_CP2_10_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_11_I" title="C2_CP2_11_I" href="fitxes/C2_CP2_11_I.html" coords="93,67,227,171" onmouseover="showTooltip(event, 'C2_CP2_11_I', 'Description for C2_CP2_11_I', 'img/C2_CP2_11_I.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_11_II" title="C2_CP2_11_II" href="fitxes/C2_CP2_11_II.html" coords="239,64,377,173" onmouseover="showTooltip(event, 'C2_CP2_11_II', 'Description for C2_CP2_11_II', 'img/C2_CP2_11_II.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_11_III" title="C2_CP2_11_III" href="fitxes/C2_CP2_11_III.html" coords="384,66,516,170" onmouseover="showTooltip(event, 'C2_CP2_11_III', 'Description for C2_CP2_11_III', 'img/C2_CP2_11_III.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_11_IV" title="C2_CP2_11_IV" href="fitxes/C2_CP2_11_IV.html" coords="529,67,665,172" onmouseover="showTooltip(event, 'C2_CP2_11_IV', 'Description for C2_CP2_11_IV', 'img/C2_CP2_11_IV.jpg')" onmouseout="hideTooltip()" shape="rect">
-    <area target="" alt="C2_CP2_11_V" title="C2_CP2_11_V" href="fitxes/C2_CP2_11_V.html" coords="670,68,807,168" onmouseover="showTooltip(event, 'C2_CP2_11_V', 'Description for C2_CP2_11_V', 'img/C2_CP2_11_V.jpg')" onmouseout="hideTooltip()" shape="rect">
-</map>
+            <button class="button" onclick="goToDrawer()">🔎 Search</button>
+          </div>
+        </div>
 
-<div id="tooltip" style="
-  display: none;
-  position: absolute;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  z-index: 10;
-  font-size: 13px;
-  text-align: left;
-">
-  <strong id="tooltip-code"></strong><br>
-  <img id="tooltip-img" src="" style="max-width: 300px; height: auto; margin-top: 5px;">
-</div>
+        <div class="card-body">
+          <p class="hint">Click on a drawer to view the product</p>
 
-<script>
-  function showTooltip(evt, code) {
-    const tooltip = document.getElementById("tooltip");
-    document.getElementById("tooltip-code").textContent = code;
-    document.getElementById("tooltip-img").src = "img/" + code + ".jpg";
-    tooltip.style.top = (evt.pageY + 15) + "px";
-    tooltip.style.left = (evt.pageX + 15) + "px";
-    tooltip.style.display = "block";
-  }
+          <!-- IMAGE MAP -->
+          <img class="rack" src="C2_CP2.jpg" alt="Armari 12x5" usemap="#image-map">
 
-  function hideTooltip() {
-    document.getElementById("tooltip").style.display = "none";
-  }
-</script>
+          <map name="image-map">
+            <!-- 🔁 Mantinc totes les teves àrees exactes -->
+            <area target="" alt="C2_CP2_0_I"   title="C2_CP2_0_I"   href="fitxes/C2_CP2_0_I.html"   coords="89,1587,233,1698"   onmouseover="showTooltip(event, 'C2_CP2_0_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_0_II"  title="C2_CP2_0_II"  href="fitxes/C2_CP2_0_II.html"  coords="237,1586,376,1696"  onmouseover="showTooltip(event, 'C2_CP2_0_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_0_III" title="C2_CP2_0_III" href="fitxes/C2_CP2_0_III.html" coords="381,1587,522,1698"  onmouseover="showTooltip(event, 'C2_CP2_0_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_0_IV"  title="C2_CP2_0_IV"  href="fitxes/C2_CP2_0_IV.html"  coords="528,1588,664,1695"  onmouseover="showTooltip(event, 'C2_CP2_0_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_0_V"   title="C2_CP2_0_V"   href="fitxes/C2_CP2_0_V.html"   coords="671,1588,809,1696"  onmouseover="showTooltip(event, 'C2_CP2_0_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
 
+            <area target="" alt="C2_CP2_1_I"   title="C2_CP2_1_I"   href="fitxes/C2_CP2_1_I.html"   coords="90,1445,232,1557"   onmouseover="showTooltip(event, 'C2_CP2_1_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_1_II"  title="C2_CP2_1_II"  href="fitxes/C2_CP2_1_II.html"  coords="238,1448,378,1559"  onmouseover="showTooltip(event, 'C2_CP2_1_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_1_III" title="C2_CP2_1_III" href="fitxes/C2_CP2_1_III.html" coords="383,1448,524,1559"  onmouseover="showTooltip(event, 'C2_CP2_1_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_1_IV"  title="C2_CP2_1_IV"  href="fitxes/C2_CP2_1_IV.html"  coords="529,1448,664,1557"  onmouseover="showTooltip(event, 'C2_CP2_1_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_1_V"   title="C2_CP2_1_V"   href="fitxes/C2_CP2_1_V.html"   coords="671,1557,812,1446"  onmouseover="showTooltip(event, 'C2_CP2_1_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
 
-<div id="tooltip" style="
-  display: none;
-  position: absolute;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  z-index: 10;
-  font-size: 13px;
-  text-align: left;
-">
-  <strong id="tooltip-code"></strong><br>
-  <span id="tooltip-desc"></span><br>
-  <img id="tooltip-img" src="" style="max-width: 300px; height: auto; margin-top: 5px;">
-</div>
+            <area target="" alt="C2_CP2_2_I"   title="C2_CP2_2_I"   href="fitxes/C2_CP2_2_I.html"   coords="93,1311,229,1418"   onmouseover="showTooltip(event, 'C2_CP2_2_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_2_II"  title="C2_CP2_2_II"  href="fitxes/C2_CP2_2_II.html"  coords="238,1309,373,1418"  onmouseover="showTooltip(event, 'C2_CP2_2_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_2_III" title="C2_CP2_2_III" href="fitxes/C2_CP2_2_III.html" coords="381,1311,520,1421"  onmouseover="showTooltip(event, 'C2_CP2_2_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_2_IV"  title="C2_CP2_2_IV"  href="fitxes/C2_CP2_2_IV.html"  coords="528,1311,666,1420"  onmouseover="showTooltip(event, 'C2_CP2_2_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_2_V"   title="C2_CP2_2_V"   href="fitxes/C2_CP2_2_V.html"   coords="670,1308,810,1420"  onmouseover="showTooltip(event, 'C2_CP2_2_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
 
-<script>
-  function showTooltip(evt, code, desc, imgSrc) {
-    const tooltip = document.getElementById("tooltip");
-    document.getElementById("tooltip-code").textContent = code;
-    document.getElementById("tooltip-desc").textContent = desc;
-    document.getElementById("tooltip-img").src = imgSrc;
+            <area target="" alt="C2_CP2_3_I"   title="C2_CP2_3_I"   href="fitxes/C2_CP2_3_I.html"   coords="91,1171,230,1278"   onmouseover="showTooltip(event, 'C2_CP2_3_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_3_II"  title="C2_CP2_3_II"  href="fitxes/C2_CP2_3_II.html"  coords="237,1171,375,1278"  onmouseover="showTooltip(event, 'C2_CP2_3_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_3_III" title="C2_CP2_3_III" href="fitxes/C2_CP2_3_III.html" coords="383,1171,521,1281"  onmouseover="showTooltip(event, 'C2_CP2_3_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_3_IV"  title="C2_CP2_3_IV"  href="fitxes/C2_CP2_3_IV.html"  coords="527,1170,666,1280"  onmouseover="showTooltip(event, 'C2_CP2_3_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_3_V"   title="C2_CP2_3_V"   href="fitxes/C2_CP2_3_V.html"   coords="669,1167,810,1281"  onmouseover="showTooltip(event, 'C2_CP2_3_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
 
-    tooltip.style.top = (evt.pageY + 15) + "px";
-    tooltip.style.left = (evt.pageX + 15) + "px";
-    tooltip.style.display = "block";
-  }
+            <area target="" alt="C2_CP2_4_I"   title="C2_CP2_4_I"   href="fitxes/C2_CP2_4_I.html"   coords="91,1031,227,1140"   onmouseover="showTooltip(event, 'C2_CP2_4_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_4_II"  title="C2_CP2_4_II"  href="fitxes/C2_CP2_4_II.html"  coords="238,1032,375,1140"  onmouseover="showTooltip(event, 'C2_CP2_4_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_4_III" title="C2_CP2_4_III" href="fitxes/C2_CP2_4_III.html" coords="383,1032,521,1139"  onmouseover="showTooltip(event, 'C2_CP2_4_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_4_IV"  title="C2_CP2_4_IV"  href="fitxes/C2_CP2_4_IV.html"  coords="527,1031,665,1139"  onmouseover="showTooltip(event, 'C2_CP2_4_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_4_V"   title="C2_CP2_4_V"   href="fitxes/C2_CP2_4_V.html"   coords="672,1032,809,1140"  onmouseover="showTooltip(event, 'C2_CP2_4_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
 
-  function hideTooltip() {
-    document.getElementById("tooltip").style.display = "none";
-  }
-</script>
+            <area target="" alt="C2_CP2_5_I"   title="C2_CP2_5_I"   href="fitxes/C2_CP2_5_I.html"   coords="93,894,231,1001"    onmouseover="showTooltip(event, 'C2_CP2_5_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_5_II"  title="C2_CP2_5_II"  href="fitxes/C2_CP2_5_II.html"  coords="239,894,374,1001"   onmouseover="showTooltip(event, 'C2_CP2_5_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_5_III" title="C2_CP2_5_III" href="fitxes/C2_CP2_5_III.html" coords="382,894,523,1005"   onmouseover="showTooltip(event, 'C2_CP2_5_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_5_IV"  title="C2_CP2_5_IV"  href="fitxes/C2_CP2_5_IV.html"  coords="528,895,666,1001"   onmouseover="showTooltip(event, 'C2_CP2_5_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_5_V"   title="C2_CP2_5_V"   href="fitxes/C2_CP2_5_V.html"   coords="672,890,808,1003"   onmouseover="showTooltip(event, 'C2_CP2_5_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
 
+            <area target="" alt="C2_CP2_6_I"   title="C2_CP2_6_I"   href="fitxes/C2_CP2_6_I.html"   coords="92,753,232,863"     onmouseover="showTooltip(event, 'C2_CP2_6_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_6_II"  title="C2_CP2_6_II"  href="fitxes/C2_CP2_6_II.html"  coords="237,752,373,861"    onmouseover="showTooltip(event, 'C2_CP2_6_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_6_III" title="C2_CP2_6_III" href="fitxes/C2_CP2_6_III.html" coords="382,753,516,863"     onmouseover="showTooltip(event, 'C2_CP2_6_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_6_IV"  title="C2_CP2_6_IV"  href="fitxes/C2_CP2_6_IV.html"  coords="526,753,665,863"    onmouseover="showTooltip(event, 'C2_CP2_6_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_6_V"   title="C2_CP2_6_V"   href="fitxes/C2_CP2_6_V.html"   coords="672,753,808,860"    onmouseover="showTooltip(event, 'C2_CP2_6_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+
+            <area target="" alt="C2_CP2_7_I"   title="C2_CP2_7_I"   href="fitxes/C2_CP2_7_I.html"   coords="93,615,227,722"     onmouseover="showTooltip(event, 'C2_CP2_7_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_7_II"  title="C2_CP2_7_II"  href="fitxes/C2_CP2_7_II.html"  coords="235,613,373,722"    onmouseover="showTooltip(event, 'C2_CP2_7_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_7_III" title="C2_CP2_7_III" href="fitxes/C2_CP2_7_III.html" coords="382,611,520,727"     onmouseover="showTooltip(event, 'C2_CP2_7_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_7_IV"  title="C2_CP2_7_IV"  href="fitxes/C2_CP2_7_IV.html"  coords="529,611,668,725"    onmouseover="showTooltip(event, 'C2_CP2_7_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_7_V"   title="C2_CP2_7_V"   href="fitxes/C2_CP2_7_V.html"   coords="672,611,809,722"    onmouseover="showTooltip(event, 'C2_CP2_7_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+
+            <area target="" alt="C2_CP2_8_I"   title="C2_CP2_8_I"   href="fitxes/C2_CP2_8_I.html"   coords="92,475,228,585"     onmouseover="showTooltip(event, 'C2_CP2_8_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_8_II"  title="C2_CP2_8_II"  href="fitxes/C2_CP2_8_II.html"  coords="236,475,375,584"    onmouseover="showTooltip(event, 'C2_CP2_8_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_8_III" title="C2_CP2_8_III" href="fitxes/C2_CP2_8_III.html" coords="383,474,521,582"     onmouseover="showTooltip(event, 'C2_CP2_8_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_8_IV"  title="C2_CP2_8_IV"  href="fitxes/C2_CP2_8_IV.html"  coords="527,476,663,583"    onmouseover="showTooltip(event, 'C2_CP2_8_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_8_V"   title="C2_CP2_8_V"   href="fitxes/C2_CP2_8_V.html"   coords="672,477,807,584"    onmouseover="showTooltip(event, 'C2_CP2_8_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+
+            <area target="" alt="C2_CP2_9_I"   title="C2_CP2_9_I"   href="fitxes/C2_CP2_9_I.html"   coords="94,341,229,444"     onmouseover="showTooltip(event, 'C2_CP2_9_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_9_II"  title="C2_CP2_9_II"  href="fitxes/C2_CP2_9_II.html"  coords="240,342,372,445"    onmouseover="showTooltip(event, 'C2_CP2_9_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_9_III" title="C2_CP2_9_III" href="fitxes/C2_CP2_9_III.html" coords="382,338,518,441"     onmouseover="showTooltip(event, 'C2_CP2_9_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_9_IV"  title="C2_CP2_9_IV"  href="fitxes/C2_CP2_9_IV.html"  coords="528,341,665,444"     onmouseover="showTooltip(event, 'C2_CP2_9_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_9_V"   title="C2_CP2_9_V"   href="fitxes/C2_CP2_9_V.html"   coords="671,344,809,443"    onmouseover="showTooltip(event, 'C2_CP2_9_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+
+            <area target="" alt="C2_CP2_10_I"   title="C2_CP2_10_I"   href="fitxes/C2_CP2_10_I.html"   coords="92,198,226,309"   onmouseover="showTooltip(event, 'C2_CP2_10_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_10_II"  title="C2_CP2_10_II"  href="fitxes/C2_CP2_10_II.html"  coords="239,199,373,311"  onmouseover="showTooltip(event, 'C2_CP2_10_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_10_III" title="C2_CP2_10_III" href="fitxes/C2_CP2_10_III.html" coords="383,198,519,309"  onmouseover="showTooltip(event, 'C2_CP2_10_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_10_IV"  title="C2_CP2_10_IV"  href="fitxes/C2_CP2_10_IV.html"  coords="528,198,662,310"  onmouseover="showTooltip(event, 'C2_CP2_10_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_10_V"   title="C2_CP2_10_V"   href="fitxes/C2_CP2_10_V.html"   coords="672,200,809,312"  onmouseover="showTooltip(event, 'C2_CP2_10_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+
+            <area target="" alt="C2_CP2_11_I"   title="C2_CP2_11_I"   href="fitxes/C2_CP2_11_I.html"   coords="93,67,227,171"   onmouseover="showTooltip(event, 'C2_CP2_11_I')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_11_II"  title="C2_CP2_11_II"  href="fitxes/C2_CP2_11_II.html"  coords="239,64,377,173"  onmouseover="showTooltip(event, 'C2_CP2_11_II')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_11_III" title="C2_CP2_11_III" href="fitxes/C2_CP2_11_III.html" coords="384,66,516,170"   onmouseover="showTooltip(event, 'C2_CP2_11_III')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_11_IV"  title="C2_CP2_11_IV"  href="fitxes/C2_CP2_11_IV.html"  coords="529,67,665,172"  onmouseover="showTooltip(event, 'C2_CP2_11_IV')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+            <area target="" alt="C2_CP2_11_V"   title="C2_CP2_11_V"   href="fitxes/C2_CP2_11_V.html"   coords="670,68,807,168"  onmouseover="showTooltip(event, 'C2_CP2_11_V')"   onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" shape="rect">
+          </map>
+        </div>
+      </section>
+
+      <div id="tooltip">
+        <strong id="tooltip-code">—</strong>
+        <img id="tooltip-img" src="" alt="">
+      </div>
+    </main>
+
+    <footer class="footer">
+      © Parcsafe · Interactive cabinet map · C2 / CP2
+    </footer>
+  </div>
+
+  <script>
+    // Search / navigation
+    function goToDrawer() {
+      const code = document.getElementById("searchBox").value.trim();
+      if (!code) return;
+      const url = "fitxes/" + code + ".html";
+      if (code.startsWith("C2_CP2_")) {
+        window.location.href = url;
+      } else {
+        alert("Please enter a valid drawer code (e.g. C2_CP2_3_IV).");
+      }
+    }
+    document.getElementById("searchBox").addEventListener("keypress", function(e){
+      if (e.key === "Enter") goToDrawer();
+    });
+
+    // Tooltip logic (single instance; follows cursor smoothly)
+    const tt = document.getElementById("tooltip");
+    const ttCode = document.getElementById("tooltip-code");
+    const ttImg  = document.getElementById("tooltip-img");
+    let rafId = null, targetX = 0, targetY = 0, curX = 0, curY = 0;
+
+    function showTooltip(evt, code){
+      ttCode.textContent = code;
+      ttImg.src = "img/" + code + ".jpg";
+      targetX = evt.pageX + 16;
+      targetY = evt.pageY + 16;
+      tt.style.display = "block";
+      animateTooltip();
+    }
+    function moveTooltip(evt){
+      targetX = evt.pageX + 16;
+      targetY = evt.pageY + 16;
+    }
+    function hideTooltip(){
+      tt.style.display = "none";
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    function animateTooltip(){
+      curX += (targetX - curX) * 0.2;
+      curY += (targetY - curY) * 0.2;
+      tt.style.left = curX + "px";
+      tt.style.top  = curY + "px";
+      rafId = requestAnimationFrame(animateTooltip);
+    }
+  </script>
 </body>
-<script>
-  function goToDrawer() {
-    const code = document.getElementById("searchBox").value.trim();
-    const url = "fitxes/" + code + ".html";
-    if (code.startsWith("C2_CP2_")) {
-      window.location.href = url;
-    } else {
-      alert("Please enter a valid drawer code (e.g. C2_CP2_3_IV).");
-    }
-  }
-
-  // Permet fer servir la tecla Enter
-  document.getElementById("searchBox").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-      goToDrawer();
-    }
-  });
-</script>
-
 </html>
