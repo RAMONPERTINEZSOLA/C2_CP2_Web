@@ -447,9 +447,6 @@
 
     // Prova diverses rutes de logo fins que una funcioni
     const LOGO_CANDIDATES = [
-      "../../PARCsafe-[369]-BP-2022.png",
-      "../PARCsafe-[369]-BP-2022.png",
-      "../../../PARCsafe-[369]-BP-2022.png",
       "../../parcsafe-logo.png",
       "../parcsafe-logo.png",
       "../../../parcsafe-logo.png"
@@ -472,7 +469,6 @@
       });
       return qrLogoPromise;
     }
-
 
     function currentCleanUrl(){
       return window.location.href.split('#')[0].split('?')[0];
@@ -503,7 +499,7 @@
         }
       }
 
-      // Logo central (només si hi ha logo)
+     // Logo central (només si hi ha logo)
     const logoImg = await loadQrLogo();
     if (logoImg) {
       const logoBox = Math.floor(size * 0.22);
@@ -528,6 +524,8 @@
 
       ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
     }
+    }
+
     function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function openQrModal(){
