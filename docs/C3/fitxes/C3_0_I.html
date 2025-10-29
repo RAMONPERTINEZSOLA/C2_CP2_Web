@@ -80,40 +80,30 @@
     .modal .ft{padding:18px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
     .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
 
-        /* ✅ Doble imatge superposada per "Cabinet Highlight" */
-    .imgwrap.rack-hi{
-      position: relative;
-      display: block;
-      overflow: hidden;
-      border: 1px dashed #cdd4d9;
-      background: #fafafa;
-      border-radius: 12px;
+      /* Disposició sense superposar: figures amb marc i estil com .imgwrap */
+    .imggrid{
+      display:grid;
+      gap:12px;
+    }
+    .imggrid.two-cols{ grid-template-columns: 1fr 1fr; }
+    .imggrid figure{
+      margin:0;
+      border:1px dashed #cdd4d9;
+      background:#fafafa;
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .imggrid figure img{
+      display:block;
+      width:100%;
+      height:auto;
+      object-fit:contain;
     }
 
-    .imgwrap.rack-hi img{
-      display: block;
-      width: 100%;
-      height: auto;
-      object-fit: contain;
+    /* Responsive: sota 900px passa a una columna */
+    @media (max-width: 900px){
+      .imggrid.two-cols{ grid-template-columns: 1fr; }
     }
-
-    /* La imatge superior (cercle del rack) va a sobre */
-    .imgwrap.rack-hi img.overlay{
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none; /* no bloqueja clics */
-      opacity: 1;
-      mix-blend-mode: normal; /* si vols veure un efecte, pots provar 'multiply' */
-    }
-
-    /* Opcional: si el rack queda lleugerament desplaçat, pots afinar-ho */
-    .imgwrap.rack-hi img.overlay {
-      transform: translate(0px, 0px); /* ajusta x,y si cal */
-    }
-
-
   </style>
 
   <!-- 🔧 Override petit per assegurar el diàleg al davant -->
@@ -179,21 +169,21 @@
       </div>
 
       <div class="card">
-        <h3>Cabinet Highlight</h3>
-        <div class="imgwrap rack-hi">
-          <!-- BASE: calaix negre -->
-          <img class="base" 
-              src="../images/C3_blackdrawer_1R.jpg" 
+      <h3>Cabinet Highlight</h3>
+      <div class="imggrid two-cols">
+        <figure>
+          <img src="../images/C3_blackdrawer_1R.jpg"
               alt="Drawer base"
-              onerror="this.onerror=null; this.src='../../images/C3_blackdrawer_1R.jpg';" />
-
-          <!-- OVERLAY: rack amb cercle -->
-          <img class="overlay"
-              src="../images/C3_rack_C3_0_I.jpg"
-              alt="Rack highlight"
-              onerror="this.onerror=null; this.src='../../images/C3_rack_C3_0_I.jpg';" />
-        </div>
+              onerror="this.onerror=null; this.src='../../images/C3_blackdrawer_1R.jpg';">
+        </figure>
+        <figure>
+          <img src="../images/C3_rack_C3_0_I.jpg"
+              alt="Rack view"
+              onerror="this.onerror=null; this.src='../../images/C3_rack_C3_0_I.jpg';">
+        </figure>
       </div>
+    </div>
+
     </div>
 
     <div class="card" style="margin-top:20px">
