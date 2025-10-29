@@ -101,98 +101,65 @@
   </div>
 
   <script>
-    /* ==== Robust logo loader ==== */
-    (function loadLogo(){
-      const logo = document.getElementById('logo');
-      const c = ["../../PARCsafe-[369]-BP-2022.png","../PARCsafe-[369]-BP-2022.png","../../../PARCsafe-[369]-BP-2022.png","../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"];
-      let i=0; const next=()=>{ if(i>=c.length){logo.remove();return;} logo.src=c[i++]; };
-      logo.onerror=next; next();
-    })();
+  /* ==== Responsive image-map scaler (deixa'l igual si ja el tens) ==== */
+  (function responsiveMap(){
+    const img = document.getElementById('drawerImg');
+    const map = document.getElementById('image-map');
+    const areas = Array.from(map.querySelectorAll('area'));
 
-    /* ==== Responsive image-map scaler (preserves proportions exactly) ==== */
-    (function responsiveMap(){
-      const img = document.getElementById('drawerImg');
-      const map = document.getElementById('image-map');
-      const areas = Array.from(map.querySelectorAll('area'));
+    function rescale(){
+      const natW = img.naturalWidth, natH = img.naturalHeight;
+      if(!natW || !natH) return;
+      const curW = img.clientWidth, curH = img.clientHeight;
+      const sx = curW / natW, sy = curH / natH;
 
-      function rescale(){
-        const natW = img.naturalWidth, natH = img.naturalHeight;
-        if(!natW || !natH) return;
-        const curW = img.clientWidth, curH = img.clientHeight;
-        const sx = curW / natW, sy = curH / natH;
-
-        areas.forEach(a=>{
-          const orig = (a.dataset.orig || a.getAttribute('coords')).split(',').map(Number);
-          const scaled = orig.map((v,i)=> i%2===0 ? Math.round(v*sx) : Math.round(v*sy));
-          a.coords = scaled.join(',');
-        });
-      }
-
-      // Debounce resize for performance
-      let rAF = null;
-      function onResize(){
-        if(rAF) cancelAnimationFrame(rAF);
-        rAF = requestAnimationFrame(()=>{ rAF=null; rescale(); });
-      }
-
-      if (img.complete) rescale();
-      img.addEventListener('load', rescale);
-      window.addEventListener('resize', onResize);
-    })();
-
-    /* ==== Tooltip preview (../img/C3_1_I_A.jpg, ../img/C3_1_I_B.jpg) ==== */
-    const tt = document.getElementById('tooltip');
-    const ttCode = document.getElementById('tt-code');
-    const ttImg = document.getElementById('tt-img');
-    let raf=null, tx=0, ty=0, cx=0, cy=0;
-
-    function showTooltip(evt, code){
-      ttCode.textContent = code;
-      ttImg.src = "../img/" + code + ".jpg";
-      tx = evt.pageX + 16; ty = evt.pageY + 16;
-      tt.style.display = "block"; animate();
+      areas.forEach(a=>{
+        const orig = (a.dataset.orig || a.getAttribute('coords')).split(',').map(Number);
+        const scaled = orig.map((v,i)=> i%2===0 ? Math.round(v*sx) : Math.round(v*sy));
+        a.coords = scaled.join(',');
+      });
     }
-    function moveTooltip(evt){ tx = evt.pageX + 16; ty = evt.pageY + 16; }
-    function hideTooltip(){ tt.style.display="none"; cancelAnimationFrame(raf); raf=null; }
-    function animate(){ cx += (tx-cx)*0.2; cy += (ty-cy)*0.2; tt.style.left=cx+"px"; tt.style.top=cy+"px"; raf=requestAnimationFrame(animate); }
-    // cursor “mà” sobre les àrees
-  Array.from(document.querySelectorAll('map area')).forEach(a=>a.style.cursor='pointer');
+
+    let rAF = null;
+    function onResize(){
+      if(rAF) cancelAnimationFrame(rAF);
+      rAF = requestAnimationFrame(()=>{ rAF=null; rescale(); });
+    }
+
+    if (img.complete) rescale();
+    img.addEventListener('load', rescale);
+    window.addEventListener('resize', onResize);
+  })();
+
+  /* ==== Tooltip (sense animació, zero lag) ==== */
+  Array.from(document.querySelectorAll('map area')).forEach(a => a.style.cursor = 'pointer');
 
   const tt = document.getElementById('tooltip');
   const ttCode = document.getElementById('tt-code');
   const ttImg = document.getElementById('tt-img');
-  let raf=null, tx=0, ty=0, cx=0, cy=0;
 
-  function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+  const PAD = 16, TT_MAX_W = 340, TT_MAX_H = 220;
+  const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
+
+  function placeTooltip(evt){
+    const vw = window.innerWidth, vh = window.innerHeight;
+    let x = clamp(evt.pageX + PAD, 0, vw - TT_MAX_W);
+    let y = clamp(evt.pageY + PAD, 0, vh - TT_MAX_H);
+    tt.style.left = x + 'px';
+    tt.style.top  = y + 'px';
+  }
 
   function showTooltip(evt, code){
     ttCode.textContent = code;
     ttImg.src = "../img/" + code + ".jpg";
-    const pad = 16;
-    const vw = window.innerWidth, vh = window.innerHeight;
-
-    // posició inicial al costat del cursor
-    tx = clamp(evt.pageX + pad, 0, vw - 340);  // 340≈ amplada màxima del tooltip
-    ty = clamp(evt.pageY + pad, 0, vh - 200);  // 200≈ alçada típica
     tt.style.display = "block";
-    animate();
+    placeTooltip(evt);
   }
   function moveTooltip(evt){
-    const pad = 16, vw = window.innerWidth, vh = window.innerHeight;
-    tx = clamp(evt.pageX + pad, 0, vw - 340);
-    ty = clamp(evt.pageY + pad, 0, vh - 200);
+    if (tt.style.display !== "block") return;
+    placeTooltip(evt);
   }
-  function hideTooltip(){
-    tt.style.display = "none";
-    cancelAnimationFrame(raf); raf=null;
-  }
-  function animate(){
-    cx += (tx - cx) * 0.2;
-    cy += (ty - cy) * 0.2;
-    tt.style.left = cx + "px";
-    tt.style.top  = cy + "px";
-    raf = requestAnimationFrame(animate);
-  }
-  </script>
+  function hideTooltip(){ tt.style.display = "none"; }
+</script>
 </body>
 </html>
