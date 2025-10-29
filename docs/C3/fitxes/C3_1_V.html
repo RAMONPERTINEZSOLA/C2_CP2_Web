@@ -1,86 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Drawer C3_1_V</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>C3_1_V — Sections</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin: 40px;
+    :root{
+      --green:#6dbd45; --ink:#222; --muted:#667085;
+      --bg:#f5f7f8; --card:#ffffff; --line:#e6e8eb;
+      --shadow:0 6px 24px rgba(109,189,69,.18); --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0}
+    .container{max-width:1100px;margin:40px auto;padding:0 20px}
+
+    header.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+    .back{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);text-decoration:none;color:var(--ink);font-weight:600}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{height:64px;object-fit:contain}
+
+    h1.title{font-size:26px;margin:10px 0 6px 0;display:flex;align-items:center;gap:10px}
+    .drawer-code{font-size:12px;color:#475467;background:#eef4ff;border:1px solid #d6e4ff;padding:4px 8px;border-radius:999px;font-weight:700;letter-spacing:.3px}
+    .subtitle{color:var(--muted);margin:0 0 14px 0}
+
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    .card h3{margin:0 0 12px 0;font-size:16px}
+    .hint{color:#475467;font-size:13px;margin:6px 2px 12px}
+
+    .imgwrap{
+      border:1px dashed #cdd4d9;background:#fafafa;border-radius:12px;
+      position:relative;overflow:hidden;padding:0;
+    }
+    #drawerImg{
+      display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;
+      touch-action:manipulation;
     }
 
-    img {
-      max-width: 100%;
-      height: auto;
+    #tooltip{
+      position:fixed;
+      display:none;
+      z-index:10000;
+      background:#0f1b2f; color:#e8f3ff;
+      border:1px solid #cfe4ff33; border-radius:12px;
+      padding:10px; width:min(320px,60vw);
+      pointer-events:none;
+      box-shadow:0 12px 32px rgba(0,0,0,.5); text-align:left;
     }
-
-    .button {
-      display: inline-block;
-      padding: 10px 20px;
-      margin-bottom: 30px;
-      background-color: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-
-    #tooltip {
-      display: none;
-      position: absolute;
-      background: white;
-      border: 1px solid #ccc;
-      padding: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      z-index: 10;
-    }
-
-    #tooltip img {
-      max-width: 200px;
-      height: auto;
-    }
+    #tooltip strong{font-size:13px}
+    #tooltip img{display:block;margin-top:8px;width:100%;height:auto;border-radius:10px;border:1px solid #ffffff1a;background:#00000050}
   </style>
 </head>
 <body>
+  <div class="container">
+    <header class="bar">
+      <a class="back" href="../index.html">← Back to index</a>
+      <img class="logo" src="../../parcsafe-logo.png" alt="Parcsafe">
+    </header>
 
-  <a href="../index.html" class="button">← Back to index</a>
+    <h1 class="title">Select section <span class="drawer-code">C3_1_V</span></h1>
+    <p class="subtitle">Some drawers have multiple compartments. Choose the section to open the final product page.</p>
 
-  <h1>Drawer: C3_1_V</h1>
-  <p>Click on a section of the drawer to view details:</p>
+    <section class="card">
+      <h3>Sections</h3>
+      <p class="hint">Click on the corresponding area. Hover to preview the section.</p>
 
-  <div style="position: relative;">
+      <div class="imgwrap">
+        <img id="drawerImg" src="../images/C3_bluedrawer_3R.png" alt="C3_1_V drawer"
+             usemap="#image-map"
+             onerror="this.onerror=null; this.src='../../images/C3_bluedrawer_3R.png';" />
 
-    <img src="../images/C3_bluedrawer_3R.png" usemap="#image-map" alt="C3_1_V drawer">
+        <map name="image-map" id="image-map">
+          <!-- ORIGINAL COORDS (based on the natural pixels of C3_bluedrawer_3R.png) -->
+          <area data-orig="949,724,1295,168" shape="rect" coords="949,724,1295,168"
+                href="C3_1_V_A.html"
+                onmouseover="showTooltip(event,'C3_1_V_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()"
+                alt="C3_1_V_A" title="C3_1_V_A">
 
-    <map name="image-map">
-      <area target="" alt="C3_1_V_A" title="C3_1_V_A" href="C3_1_V_A.html" coords="949,724,1295,168" shape="rect" 
-            onmouseover="showTooltip(event, 'C3_1_V_A')" onmouseout="hideTooltip()">
-      <area target="" alt="C3_1_V_B" title="C3_1_V_B" href="C3_1_V_B.html" coords="642,726,900,167" shape="rect" 
-            onmouseover="showTooltip(event, 'C3_1_V_B')" onmouseout="hideTooltip()">
-      <area target="" alt="C3_1_V_C" title="C3_1_V_C" href="C3_1_V_C.html" coords="613,727,233,171" shape="rect" 
-            onmouseover="showTooltip(event, 'C3_1_V_C')" onmouseout="hideTooltip()">
-    </map>
+          <area data-orig="642,726,900,167" shape="rect" coords="642,726,900,167"
+                href="C3_1_V_B.html"
+                onmouseover="showTooltip(event,'C3_1_V_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()"
+                alt="C3_1_V_B" title="C3_1_V_B">
 
-    <div id="tooltip">
-      <img id="tooltip-img" src="" alt="preview">
-    </div>
+          <area data-orig="613,727,233,171" shape="rect" coords="613,727,233,171"
+                href="C3_1_V_C.html"
+                onmouseover="showTooltip(event,'C3_1_V_C')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()"
+                alt="C3_1_V_C" title="C3_1_V_C">
+        </map>
+
+        <div id="tooltip">
+          <strong id="tt-code">—</strong>
+          <img id="tt-img" src="" alt="">
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
-    function showTooltip(evt, code) {
-      const tooltip = document.getElementById("tooltip");
-      const img = document.getElementById("tooltip-img");
-
-      img.src = "../img/" + code + ".jpg";
-      tooltip.style.display = "block";
-      tooltip.style.top = (evt.pageY + 15) + "px";
-      tooltip.style.left = (evt.pageX + 15) + "px";
+  /* === Responsive image-map scaler === */
+  (function responsiveMap(){
+    const img=document.getElementById('drawerImg');
+    const map=document.getElementById('image-map');
+    const areas=Array.from(map.querySelectorAll('area'));
+    function rescale(){
+      const natW=img.naturalWidth,natH=img.naturalHeight;
+      if(!natW||!natH)return;
+      const curW=img.clientWidth,curH=img.clientHeight;
+      const sx=curW/natW,sy=curH/natH;
+      areas.forEach(a=>{
+        const orig=(a.dataset.orig||a.getAttribute('coords')).split(',').map(Number);
+        const scaled=orig.map((v,i)=>i%2===0?Math.round(v*sx):Math.round(v*sy));
+        a.coords=scaled.join(',');
+      });
     }
+    let rAF=null;
+    function onResize(){if(rAF)cancelAnimationFrame(rAF);rAF=requestAnimationFrame(()=>{rAF=null;rescale();});}
+    if(img.complete)rescale();
+    img.addEventListener('load',rescale);
+    window.addEventListener('resize',onResize);
+  })();
 
-    function hideTooltip() {
-      document.getElementById("tooltip").style.display = "none";
-    }
+  /* === Tooltip === */
+  Array.from(document.querySelectorAll('map area')).forEach(a=>a.style.cursor='pointer');
+  const tt=document.getElementById('tooltip');
+  const ttCode=document.getElementById('tt-code');
+  const ttImg=document.getElementById('tt-img');
+  const PAD=16,TT_MAX_W=340,TT_MAX_H=220;
+  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+  function placeTooltip(evt){
+    const vw=window.innerWidth,vh=window.innerHeight;
+    let x=clamp(evt.pageX+PAD,0,vw-TT_MAX_W);
+    let y=clamp(evt.pageY+PAD,0,vh-TT_MAX_H);
+    tt.style.left=x+'px';
+    tt.style.top=y+'px';
+  }
+  function showTooltip(evt,code){
+    ttCode.textContent=code;
+    ttImg.src="../img/"+code+".jpg";
+    tt.style.display="block";
+    placeTooltip(evt);
+  }
+  function moveTooltip(evt){if(tt.style.display!=="block")return;placeTooltip(evt);}
+  function hideTooltip(){tt.style.display="none";}
   </script>
-
 </body>
 </html>
