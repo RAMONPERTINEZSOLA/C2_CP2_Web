@@ -79,6 +79,31 @@
     .note{color:var(--muted);font-size:12px;margin-top:6px;grid-column:1 / -1}
     .modal .ft{padding:18px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
     .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
+
+      /* Disposició sense superposar: figures amb marc i estil com .imgwrap */
+    .imggrid{
+      display:grid;
+      gap:12px;
+    }
+    .imggrid.two-cols{ grid-template-columns: 1fr 1fr; }
+    .imggrid figure{
+      margin:0;
+      border:1px dashed #cdd4d9;
+      background:#fafafa;
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .imggrid figure img{
+      display:block;
+      width:100%;
+      height:auto;
+      object-fit:contain;
+    }
+
+    /* Responsive: sota 900px passa a una columna */
+    @media (max-width: 900px){
+      .imggrid.two-cols{ grid-template-columns: 1fr; }
+    }
   </style>
 
   <!-- 🔧 Override petit per assegurar el diàleg al davant -->
@@ -144,11 +169,21 @@
       </div>
 
       <div class="card">
-        <h3>Cabinet Highlight</h3>
-        <div class="imgwrap">
-          <img id="cabImg" src="../images/C2_CP2_cabinet_C3_0_II.png" alt="Cabinet highlight" onerror="this.onerror=null; this.src='../../images/C2_CP2_cabinet_C3_0_II.png';" />
-        </div>
+      <h3>Cabinet Highlight</h3>
+      <div class="imggrid two-cols">
+        <figure>
+          <img src="../images/C3_blackdrawer_1R.jpg"
+              alt="Drawer base"
+              onerror="this.onerror=null; this.src='../../images/C3_blackdrawer_1R.jpg';">
+        </figure>
+        <figure>
+          <img src="../images/C3_rack_C3_0_II.jpg"
+              alt="Rack view"
+              onerror="this.onerror=null; this.src='../../images/C3_rack_C3_0_II.jpg';">
+        </figure>
       </div>
+    </div>
+
     </div>
 
     <div class="card" style="margin-top:20px">
@@ -227,20 +262,19 @@
 
   <script>
     async function ensureQrLib(timeoutMs = 1000) {
-  const t0 = performance.now();
-  while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
-    if (performance.now() - t0 > timeoutMs) throw new Error("QR lib not ready");
-    await new Promise(r => setTimeout(r, 20));
+      const t0 = performance.now();
+      while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
+        if (performance.now() - t0 > timeoutMs) throw new Error("QR lib not ready");
+        await new Promise(r => setTimeout(r, 20));
+      }
     }
-  }
 
     const drawerCode = "C3_0_II";
     const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
     // === QR ESTÀTIC (canvia-ho si vols un altre text/URL) ===
-    const QR_STATIC_VALUE = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP2/fitxes/C3_0_II.html";
-
+    const QR_STATIC_VALUE = "https://ramonpertinezsola.github.io/C2_CP2_Web/C3/fitxes/C3_0_II.html";
 
     // ===== Robust logo loader (header) =====
     (function loadLogo(){
@@ -499,44 +533,42 @@
         }
       }
 
-     // Logo central (només si hi ha logo)
-    const logoImg = await loadQrLogo();
-    if (logoImg) {
-      const logoBox = Math.floor(size * 0.22);
-      const cx = size/2, cy = size/2;
-      const r = Math.floor(logoBox/2) + 14;
+      // Logo central (si existeix)
+      const logoImg = await loadQrLogo();
+      if (logoImg) {
+        const logoBox = Math.floor(size * 0.22);
+        const cx = size/2, cy = size/2;
+        const r = Math.floor(logoBox/2) + 14;
 
-      // disc blanc sota el logo (ara sí, només quan hi ha logo)
-      ctx.save();
-      ctx.fillStyle = '#FFF';
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
+        // disc blanc sota el logo
+        ctx.save();
+        ctx.fillStyle = '#FFF';
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
 
-      const pad = 18;
-      const w = logoBox - pad*2;
-      const h = logoBox - pad*2;
+        const pad = 18;
+        const w = logoBox - pad*2;
+        const h = logoBox - pad*2;
 
-      const aspect = logoImg.width / logoImg.height;
-      let drawW = w, drawH = w / aspect;
-      if (drawH > h) { drawH = h; drawW = h * aspect; }
+        const aspect = logoImg.width / logoImg.height;
+        let drawW = w, drawH = w / aspect;
+        if (drawH > h) { drawH = h; drawW = h * aspect; }
 
-      ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
-    }
+        ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
+      }
     }
 
     function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function openQrModal(){
-      qrUrlNote.textContent = QR_STATIC_VALUE;   // (ja el tens estàtic)
+      qrUrlNote.textContent = QR_STATIC_VALUE;
       safeOpenDialog(qrModal);
       await new Promise(r=>requestAnimationFrame(r));
-      await ensureQrLib();                        // ✅ espera la llibreria
+      await ensureQrLib();
       await drawQR(QR_STATIC_VALUE);
     }
-
-
 
     qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
     qrClose?.addEventListener('click', ()=> qrModal.close());
@@ -552,7 +584,6 @@
       try{ await navigator.clipboard.writeText(url); showToast('🔗 Enllaç copiat'); }
       catch{ const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('🔗 Enllaç copiat'); }
     });
-
 
     // Descarregar PNG
     dlPngBtn?.addEventListener('click', ()=>{
@@ -576,7 +607,6 @@
       pdf.text(QR_STATIC_VALUE, margin, pageH - margin/2);
       pdf.save(`${drawerCode}_QR.pdf`);
     });
-
   </script>
 </body>
 </html>
