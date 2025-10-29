@@ -42,14 +42,18 @@
       touch-action:manipulation;
     }
 
-    /* Tooltip */
+    /* abans: #tooltip { position:absolute; ... }  */
     #tooltip{
-      position:absolute; display:none; z-index:20;
+      position: fixed;           /* <-- així uses pageX/pageY directament */
+      display: none;
+      z-index: 10000;            /* per sobre de tot */
       background:#0f1b2f; color:#e8f3ff;
       border:1px solid #cfe4ff33; border-radius:12px;
-      padding:10px; width:min(320px, 60vw); pointer-events:none;
-      box-shadow: 0 12px 32px rgba(0,0,0,.5); text-align:left;
+      padding:10px; width:min(320px, 60vw);
+      pointer-events:none;
+      box-shadow:0 12px 32px rgba(0,0,0,.5); text-align:left;
     }
+
     #tooltip strong{font-size:13px}
     #tooltip img{display:block;margin-top:8px;width:100%;height:auto;border-radius:10px;border:1px solid #ffffff1a;background:#00000050}
   </style>
@@ -151,6 +155,44 @@
     function moveTooltip(evt){ tx = evt.pageX + 16; ty = evt.pageY + 16; }
     function hideTooltip(){ tt.style.display="none"; cancelAnimationFrame(raf); raf=null; }
     function animate(){ cx += (tx-cx)*0.2; cy += (ty-cy)*0.2; tt.style.left=cx+"px"; tt.style.top=cy+"px"; raf=requestAnimationFrame(animate); }
+    // cursor “mà” sobre les àrees
+  Array.from(document.querySelectorAll('map area')).forEach(a=>a.style.cursor='pointer');
+
+  const tt = document.getElementById('tooltip');
+  const ttCode = document.getElementById('tt-code');
+  const ttImg = document.getElementById('tt-img');
+  let raf=null, tx=0, ty=0, cx=0, cy=0;
+
+  function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+  function showTooltip(evt, code){
+    ttCode.textContent = code;
+    ttImg.src = "../img/" + code + ".jpg";
+    const pad = 16;
+    const vw = window.innerWidth, vh = window.innerHeight;
+
+    // posició inicial al costat del cursor
+    tx = clamp(evt.pageX + pad, 0, vw - 340);  // 340≈ amplada màxima del tooltip
+    ty = clamp(evt.pageY + pad, 0, vh - 200);  // 200≈ alçada típica
+    tt.style.display = "block";
+    animate();
+  }
+  function moveTooltip(evt){
+    const pad = 16, vw = window.innerWidth, vh = window.innerHeight;
+    tx = clamp(evt.pageX + pad, 0, vw - 340);
+    ty = clamp(evt.pageY + pad, 0, vh - 200);
+  }
+  function hideTooltip(){
+    tt.style.display = "none";
+    cancelAnimationFrame(raf); raf=null;
+  }
+  function animate(){
+    cx += (tx - cx) * 0.2;
+    cy += (ty - cy) * 0.2;
+    tt.style.left = cx + "px";
+    tt.style.top  = cy + "px";
+    raf = requestAnimationFrame(animate);
+  }
   </script>
 </body>
 </html>
