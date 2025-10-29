@@ -32,17 +32,14 @@
     .card h3{margin:0 0 12px 0;font-size:16px}
     .hint{color:#475467;font-size:13px;margin:6px 2px 12px}
 
-    /* Static map wrapper: never scales the image; scroll if too big */
-    .imgwrap-static{
+    /* The image can resize; keep aspect and scale coords */
+    .imgwrap{
       border:1px dashed #cdd4d9;background:#fafafa;border-radius:12px;
-      position:relative;overflow:auto; /* allow scroll on small screens */
-      padding:0; max-width:100%;
+      position:relative;overflow:hidden;padding:0;
     }
-    .imgwrap-static img.base{
-      display:block;
-      width:auto;           /* do NOT stretch */
-      height:auto;
-      max-width:none;       /* keep natural pixel size */
+    #drawerImg{
+      display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;
+      touch-action:manipulation;
     }
 
     /* Tooltip */
@@ -71,23 +68,23 @@
       <h3>Sections</h3>
       <p class="hint">Click on the corresponding area. Hover to preview the section.</p>
 
-      <div class="imgwrap-static" id="wrap">
-        <!-- 🖼️ BASE IMAGE (natural size, never rescaled) -->
-        <img class="base" id="drawerImg"
-             src="../images/C3_bluedrawer_2R.png"
-             alt="C3_1_I drawer"
+      <div class="imgwrap">
+        <!-- Base image (natural size known at runtime) -->
+        <img id="drawerImg" src="../images/C3_bluedrawer_2R.png" alt="C3_1_I drawer"
              usemap="#image-map"
              onerror="this.onerror=null; this.src='../../images/C3_bluedrawer_2R.png';" />
 
-        <map name="image-map">
-          <!-- ✅ STATIC COORDS: do not change -->
-          <area shape="rect" coords="792,730,1279,168" href="C3_1_I_A.html"
-            onmouseover="showTooltip(event, 'C3_1_I_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()"
-            alt="C3_1_I_A" title="C3_1_I_A">
+        <map name="image-map" id="image-map">
+          <!-- ORIGINAL COORDS (based on the natural pixels of C3_bluedrawer_2R.png) -->
+          <area data-orig="792,730,1279,168" shape="rect" coords="792,730,1279,168"
+                href="C3_1_I_A.html"
+                onmouseover="showTooltip(event, 'C3_1_I_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()"
+                alt="C3_1_I_A" title="C3_1_I_A">
 
-          <area shape="rect" coords="767,731,295,170" href="C3_1_I_B.html"
-            onmouseover="showTooltip(event, 'C3_1_I_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()"
-            alt="C3_1_I_B" title="C3_1_I_B">
+          <area data-orig="767,731,295,170" shape="rect" coords="767,731,295,170"
+                href="C3_1_I_B.html"
+                onmouseover="showTooltip(event, 'C3_1_I_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()"
+                alt="C3_1_I_B" title="C3_1_I_B">
         </map>
 
         <!-- Tooltip -->
@@ -100,36 +97,46 @@
   </div>
 
   <script>
-    // Logo loader (robust paths)
+    /* ==== Robust logo loader ==== */
     (function loadLogo(){
       const logo = document.getElementById('logo');
-      const candidates = [
-        "../../PARCsafe-[369]-BP-2022.png",
-        "../PARCsafe-[369]-BP-2022.png",
-        "../../../PARCsafe-[369]-BP-2022.png",
-        "../../parcsafe-logo.png",
-        "../parcsafe-logo.png",
-        "../../../parcsafe-logo.png"
-      ];
-      let i=0; const tryNext=()=>{ if(i>=candidates.length){logo.remove();return;} logo.src=candidates[i++]; };
-      logo.onerror = tryNext; tryNext();
+      const c = ["../../PARCsafe-[369]-BP-2022.png","../PARCsafe-[369]-BP-2022.png","../../../PARCsafe-[369]-BP-2022.png","../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"];
+      let i=0; const next=()=>{ if(i>=c.length){logo.remove();return;} logo.src=c[i++]; };
+      logo.onerror=next; next();
     })();
 
-    // Keep image at natural pixel size to preserve static coords
-    (function lockNaturalSize(){
+    /* ==== Responsive image-map scaler (preserves proportions exactly) ==== */
+    (function responsiveMap(){
       const img = document.getElementById('drawerImg');
-      function apply(){
-        if (img.naturalWidth) {
-          img.style.width  = img.naturalWidth + 'px';
-          img.style.height = 'auto';
-        }
+      const map = document.getElementById('image-map');
+      const areas = Array.from(map.querySelectorAll('area'));
+
+      function rescale(){
+        const natW = img.naturalWidth, natH = img.naturalHeight;
+        if(!natW || !natH) return;
+        const curW = img.clientWidth, curH = img.clientHeight;
+        const sx = curW / natW, sy = curH / natH;
+
+        areas.forEach(a=>{
+          const orig = (a.dataset.orig || a.getAttribute('coords')).split(',').map(Number);
+          const scaled = orig.map((v,i)=> i%2===0 ? Math.round(v*sx) : Math.round(v*sy));
+          a.coords = scaled.join(',');
+        });
       }
-      if (img.complete) apply();
-      else img.addEventListener('load', apply);
-      // Never add resize listeners or CSS that changes width.
+
+      // Debounce resize for performance
+      let rAF = null;
+      function onResize(){
+        if(rAF) cancelAnimationFrame(rAF);
+        rAF = requestAnimationFrame(()=>{ rAF=null; rescale(); });
+      }
+
+      if (img.complete) rescale();
+      img.addEventListener('load', rescale);
+      window.addEventListener('resize', onResize);
     })();
 
-    // Tooltip preview ../img/C3_1_I_[A|B].jpg
+    /* ==== Tooltip preview (../img/C3_1_I_A.jpg, ../img/C3_1_I_B.jpg) ==== */
     const tt = document.getElementById('tooltip');
     const ttCode = document.getElementById('tt-code');
     const ttImg = document.getElementById('tt-img');
