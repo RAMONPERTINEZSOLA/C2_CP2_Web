@@ -101,7 +101,7 @@ C3_0_IV,4444,ENTA Compression Spring Yellow,20.03-ENT-ECY-10,VLSPRY - Velocity C
 C3_0_V,21,0,20.03-ENT-----10,0,10
 C3_0_VI,21,0,20.03-ENT-----10,0,10
 C3_1_I_A,12,Spring Cylinder Housing,20.03-ENT-SCH-10,Spring Cylinder Housing,10
-C3_1_I_B,21,Spring Seat Housing,20.03-ENT-SSH-10,Spring Seat Housing,10
+C3_1_I_B,2,Spring Seat Housing,20.03-ENT-SSH-10,Spring Seat Housing,10
 C3_1_II,21,0,20.03-ENT-----10,0,10
 C3_1_III,21,50m Roller Cable Turnstar,20.03-ENT-5RC-10,50m Roller Cable Turnstar,10
 C3_1_IV,21,Access control with coins,20.03-ENT-ACA-10,Access control with coins,10
