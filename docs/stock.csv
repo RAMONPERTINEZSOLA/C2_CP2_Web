@@ -79,7 +79,7 @@ C2_CP2_8_II,44,ZIP TIES 4x200mm,0.1-ELE-ZT4-10,ZIP TIES 4x200mm,10
 C2_CP2_8_III,2000,--,--,--,10
 C2_CP2_8_IV,200,--,--,--,10
 C2_CP2_8_V,200,--,--,--,10
-C2_CP2_9_I,333,"QUICK TERMINAL 2 - 3 - 5 PIN, brand WAGO",0.1-ELE-QTA-10,"QUICK TERMINAL 2 - 3 - 5 PIN, brand WAGO",10
+C2_CP2_9_I,333,QUICK TERMINAL 2 - 3 - 5 PIN; brand WAGO,0.1-ELE-QTA-10,QUICK TERMINAL 2 - 3 - 5 PIN; brand WAGO,10
 C2_CP2_9_II,200,3 POLE TERMINAL,0.1-ELE-3PT-10,3 POLE TERMINAL,10
 C2_CP2_9_III,200,--,--,--,10
 C2_CP2_9_IV,200,--,--,--,10
@@ -123,21 +123,21 @@ C3_2_IV_B,21,0,20.03-ENT-----10,0,10
 C3_2_IV_C,21,0,20.03-ENT-----10,0,10
 C3_2_V_A,21,Link Arm,20.03-ENT-LAR-10,Link Arm,10
 C3_2_V_B,21,0,20.03-ENT-----10,0,10
-C3_2_V_C,21,Adjustable Steel Mounting Bracket with Threaded Rod,20.03-ENT-ASM-10,"Galvanized steel mounting plate with slotted holes for flexible alignment. Includes pre-installed threaded rod and hex bolt, ideal for adjustable installations in structural or electrical systems.",10
+C3_2_V_C,21,Adjustable Steel Mounting Bracket with Threaded Rod,20.03-ENT-ASM-10,Galvanized steel mounting plate with slotted holes for flexible alignment. Includes pre-installed threaded rod and hex bolt; ideal for adjustable installations in structural or electrical systems.,10
 C3_2_VI_A,21,30x8 Rubber Buffer,20.03-ENT-3RB-10,30x8 Rubber Buffer,10
 C3_2_VI_B,21,0,20.03-ENT-----10,0,10
-C3_2_VI_C,21, Powder Coated Steel – ENTA Turnstar Gate Arm,20.03-ENT-PCS-10,"Support arm from ENTA (Turnstar), typically used in gate or turnstile mechanisms. Constructed from durable powder-coated steel with elongated slot for adjustable mounting. Designed for robust performance in access control systems.",10
+C3_2_VI_C,21, Powder Coated Steel – ENTA Turnstar Gate Arm,20.03-ENT-PCS-10,Support arm from ENTA (Turnstar); typically used in gate or turnstile mechanisms. Constructed from durable powder-coated steel with elongated slot for adjustable mounting. Designed for robust performance in access control systems.,10
 C3_3_I_A,21,0,20.03-ENT-----10,0,10
 C3_3_I_B,21,SBL106TUR Logic Controller,20.03-ENT-SLC-10,SBL106TUR Logic Controller,10
 C3_3_I_C,21,Power Supply 220-110V,20.03-ENT-PSA-10,Power Supply 220-110V,10
 C3_3_II_A,21,0,20.03-ENT-----10,0,10
-C3_3_II_B,21, 3-Wire Twisted Cable for Flexible LED – Signal Connector,20.03-ENT-3TC-10,"Three-core twisted cable (red, white, green) with 3-pin connector, designed for signal transmission to flexible LED modules. The twisted wires reduce interference, ensuring stable LED performance and precise control.",10
+C3_3_II_B,21, 3-Wire Twisted Cable for Flexible LED – Signal Connector,20.03-ENT-3TC-10,Three-core twisted cable (red; white; green) with 3-pin connector; designed for signal transmission to flexible LED modules. The twisted wires reduce interference; ensuring stable LED performance and precise control.,10
 C3_3_II_C,21,0,20.03-ENT-----10,0,10
 C3_3_III_A,21,0,20.03-ENT-----10,0,10
 C3_3_III_B,21,0,20.03-ENT-----10,0,10
 C3_3_III_C,21,0,20.03-ENT-----10,0,10
-C3_3_IV_A,21,Power & Signal Cable for Boom Gate System,20.03-ENT-P&S-10,"Custom harness with power terminals and RJ-style connector, typically used for wiring boom gate motors or controllers. Includes female spade connectors, a twisted pair for signal/data, and extra lines for sensors or auxiliary devices. Designed for quick installation and reliable field connections.",10
-C3_3_IV_B,21,VAUTEX VS7A-12,20.03-ENT-VVS-10,"12V 7Ah sealed rechargeable lead-acid battery (AGM type), designed for high-rate discharge applications such as backup systems, access control, alarms, and emergency power. Features voltage regulation for standby use (13.6–13.9V) and cyclic use (14.5–15.0V). Maintenance-free and leak-proof.",10
+C3_3_IV_A,21,Power & Signal Cable for Boom Gate System,20.03-ENT-P&S-10,Custom harness with power terminals and RJ-style connector; typically used for wiring boom gate motors or controllers. Includes female spade connectors; a twisted pair for signal/data; and extra lines for sensors or auxiliary devices. Designed for quick installation and reliable field connections.,10
+C3_3_IV_B,21,VAUTEX VS7A-12,20.03-ENT-VVS-10,12V 7Ah sealed rechargeable lead-acid battery (AGM type); designed for high-rate discharge applications such as backup systems; access control; alarms; and emergency power. Features voltage regulation for standby use (13.6–13.9V) and cyclic use (14.5–15.0V). Maintenance-free and leak-proof.,10
 C3_3_V_A,21,Motor 24 BLDC 100W,20.03-ENT-M2B-10,Motor 24 BLDC 100W,10
 C3_3_V_B,600,Power Switch ON - OFF,20.03-ENT-PSO-10,Power Switch ON - OFF,10
 C3_3_V_C,21,Switch Plate,20.03-ENT-SPL-10,Switch Plate,10
@@ -156,39 +156,39 @@ C4_0_III,21,0,#SPILL!,0,10
 C4_0_IV,21,0,#SPILL!,0,10
 C4_0_V,21,0,#SPILL!,0,10
 C4_0_VI,21,0,#SPILL!,0,10
-C4_1_I_A,21,Green Single-Core Cable,12.01--GSC-10,"Flexible green wire, single-core, typically used for grounding or low-voltage signal wiring in control systems.",10
-C4_1_I_B,21,4-Core Grey Control Cable,12.01--4GC-10,"Multi-strand flexible cable with 4 insulated conductors, commonly used for control circuits in automation and gate systems. Marked ""UL2464 4x0.75mm²"" or similar.",10
-C4_1_II,21,Mounting Plate LBA,12.01--MPL-10,"Galvanized steel base plate with square cutout and pre-drilled holes, used for securing LBA manual post systems.",10
-C4_1_III,21,Manual Latch Support Arm,12.01--MLS-10,"Galvanized rotating support arm with welded base plate, used for manually securing removable boom gates or barriers in parking systems.",10
-C4_1_IV,202,Altivar ATV12H037M2,12.01--AAT-10,"0.37 kW variable frequency drive (VFD),200-240V input,for controlling three-phase motors in automation systems",10
+C4_1_I_A,21,Green Single-Core Cable,12.01--GSC-10,Flexible green wire; single-core; typically used for grounding or low-voltage signal wiring in control systems.,10
+C4_1_I_B,21,4-Core Grey Control Cable,12.01--4GC-10,"Multi-strand flexible cable with 4 insulated conductors; commonly used for control circuits in automation and gate systems. Marked ""UL2464 4x0.75mm²"" or similar.",10
+C4_1_II,21,Mounting Plate LBA,12.01--MPL-10,Galvanized steel base plate with square cutout and pre-drilled holes; used for securing LBA manual post systems.,10
+C4_1_III,21,Manual Latch Support Arm,12.01--MLS-10,Galvanized rotating support arm with welded base plate; used for manually securing removable boom gates or barriers in parking systems.,10
+C4_1_IV,202,Altivar ATV12H037M2,12.01--AAT-10,0.37 kW variable frequency drive (VFD);200-240V input;for controlling three-phase motors in automation systems,10
 C4_1_V_A,21,0,12.01------10,0,10
 C4_1_V_B,21,0,12.01------10,0,10
 C4_1_V_C,21,0,12.01------10,0,10
-C4_1_VI,21,"VOPAC Ethernet Card AS1622, VOPAC MCB Card AS1620 with female connectors, HMI Card AS1621 (Tested)",12.01--VEC-10,"Communication card for AS1622 system, Control board with female connectors for AS1620, Interface card tested for AS1621 system",10
+C4_1_VI,21,VOPAC Ethernet Card AS1622; VOPAC MCB Card AS1620 with female connectors; HMI Card AS1621 (Tested),12.01--VEC-10,Communication card for AS1622 system; Control board with female connectors for AS1620; Interface card tested for AS1621 system,10
 C4_1_VII,--,--,--,--,10
-C4_2_I,21,LED Strip 24V RGB 14.4W/m,12.01--LS2-10,"Flexible 24V RGB LED strip, 14.4W per meter, used for ambient or decorative lighting in signage or enclosures.",10
-C4_2_II_A,21,"Plastic Floor Cover, Reflective Warning Tape",12.01--PFC-10,"Plastic cover for floor or wall cable holes, provides clean finish and basic protection, Highly visible red reflective tape for marking hazardous areas or improving visibility in low-light conditions",10
-C4_2_II_B,21,"K1 Connector; M16 Plastic Plug",12.01--KCM-10,"Quick splice K1 connector for low-voltage cable joints; allows connection without stripping wires; moisture-resistant; Grey M16 plastic plug for sealing holes in enclosures or panels; features external thread for quick installation and secure fit.",10
-C4_2_II_C,21,"Plastic Cover Cap, Rubber Grommet, Flat Head Allen Screw (M4), Cable Gland (M16), Flat Head Allen Screw (M5)",12.01--PCC-10,"White semi-circular cap for concealing open slots or unused ports, Black rubber ring used for cable protection through panel holes, Stainless steel M4 screw with countersunk flat head and hex drive, M16 plastic cable gland for sealing and securing cables on enclosures, Stainless steel M5 screw with countersunk flat head and hex drive",10
-C4_2_III_A,21,Bearing Block Assembly,12.01--BBA-10,"Aluminium square block with integrated ball bearing and hex socket screw, used for rotating shaft support or guiding applications.",10
-C4_2_III_B,21,Aluminium Spacer Block,12.01--ASE-10,"Rectangular aluminium block with central threaded hole, used as a spacer or mounting adapter for structural assemblies.",10
+C4_2_I,21,LED Strip 24V RGB 14.4W/m,12.01--LS2-10,Flexible 24V RGB LED strip; 14.4W per meter; used for ambient or decorative lighting in signage or enclosures.,10
+C4_2_II_A,21,Plastic Floor Cover; Reflective Warning Tape,12.01--PFC-10,Plastic cover for floor or wall cable holes; provides clean finish and basic protection; Highly visible red reflective tape for marking hazardous areas or improving visibility in low-light conditions,10
+C4_2_II_B,21,K1 Connector; M16 Plastic Plug,12.01--KCM-10,Quick splice K1 connector for low-voltage cable joints; allows connection without stripping wires; moisture-resistant; Grey M16 plastic plug for sealing holes in enclosures or panels; features external thread for quick installation and secure fit.,10
+C4_2_II_C,21,Plastic Cover Cap; Rubber Grommet; Flat Head Allen Screw (M4); Cable Gland (M16); Flat Head Allen Screw (M5),12.01--PCC-10,White semi-circular cap for concealing open slots or unused ports; Black rubber ring used for cable protection through panel holes; Stainless steel M4 screw with countersunk flat head and hex drive; M16 plastic cable gland for sealing and securing cables on enclosures; Stainless steel M5 screw with countersunk flat head and hex drive,10
+C4_2_III_A,21,Bearing Block Assembly,12.01--BBA-10,Aluminium square block with integrated ball bearing and hex socket screw; used for rotating shaft support or guiding applications.,10
+C4_2_III_B,21,Aluminium Spacer Block,12.01--ASE-10,Rectangular aluminium block with central threaded hole; used as a spacer or mounting adapter for structural assemblies.,10
 C4_2_III_C,21,Metal Mounting Bracket,12.01--MMB-10,Steel bracket for mounting components onto vertical or horizontal surfaces. Commonly used in access control or signage systems.,10
-C4_2_IV_A,21,Metal Spacer + Plastic End Cap,12.01--MS+-10,"Metal Spacer: Precision-cut tubular sleeve made of stainless steel or zinc-plated steel. Internally hollow to allow bolt insertion. Plastic End Cap: Push-fit cap made from durable white plastic (typically PP or PVC), shaped to fit snugly over the spacer or bolt head.",10
+C4_2_IV_A,21,Metal Spacer + Plastic End Cap,12.01--MS+-10,Metal Spacer: Precision-cut tubular sleeve made of stainless steel or zinc-plated steel. Internally hollow to allow bolt insertion. Plastic End Cap: Push-fit cap made from durable white plastic (typically PP or PVC); shaped to fit snugly over the spacer or bolt head.,10
 C4_2_IV_B,21,Allen Bolt + Nyloc Nut – Stainless Steel,12.01--AB+-10,Inoxidable M8 bolt with nyloc nut.,10
 C4_2_IV_C,21,Stainless Steel Bolt + Nyloc Nut,12.01--SSA-10,Allen bolt with matching stainless steel nyloc nut.,10
 C4_2_V_A,21,Threaded Mounting Base LBA,12.01--TMO-10,Threaded metal mounting base with 4 holes and welded reinforcement.,10
-C4_2_V_B,21,Metal Mounting Bracket Flat LBA,12.01--MMA-10,"Flat metal bracket with 4 holes, LBA mounting accessory.",10
+C4_2_V_B,21,Metal Mounting Bracket Flat LBA,12.01--MMA-10,Flat metal bracket with 4 holes; LBA mounting accessory.,10
 C4_2_VI_A,21,Metal Sensor Mounting Bracket LBA,12.01--MSM-10,Stamped metal bracket with multiple holes for sensor or device mounting (LBA).,10
-C4_2_VI_B,21,Metal Mounting Plate LBA,12.01--MMP-10,"Metal mounting plate with 2 holes, LBA component.",10
-C4_2_VI_C,21,Boom Gate Support Arm LBA,12.01--BGS-10,"Adjustable support arm for LBA boom gates, with rubber base.",10
+C4_2_VI_B,21,Metal Mounting Plate LBA,12.01--MMP-10,Metal mounting plate with 2 holes; LBA component.,10
+C4_2_VI_C,21,Boom Gate Support Arm LBA,12.01--BGS-10,Adjustable support arm for LBA boom gates; with rubber base.,10
 C4_3_I_A,21,AX2 Radar Vehicle Sensor with cable,0.1-ASS-ARV-10,AX2 Radar Vehicle Sensor with cable,10
 C4_3_I_B,21,AX2 Radar Vehicle Detector Bracket,0.1-ASS-ARA-10,AX2 Radar Vehicle Detector Bracket,10
 C4_3_II_A,21,Infrared Beam Sensor Ips-20r,0.1-ASS-IBS-10,Active infrared beam sensor IPS-20R for gate or barrier safety.,10
-C4_3_II_B,21,"Reflective Sensor With Cable Infrared Sensor Cylinder Type",0.1-ASS-RSC-10,"Reflective proximity sensor with 4-wire cable for automatic doors or access systems.Infrared sensor (cylindrical housing) for presence detection or beam interruption.",10
+C4_3_II_B,21,Reflective Sensor With Cable Infrared Sensor Cylinder Type,0.1-ASS-RSC-10,Reflective proximity sensor with 4-wire cable for automatic doors or access systems.Infrared sensor (cylindrical housing) for presence detection or beam interruption.,10
 C4_3_II_C,21,Dual Loop Detector 24v for DIN Rail Mounting,0.1-ASS-DLA-10,Dual Loop Detector 24v for DIN Rail Mounting LD216,10
 C4_3_III_A,21,PIN PAD ACCESS CONTROL,0.1-ACS-PPA-10,PIN PAD ACCESS CONTROL,10
 C4_3_III_B,21,GSM ACCESS CONTROL,0.1-ACS-GAC-10,GSM ACCESS CONTROL,10
-C4_3_IV_A,21,Remote Control Signal Receiver,0.1-ACS-RCB-10,"Receiver for remote control signals, installed inside gates or barriers.",10
+C4_3_IV_A,21,Remote Control Signal Receiver,0.1-ACS-RCB-10,Receiver for remote control signals; installed inside gates or barriers.,10
 C4_3_IV_B,21,REMOTE CONTROL 4 BOTTOMS,0.1-ACS-RC4-10,REMOTE CONTROL,10
 C4_3_IV_C,21,REMOTE CONTROL 1 BOTTOM,0.1-ACS-RC1-10,REMOTE CONTROL,10
 C4_3_V_A,21,REMOTE RECEIVER,0.1-ACS-RRE-10,REMOTE RECEIVER,10
@@ -205,24 +205,24 @@ C4_6_I,21,0,#SPILL!,0,10
 C4_6_II,21,0,#SPILL!,0,10
 C4_7_I,21,0,#SPILL!,0,10
 C4_7_II,21,0,#SPILL!,0,10
-C5_0,25,Rubber Speed Humps,0.1-ACS-RSH-10,"Stack of rubber speed humps with yellow reflective strips,stored on a pallet under a warehouse shelf.",10
-C5_1_I_A,21,4g LTE Modem Modules,0.1-ACS-4LM-10,"4G/LTE modem communication modules stored in a blue warehouse bin, protected with pink bubble wrap.",10
-C5_1_I_B,7,GPS Antennas & Modems,0.1-ACS-GA&-10,"GPS antennas with SMA connectors and Quectel EC25 4G modem modules,organized in a divided blue bin with protective packaging.",10
-C5_1_I_C,21,Blue PCB GPS Modules,0.1-ACS-BPG-10,"Two GPS communication modules with blue PCBs and SMA connectors, stored with mounting accessories in a blue warehouse bin.",10
+C5_0,25,Rubber Speed Humps,0.1-ACS-RSH-10,Stack of rubber speed humps with yellow reflective strips;stored on a pallet under a warehouse shelf.,10
+C5_1_I_A,21,4g LTE Modem Modules,0.1-ACS-4LM-10,4G/LTE modem communication modules stored in a blue warehouse bin; protected with pink bubble wrap.,10
+C5_1_I_B,7,GPS Antennas & Modems,0.1-ACS-GA&-10,GPS antennas with SMA connectors and Quectel EC25 4G modem modules;organized in a divided blue bin with protective packaging.,10
+C5_1_I_C,21,Blue PCB GPS Modules,0.1-ACS-BPG-10,Two GPS communication modules with blue PCBs and SMA connectors; stored with mounting accessories in a blue warehouse bin.,10
 C5_1_II_A,21,0,#SPILL!,0,10
-C5_1_II_B,21,RF Antenna 915MHZ N Male Taoglas,0.1-ACS-RA9-10,"Taoglas Limited RF Antenna,915 MHz WHIP type with straight N Male connector. Manufacturer part number: TI.16.5F11. Supplied by Digi-Key (PN: 931-1215-ND). RoHS3 compliant,made in Taiwan.",10
-C5_1_II_C,21,HGV-2409U 2.4GHZ Antenna Box L-com,0.1-ACS-H2A-10,"L-com HGV-2409U outdoor omnidirectional antenna, 2.4 GHz, 9 dBi gain. Includes N-Female connector. Suitable for Wi-Fi and wireless applications. RoHS and CE certified. Made in China.",10
+C5_1_II_B,21,RF Antenna 915MHZ N Male Taoglas,0.1-ACS-RA9-10,Taoglas Limited RF Antenna;915 MHz WHIP type with straight N Male connector. Manufacturer part number: TI.16.5F11. Supplied by Digi-Key (PN: 931-1215-ND). RoHS3 compliant;made in Taiwan.,10
+C5_1_II_C,21,HGV-2409U 2.4GHZ Antenna Box L-com,0.1-ACS-H2A-10,L-com HGV-2409U outdoor omnidirectional antenna; 2.4 GHz; 9 dBi gain. Includes N-Female connector. Suitable for Wi-Fi and wireless applications. RoHS and CE certified. Made in China.,10
 C5_1_III_A,21,0,#SPILL!,0,101
-C5_1_III_B,21,HGV-2409U Antennas L-com,0.1-ACS-HAL-10,"Multiple L-com HGV-2409U omnidirectional Wi-Fi antennas (2.4 GHz, 9 dBi) stored in a blue warehouse bin. Each unit includes N-female connector and base mount.",10
-C5_1_III_C,21,Wifi Antennas Mixed Types L-com,0.1-ACS-WAM-10,"L-com outdoor Wi-Fi antennas stored in a blue bin, including both fiberglass (HGV-2409U) and metallic-bodied variants. All with N-female connectors and mounting bases.",10
-C5_1_IV_A,21,TL Sensorv2c Parking Logic Module,16.01-ASS-TSP-10,"TL-SENSORV2C Parking Logic Sensor, hardware revision V3A. Used in vehicle detection and parking guidance systems. Units labelled with serial codes and bubble-wrapped for protection.",10
+C5_1_III_B,21,HGV-2409U Antennas L-com,0.1-ACS-HAL-10,Multiple L-com HGV-2409U omnidirectional Wi-Fi antennas (2.4 GHz; 9 dBi) stored in a blue warehouse bin. Each unit includes N-female connector and base mount.,10
+C5_1_III_C,21,Wifi Antennas Mixed Types L-com,0.1-ACS-WAM-10,L-com outdoor Wi-Fi antennas stored in a blue bin; including both fiberglass (HGV-2409U) and metallic-bodied variants. All with N-female connectors and mounting bases.,10
+C5_1_IV_A,21,TL Sensorv2c Parking Logic Module,16.01-ASS-TSP-10,TL-SENSORV2C Parking Logic Sensor; hardware revision V3A. Used in vehicle detection and parking guidance systems. Units labelled with serial codes and bubble-wrapped for protection.,10
 C5_1_IV_B,21,TL Sensorv2c Parking Logic Module Long,16.01-ASS-TSA-10,Encapsulated version of the TL-SENSORV2C Parking Logic Sensor. Long green module protected with transparent resin casing. Used for vehicle detection and communication in parking guidance systems. Labelled with serial code and activation instructions.,10
-C5_1_V,21,Lithium Battery Charger Sp1bc401,#SPILL!,"Charger for lithium batteries, model SP1BC401, part number EP6012F4.",10
+C5_1_V,21,Lithium Battery Charger Sp1bc401,#SPILL!,Charger for lithium batteries; model SP1BC401; part number EP6012F4.,10
 C5_1_VI,21,0,#SPILL!,0,10
 C5_2_I,21,Solar Control Box Parking Logix,16.01-ACS-SCB-10,Outdoor control box by Parking Logix for solar-powered projects.,10
 C5_2_II,21,Solar Long Range Box Parking Logix,16.01-ACS-SLR-10,Parking Logix solar-powered control box with dual antennas for long-range communication.,10
 C5_2_III,21,AC Long Range Box Parking Logix,16.01-ACS-ALR-10,AC-powered Parking Logix control box with dual antennas for long-range communication.,10
-C5_2_IV,21,AC Control Box Parking Logix,16.01-ACS-ACD-10,"Parking Logix control box powered by AC, designed for fixed installations.",10
+C5_2_IV,21,AC Control Box Parking Logix,16.01-ACS-ACD-10,Parking Logix control box powered by AC; designed for fixed installations.,10
 C5_2_V,21,Sign Repeater Box Parking Logix,16.01-ACS-SRB-10,Wireless repeater box for parking signage systems.,10
 C5_2_VI,21,0,#SPILL!,0,10
 C5_3_I,21,0,#SPILL!,0,10
@@ -299,23 +299,23 @@ E1_1,21,--,--,--,10
 E1_2,21,--,--,--,10
 E1_3,21,--,--,--,10
 E2_0_I,21,C-LH4 Cable Roll - 100m,3.01-PGS-CCR-10,460117 C-LH-4 PGS Cable Roll - 100m,10
-E2_0_II,21,PK-PUC -- Mounting Insert for PK-CP245 Aluminium Bars,3.01-PGS-PMI-10,"Steel bracket designed to fit inside PK-CP245 aluminium bars. The central keyhole slot allows for the insertion of a threaded rod or steel pin, enabling secure ceiling mounting. Ideal for structural support or suspended installations.",10
+E2_0_II,21,PK-PUC -- Mounting Insert for PK-CP245 Aluminium Bars,3.01-PGS-PMI-10,Steel bracket designed to fit inside PK-CP245 aluminium bars. The central keyhole slot allows for the insertion of a threaded rod or steel pin; enabling secure ceiling mounting. Ideal for structural support or suspended installations.,10
 E2_0_III,21,PK-C -- Galvanized Corner Bracket for C-Frame Structures,3.01-PGS-PGC-10,Steel corner bracket used to form 90-degree joints in C-shaped metal profiles or aluminium framing systems. Ideal for reinforcing structural corners or assembling support frames.,10
 E2_0_IV,21,PK-E -- PK-E Steel Connector Bracket for PK-CP245,3.01-PGS-PPS-10,Straight galvanized steel bracket used to join two PK-CP245 aluminium profiles in-line. Provides structural continuity and alignment in modular assembly systems.,10
-E2_0_V,21,"Electrical Junction Enclosures (Empty, Plastic)",19.02-ACS-EJE-10,"Stack of IP-rated plastic electrical enclosures used for housing power supplies, controllers, or wiring terminations. Some units pre-drilled for cable glands or connectors. Suitable for both indoor and outdoor installations.",10
+E2_0_V,21,Electrical Junction Enclosures (Empty; Plastic),19.02-ACS-EJE-10,Stack of IP-rated plastic electrical enclosures used for housing power supplies; controllers; or wiring terminations. Some units pre-drilled for cable glands or connectors. Suitable for both indoor and outdoor installations.,10
 E2_0_VI,21,0,#SPILL!,0,10
 E2_1_I,21,NWave G4 Surface Mounted Sensor,14.03-CCS-NGS-10,NWave G4 Surface Mounted Sensor NPS-4.5-SM-W,10
 E2_1_II,21,0,#SPILL!,0,10
 E2_1_III,21,0,#SPILL!,0,10
 E2_1_IV,21,0,#SPILL!,0,10
-E2_1_V_A,21,Video Intercom Monitor (Cohend),#SPILL!,"Wall-mounted indoor screen for video door entry systems, typically used to view and communicate with visitors at entry points. Includes speaker grille and control buttons, part of the Cohend intercom product line.",10
-E2_1_V_B,21,Commend C-EEDK9 Module,#SPILL!,"Commend intercom module, model C-EEDK9, used for integration in access control or communication systems. Typically housed in a wall box or enclosure, compatible with other Commend devices for full intercom and door control functionality.",10
+E2_1_V_A,21,Video Intercom Monitor (Cohend),#SPILL!,Wall-mounted indoor screen for video door entry systems; typically used to view and communicate with visitors at entry points. Includes speaker grille and control buttons; part of the Cohend intercom product line.,10
+E2_1_V_B,21,Commend C-EEDK9 Module,#SPILL!,Commend intercom module; model C-EEDK9; used for integration in access control or communication systems. Typically housed in a wall box or enclosure; compatible with other Commend devices for full intercom and door control functionality.,10
 E2_1_VI,21,0,#SPILL!,0,10
 E2_1_VII,21,0,#SPILL!,0,10
 E2_2_I,21,120mm LED Traffic Signal - RED/GREEN Combo,19.02-RRS-1LA-10,ASF50L-1RV-01 Apollo 120mm LED Traffic Signal - Single Red/Green,10
-E2_2_II,21,Stagnoli Traffic Light – Green Module,19.02-RRS-STL-10,"Green light signal module from the Italian brand Stagnoli, typically used in access control systems to indicate vehicle passage authorization. Can be integrated with boom gates or barrier systems, and housed within a full traffic light enclosure.",10
+E2_2_II,21,Stagnoli Traffic Light – Green Module,19.02-RRS-STL-10,Green light signal module from the Italian brand Stagnoli; typically used in access control systems to indicate vehicle passage authorization. Can be integrated with boom gates or barrier systems; and housed within a full traffic light enclosure.,10
 E2_2_III,21,140mm LED Traffic Signal - Red/Green,19.02-RRS-1LB-10,CHR2LRV Chronos 140mm LED Traffic Signal - Red/Green,10
-E2_2_IV,21,Stagnoli PRAP Radar Sensor,19.02-RRS-SPR-10,"Radar sensor designed for motion or presence detection, manufactured by Stagnoli (Italy). Operates with a 12–24V power supply and is commonly used in gate automation, barrier systems, and controlled access points. It includes a compact housing, metal mounting bracket, and integrated cabling for connection. Suitable for industrial or commercial environments requiring reliable vehicle or pedestrian detection.",10
+E2_2_IV,21,Stagnoli PRAP Radar Sensor,19.02-RRS-SPR-10,Radar sensor designed for motion or presence detection; manufactured by Stagnoli (Italy). Operates with a 12–24V power supply and is commonly used in gate automation; barrier systems; and controlled access points. It includes a compact housing; metal mounting bracket; and integrated cabling for connection. Suitable for industrial or commercial environments requiring reliable vehicle or pedestrian detection.,10
 E2_2_V,21,Rapid Ramp Traffic System - Master Control Board,19.02-RRS-RRT-10,85309000 Saturno-K Master Kit (Includes 2 x Slaves),10
 E2_2_VI,21,Rapid Ramp Traffic System - Slave Control Board,19.02-RRS-RRA-10,Saturno-S 85309000 - Slave Control Board,10
 E2_3_I_A,21,KSENSOR for up to 6 Bays - LPR / RGB,3.01-PGS-KU6-10,460810 KSENSOR for up to 6 Bays - LPR / RGB,10
@@ -324,7 +324,7 @@ E2_3_II_A,21,0,3.01-PGS-----10,0,10
 E2_3_II_B,21,Basic RGB Display w/3 Digits + C/A  - 125mm,3.01-PGS-BRD-10,460666 Basic RGB Display w/3 Digits + C/A  - 125mm,10
 E2_3_III,21,0,3.01-PGS-----10,0,10
 E2_3_IV,21,Sensor Cable 3m lengths Connectors - ,3.01-PGS-SC3-10,460115 PGS Sensor Cable Connectors - 3m lengths,10
-E2_3_V_A,21,MR4 Module (Circontrol),3.01-PGS-MMO-10,"Multi-relay module from Circontrol used for controlling parking guidance systems. It supports communication with host and reader devices via RS485 and provides 4 relay outputs for system integration. The device is DIN-rail mountable and includes pluggable terminals for easy wiring. Commonly used in vehicle counting, signaling, and automated control applications within smart parking infrastructure.",10
+E2_3_V_A,21,MR4 Module (Circontrol),3.01-PGS-MMO-10,Multi-relay module from Circontrol used for controlling parking guidance systems. It supports communication with host and reader devices via RS485 and provides 4 relay outputs for system integration. The device is DIN-rail mountable and includes pluggable terminals for easy wiring. Commonly used in vehicle counting; signaling; and automated control applications within smart parking infrastructure.,10
 E2_3_V_B,21,TCP3RS Signal Convertor & Gateway,3.01-PGS-TSC-10,460803 TCP3RS Signal Convertor & Gateway,10
 E2_3_VI,21,PGS Power Supply 240-48,3.01-ELE-PPB-10,200526 Power Supply 240-48,10
 E2_4_I,21,0,#SPILL!,0,10
