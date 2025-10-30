@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>C2_CP2_3_II — Parcsafe Drawer</title>
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -63,7 +64,7 @@
       100%{opacity:0;transform:translate(-50%,10px)}
     }
 
-    /* ===== Improved Modal Style ===== */
+    /* Modals */
     dialog.modal{border:none;border-radius:22px;padding:0;max-width:760px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
     dialog.modal::backdrop{background:rgba(10,12,14,.45);backdrop-filter:blur(3px)}
     .modal .hd{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#f0f7ec}
@@ -78,84 +79,77 @@
     .fld textarea{min-height:140px;resize:vertical}
     .note{color:var(--muted);font-size:12px;margin-top:6px;grid-column:1 / -1}
     .modal .ft{padding:18px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
+
+    /* Z-index per sobre de tot */
+    dialog.modal{ z-index: 10010 !important; }
+    dialog.modal::backdrop{ z-index: 10000 !important; }
     .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
   </style>
 
-  <!-- 🔧 Override petit per assegurar el diàleg al davant -->
- <style>
-    dialog.modal{ z-index: 10010 !important; }
-    dialog.modal::backdrop{ z-index: 10000 !important; }
-  </style>
-  
-<!-- PDF (CDN) + QR (LOCAL COMPILAT) -->
+  <!-- PDF + QR lib -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <!-- ✅ QR UMD per navegador (substitueix l'script local) -->
   <script type="module">
     import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
-
-    // 🔧 Shim robust: detecta on viu QrCode i exposa-ho a window.qrcodegen
-    const lib =
-      (m && m.QrCode) ? m :
-      (m && m.default && m.default.QrCode) ? m.default :
-      m;
-
+    const lib = (m && m.QrCode) ? m : ((m && m.default && m.default.QrCode) ? m.default : m);
     window.qrcodegen = lib;
   </script>
-
-
 </head>
 <body>
   <div class="container">
-
+    <!-- Header -->
     <header class="bar">
       <a class="back" href="../index.html">← Back to index</a>
-      <div class="brand">
-        <img class="logo" id="logo" alt="Parcsafe">
-      </div>
+      <div class="brand"><img class="logo" id="logo" alt="Parcsafe"></div>
     </header>
 
-    <h1 class="title">
-      Drawer details
-      <span class="drawer-code">C2_CP2_3_II</span>
-    </h1>
+    <!-- Title -->
+    <h1 class="title">Drawer details <span class="drawer-code">C2_CP2_3_II</span></h1>
 
+    <!-- Meta -->
     <div class="meta">
       <div id="product-name"><strong>Product Name:</strong> loading...</div>
       <div class="codeWrap">
         <div id="product-code"><strong>Product Code:</strong> loading...</div>
-        <button class="btn secondary" id="editInfoBtn">✏️ Edit Product Info</button>
+        <button class="btn secondary" id="editInfoBtn" type="button">✏️ Edit Product Info</button>
         <button class="btn ghost" id="qrBtn" type="button">📎 QR</button>
       </div>
     </div>
 
+    <!-- Cards -->
     <div class="cards">
+      <!-- Drawer photo -->
       <div class="card">
         <h3>Drawer Photo</h3>
         <div class="imgwrap">
-          <img id="drawerImg" src="../images/C2_CP2_3_II.jpg" alt="Drawer image C2_CP2_3_II" onerror="this.onerror=null; this.src='../../images/C2_CP2_3_II.jpg';" />
+          <img id="drawerImg" alt="Drawer image C2_CP2_3_II" />
         </div>
         <div class="spacer"></div>
         <div class="row">
-          <button class="btn" id="uploadPhotoBtn">🖼️ Update Drawer Photo</button>
-          <button class="btn ghost" id="refreshImgBtn">Refresh</button>
-          <span class="note">The new image will be renamed to <strong>C2_CP2_3_II.jpg</strong> automatically.</span>
+          <button class="btn" id="uploadPhotoBtn" type="button">🖼️ Update Drawer Photo</button>
+          <button class="btn ghost" id="refreshImgBtn" type="button">Refresh</button>
+          <span class="note">The new image will be saved as <strong>C2_CP2_3_II.jpg</strong> in <em>images/</em> and <em>img/</em>. (JPEG only)</span>
         </div>
-        <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display:none" />
+        <!-- JPEG only -->
+        <input type="file" id="fileInput" accept="image/jpeg" style="display:none" />
       </div>
 
+      <!-- Cabinet highlight -->
       <div class="card">
         <h3>Cabinet Highlight</h3>
         <div class="imgwrap">
-          <img id="cabImg" src="../images/C2_CP2_cabinet_C2_CP2_3_II.png" alt="Cabinet highlight" onerror="this.onerror=null; this.src='../../images/C2_CP2_cabinet_C2_CP2_3_II.png';" />
+          <img id="cabImg" src="../images/C2_CP2_cabinet_C2_CP2_3_II.png" alt="Cabinet highlight"
+               onerror="this.onerror=null; this.src='../../images/C2_CP2_cabinet_C2_CP2_3_II.png';" />
         </div>
       </div>
     </div>
 
+    <!-- Description -->
     <div class="card" style="margin-top:20px">
       <h3>Description</h3>
       <div id="description-text" style="line-height:1.6">loading...</div>
     </div>
 
+    <!-- Stock -->
     <div class="stock-display" id="stock-display">Loading stock...</div>
 
     <div class="stock-ui" id="stockUI">
@@ -165,11 +159,11 @@
         <span class="pill">New: <strong id="newQty">–</strong></span>
       </div>
       <div class="row" style="margin-top:10px">
-        <button id="minusBtn">−1</button>
-        <button id="plusBtn">+1</button>
+        <button id="minusBtn" type="button">−1</button>
+        <button id="plusBtn" type="button">+1</button>
         <label>Exact: <input id="exactInput" type="number" min="0" step="1" /></label>
-        <button class="secondary" id="resetBtn">Reset</button>
-        <button class="save" id="saveBtn">Save</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <button class="save" id="saveBtn" type="button">Save</button>
       </div>
       <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
     </div>
@@ -177,13 +171,13 @@
     <div id="toast"></div>
   </div>
 
-  <!-- Edit Info Modal -->
+  <!-- ===================== Edit Info Modal ===================== -->
   <dialog class="modal" id="editModal">
+    <div class="hd">
+      <strong>Edit product info</strong>
+      <button class="close-x" type="button" onclick="document.getElementById('editModal').close()">✕</button>
+    </div>
     <form method="dialog" id="editForm">
-      <div class="hd">
-        <strong>Edit product info</strong>
-        <button class="close-x" value="cancel" aria-label="Close">✕</button>
-      </div>
       <div class="bd">
         <div class="fld">
           <label for="fldName">Product Name</label>
@@ -197,20 +191,22 @@
           <label for="fldDesc">Description</label>
           <textarea id="fldDesc" required></textarea>
         </div>
-        <div class="note">Tip: press <span class="kbd">Esc</span> to close.</div>
+        <div class="note">
+          Tip: press <span class="kbd">Esc</span> to close.
+        </div>
       </div>
       <div class="ft">
-        <button class="btn ghost" value="cancel">Cancel</button>
-        <button class="btn" id="saveInfoBtn" value="default">Save changes</button>
+        <button class="btn ghost" type="button" onclick="document.getElementById('editModal').close()">Cancel</button>
+        <button class="btn" id="saveInfoBtn" value="default" type="submit">Save changes</button>
       </div>
     </form>
   </dialog>
 
-  <!-- QR MODAL -->
+  <!-- ===================== QR Modal ===================== -->
   <dialog class="modal" id="qrModal">
     <div class="hd">
       <strong>Product QR</strong>
-      <button class="close-x" value="cancel" aria-label="Close" id="qrClose">✕</button>
+      <button class="close-x" type="button" id="qrClose">✕</button>
     </div>
     <div class="bd">
       <div class="fld fld--wide" style="align-items:center">
@@ -226,23 +222,30 @@
   </dialog>
 
   <script>
-    async function ensureQrLib(timeoutMs = 1000) {
-  const t0 = performance.now();
-  while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
-    if (performance.now() - t0 > timeoutMs) throw new Error("QR lib not ready");
-    await new Promise(r => setTimeout(r, 20));
-    }
-  }
-
+    /* ====================== Const / endpoints ====================== */
     const drawerCode = "C2_CP2_3_II";
     const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    // === QR ESTÀTIC (canvia-ho si vols un altre text/URL) ===
     const QR_STATIC_VALUE = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP2/fitxes/C2_CP2_3_II.html";
 
+    /* ====================== Utils ====================== */
+    async function ensureQrLib(timeoutMs = 1200) {
+      const t0 = performance.now();
+      while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
+        if (performance.now() - t0 > timeoutMs) throw new Error("QR lib not ready");
+        await new Promise(r => setTimeout(r, 20));
+      }
+    }
+    const toast = document.getElementById("toast");
+    function showToast(msg, color="#198754"){
+      toast.textContent = msg;
+      toast.style.backgroundColor = color;
+      toast.style.display = "block";
+      setTimeout(()=> toast.style.display="none", 2600);
+    }
 
-    // ===== Robust logo loader (header) =====
+    /* ====================== Logo loader ====================== */
     (function loadLogo(){
       const logo = document.getElementById('logo');
       const candidates = [
@@ -262,21 +265,10 @@
       tryNext();
     })();
 
-    const toast = document.getElementById("toast");
-    function showToast(msg, color="#198754"){
-      toast.textContent = msg;
-      toast.style.backgroundColor = color;
-      toast.style.display = "block";
-      setTimeout(()=> toast.style.display="none", 2600);
-    }
-
+    /* ====================== CSV loader ====================== */
     async function loadCSVFromCandidates() {
       const candidates = [
-        "../../stock.csv",
-        "../stock.csv",
-        "../../../stock.csv",
-        "./stock.csv",
-        "/docs/stock.csv",
+        "../../stock.csv","../stock.csv","../../../stock.csv","./stock.csv","/docs/stock.csv",
         window.location.origin + "/docs/stock.csv",
       ];
       for (const url of candidates) {
@@ -284,52 +276,24 @@
           const res = await fetch(url + "?t=" + Date.now());
           if (res.ok) {
             const txt = await res.text();
-            if (txt.includes("drawerCode")) {
-              console.log("✅ CSV found at:", url);
-              return txt;
-            }
+            if (txt.includes("drawerCode")) return txt;
           }
-        } catch (err) { console.warn("❌ Not found:", url); }
+        } catch {}
       }
       throw new Error("stock.csv not found via any path");
     }
 
-    loadCSVFromCandidates()
-      .then(csv => {
-        const rows = csv.trim().split("\n");
-        const headers = rows[0].split(",");
-        const data = rows.slice(1).map(r => {
-          const vals = r.split(",");
-          return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
-        });
-        const match = data.find(r => (r.drawerCode || "").trim() === drawerCode);
-        if (!match) throw new Error("Drawer not found");
-
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ""}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ""}`;
-        document.getElementById("description-text").textContent = match.description || "";
-
-        const MIN_STOCK = parseInt(match.minStock || "10", 10);
-        document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
-        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
-        initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
-
-        document.getElementById("fldName").value = match.productName || "";
-        document.getElementById("fldCode").value = match.productCode || "";
-        document.getElementById("fldDesc").value = match.description || "";
-      })
-      .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
-
+    /* ====================== Stock UI ====================== */
     function initStockUI(initialQty, MIN_STOCK = 10) {
-      const curEl = document.getElementById('curQty');
+      const curEl   = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
-      const newEl = document.getElementById('newQty');
-      const minus = document.getElementById('minusBtn');
-      const plus = document.getElementById('plusBtn');
-      const exact = document.getElementById('exactInput');
-      const reset = document.getElementById('resetBtn');
-      const save = document.getElementById('saveBtn');
-      const warn = document.getElementById('minWarn');
+      const newEl   = document.getElementById('newQty');
+      const minus   = document.getElementById('minusBtn');
+      const plus    = document.getElementById('plusBtn');
+      const exact   = document.getElementById('exactInput');
+      const reset   = document.getElementById('resetBtn');
+      const save    = document.getElementById('saveBtn');
+      const warn    = document.getElementById('minWarn');
       let cur = initialQty, delta = 0;
 
       function refresh(){
@@ -344,7 +308,7 @@
       }
 
       minus.addEventListener('click', ()=>{ delta -= 1; refresh(); });
-      plus.addEventListener('click', ()=>{ delta += 1; refresh(); });
+      plus.addEventListener('click',  ()=>{ delta += 1; refresh(); });
       exact.addEventListener('input', ()=>{ const v=parseInt(exact.value,10); if(!isNaN(v)){ delta=v-cur; refresh(); }});
       reset.addEventListener('click', ()=>{ delta=0; refresh(); });
 
@@ -365,23 +329,68 @@
           showToast('❌ Error updating stock', '#b3261e');
         }
       });
+
       refresh();
     }
 
-    // === Upload image ===
-    const uploadBtn = document.getElementById('uploadPhotoBtn');
-    const refreshImgBtn = document.getElementById('refreshImgBtn');
-    const fileInput = document.getElementById('fileInput');
-    uploadBtn.addEventListener('click', ()=> fileInput.click());
-    refreshImgBtn.addEventListener('click', ()=> {
+    /* ====================== Drawer image (JPEG only) ====================== */
+    // Versió local per cache-busting persistent
+    const IMG_VER_KEY = `imgVer_${drawerCode}`;
+    function getImgVersion(){
+      const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10);
+      return isNaN(v) ? 1 : v;
+    }
+    function bumpImgVersion(){
+      const v = getImgVersion() + 1;
+      localStorage.setItem(IMG_VER_KEY, String(v));
+      return v;
+    }
+
+    function imageCandidatesWithVersion(version){
+      const ts = `?v=${version}`;
+      return [
+        `../images/${drawerCode}.jpg${ts}`,
+        `../../images/${drawerCode}.jpg${ts}`,
+        `../img/${drawerCode}.jpg${ts}`,
+        `../../img/${drawerCode}.jpg${ts}`,
+      ];
+    }
+
+    function setDrawerImg(forceBump=false){
       const el = document.getElementById('drawerImg');
-      el.src = `../images/${drawerCode}.jpg?t=${Date.now()}`;
+      const v = forceBump ? bumpImgVersion() : getImgVersion();
+      const candidates = imageCandidatesWithVersion(v);
+      let i = 0;
+      const tryNext = () => {
+        if (i >= candidates.length) return; // queda en blanc si cap carrega
+        el.onerror = () => { i++; tryNext(); };
+        el.src = candidates[i];
+      };
+      tryNext();
+    }
+
+    // Intenta evitar que tornis a la imatge antiga quan fas Ctrl+F5:
+    // - Sempre porta ?v=<localVersion>
+    // - En fer "Refresh" o després d'upload, fem bump de versió.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') setDrawerImg(false);
     });
+
+    /* ====================== Upload (JPEG only) ====================== */
+    const uploadBtn     = document.getElementById('uploadPhotoBtn');
+    const refreshImgBtn = document.getElementById('refreshImgBtn');
+    const fileInput     = document.getElementById('fileInput');
+
+    document.addEventListener('DOMContentLoaded', () => setDrawerImg(false));
+    uploadBtn.addEventListener('click', ()=> fileInput.click());
+    refreshImgBtn.addEventListener('click', ()=> setDrawerImg(true)); // bump & reload
+
     fileInput.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0];
       if(!file) return;
-      if(!/image\/(jpeg|png)/.test(file.type)) return showToast('Only JPG/PNG allowed', '#b3261e');
+      if(!/image\/jpe?g/i.test(file.type)) return showToast('JPEG only (.jpg/.jpeg)', '#b3261e');
       if(file.size > 8*1024*1024) return showToast('Max 8MB image', '#b3261e');
+
       const fd = new FormData();
       fd.append('image', file);
       fd.append('drawerCode', drawerCode);
@@ -389,21 +398,20 @@
         const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
-        const el = document.getElementById('drawerImg');
-        el.src = `../images/${drawerCode}.jpg?t=${Date.now()}`;
+        setDrawerImg(true); // bump version after upload
       }catch(err){
         console.error(err);
         showToast('❌ Error uploading image', '#b3261e');
       }finally{ fileInput.value = ''; }
     });
 
-    // === Edit info modal ===
-    const editBtn = document.getElementById('editInfoBtn');
-    const modal = document.getElementById('editModal');
+    /* ====================== Edit Info logic ====================== */
+    const editBtn   = document.getElementById('editInfoBtn');
+    const modal     = document.getElementById('editModal');
     const saveInfoBtn = document.getElementById('saveInfoBtn');
-    const fldName = document.getElementById('fldName');
-    const fldCode = document.getElementById('fldCode');
-    const fldDesc = document.getElementById('fldDesc');
+    const fldName   = document.getElementById('fldName');
+    const fldCode   = document.getElementById('fldCode');
+    const fldDesc   = document.getElementById('fldDesc');
 
     editBtn.addEventListener('click', ()=> modal.showModal());
     modal.addEventListener('click', (e)=>{
@@ -411,11 +419,12 @@
       const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
       if(!inside) modal.close();
     });
+
     saveInfoBtn.addEventListener('click', async (ev)=>{
       ev.preventDefault();
-      const name = fldName.value.trim();
-      const code = fldCode.value.trim();
-      const desc = fldDesc.value.trim();
+      const name = (fldName.value || '').trim();
+      const code = (fldCode.value || '').trim();
+      const desc = (fldDesc.value || '').trim();
       if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
       try{
         const r = await fetch(UPDATE_INFO_ENDPOINT, {
@@ -435,24 +444,18 @@
       }
     });
 
-    // ===== QR (qrcodegen local) =====
-    const qrBtn = document.getElementById('qrBtn');
-    const qrModal = document.getElementById('qrModal');
-    const qrClose = document.getElementById('qrClose');
-    const qrCanvas = document.getElementById('qrCanvas');
-    const dlPngBtn = document.getElementById('dlPngBtn');
-    const dlPdfBtn = document.getElementById('dlPdfBtn');
-    const copyLinkBtn = document.getElementById('copyLinkBtn');
-    const qrUrlNote = document.getElementById('qrUrlNote');
+    /* ====================== QR modal ====================== */
+    const qrBtn      = document.getElementById('qrBtn');
+    const qrModal    = document.getElementById('qrModal');
+    const qrClose    = document.getElementById('qrClose');
+    const qrCanvas   = document.getElementById('qrCanvas');
+    const dlPngBtn   = document.getElementById('dlPngBtn');
+    const dlPdfBtn   = document.getElementById('dlPdfBtn');
+    const copyLinkBtn= document.getElementById('copyLinkBtn');
+    const qrUrlNote  = document.getElementById('qrUrlNote');
 
-    // Prova diverses rutes de logo fins que una funcioni
-    const LOGO_CANDIDATES = [
-      "../../parcsafe-logo.png",
-      "../parcsafe-logo.png",
-      "../../../parcsafe-logo.png"
-    ];
-
-    let qrLogoPromise; // cache perquè només es provi una vegada
+    const LOGO_CANDIDATES = ["../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"];
+    let qrLogoPromise;
     function loadQrLogo() {
       if (qrLogoPromise) return qrLogoPromise;
       qrLogoPromise = new Promise((resolve) => {
@@ -470,9 +473,7 @@
       return qrLogoPromise;
     }
 
-    function currentCleanUrl(){
-      return window.location.href.split('#')[0].split('?')[0];
-    }
+    function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function drawQR(url){
       const size = 1024;
@@ -480,8 +481,7 @@
       qrCanvas.width = size; qrCanvas.height = size;
       ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,size,size);
 
-      // Genera QR amb la llibreria local
-      const ecc = qrcodegen.QrCode.Ecc.HIGH || qrcodegen.QrCode.Ecc.H; // compat
+      const ecc = qrcodegen.QrCode.Ecc.HIGH || qrcodegen.QrCode.Ecc.H;
       const qr  = qrcodegen.QrCode.encodeText(url, ecc);
       const modules = qr.size, border = 2;
       const ppm = Math.floor(size / (modules + border*2));
@@ -499,44 +499,38 @@
         }
       }
 
-     // Logo central (només si hi ha logo)
-    const logoImg = await loadQrLogo();
-    if (logoImg) {
-      const logoBox = Math.floor(size * 0.22);
-      const cx = size/2, cy = size/2;
-      const r = Math.floor(logoBox/2) + 14;
+      const logoImg = await loadQrLogo();
+      if (logoImg) {
+        const logoBox = Math.floor(size * 0.22);
+        const cx = size/2, cy = size/2;
+        const r = Math.floor(logoBox/2) + 14;
 
-      // disc blanc sota el logo (ara sí, només quan hi ha logo)
-      ctx.save();
-      ctx.fillStyle = '#FFF';
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
+        ctx.save();
+        ctx.fillStyle = '#FFF';
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
 
-      const pad = 18;
-      const w = logoBox - pad*2;
-      const h = logoBox - pad*2;
+        const pad = 18;
+        const w = logoBox - pad*2;
+        const h = logoBox - pad*2;
 
-      const aspect = logoImg.width / logoImg.height;
-      let drawW = w, drawH = w / aspect;
-      if (drawH > h) { drawH = h; drawW = h * aspect; }
+        const aspect = logoImg.width / logoImg.height;
+        let drawW = w, drawH = w / aspect;
+        if (drawH > h) { drawH = h; drawW = h * aspect; }
 
-      ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
+        ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
+      }
     }
-    }
-
-    function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function openQrModal(){
-      qrUrlNote.textContent = QR_STATIC_VALUE;   // (ja el tens estàtic)
+      qrUrlNote.textContent = QR_STATIC_VALUE;
       safeOpenDialog(qrModal);
       await new Promise(r=>requestAnimationFrame(r));
-      await ensureQrLib();                        // ✅ espera la llibreria
+      await ensureQrLib();
       await drawQR(QR_STATIC_VALUE);
     }
-
-
 
     qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
     qrClose?.addEventListener('click', ()=> qrModal.close());
@@ -546,15 +540,15 @@
       if(!inside) qrModal.close();
     });
 
-    // Copiar enllaç
     copyLinkBtn?.addEventListener('click', async ()=>{
-      const url = QR_STATIC_VALUE;
-      try{ await navigator.clipboard.writeText(url); showToast('🔗 Enllaç copiat'); }
-      catch{ const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('🔗 Enllaç copiat'); }
+      try{ await navigator.clipboard.writeText(QR_STATIC_VALUE); showToast('🔗 Link copied'); }
+      catch{
+        const ta=document.createElement('textarea'); ta.value=QR_STATIC_VALUE;
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+        showToast('🔗 Link copied');
+      }
     });
 
-
-    // Descarregar PNG
     dlPngBtn?.addEventListener('click', ()=>{
       const a = document.createElement('a');
       a.href = qrCanvas.toDataURL('image/png');
@@ -562,7 +556,6 @@
       a.click();
     });
 
-    // Descarregar PDF
     dlPdfBtn?.addEventListener('click', ()=>{
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ unit:'mm', format:'A4' });
@@ -577,6 +570,33 @@
       pdf.save(`${drawerCode}_QR.pdf`);
     });
 
+    /* ====================== Bootstrapping (CSV → UI) ====================== */
+    loadCSVFromCandidates()
+      .then(csv => {
+        const rows = csv.trim().split("\n");
+        const headers = rows[0].split(",");
+        const data = rows.slice(1).map(r => {
+          const vals = r.split(",");
+          return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
+        });
+        const match = data.find(r => (r.drawerCode || "").trim() === drawerCode);
+        if (!match) throw new Error("Drawer not found");
+
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ""}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ""}`;
+        document.getElementById("description-text").textContent = match.description || "";
+
+        const MIN_STOCK = parseInt(match.minStock || "10", 10);
+        document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
+        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
+        initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
+
+        // Precarrega modal
+        document.getElementById("fldName").value = match.productName || "";
+        document.getElementById("fldCode").value = match.productCode || "";
+        document.getElementById("fldDesc").value = match.description || "";
+      })
+      .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
   </script>
 </body>
 </html>
