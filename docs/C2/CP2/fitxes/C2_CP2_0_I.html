@@ -62,60 +62,30 @@
       90%{opacity:1;transform:translate(-50%,0)}
       100%{opacity:0;transform:translate(-50%,10px)}
     }
-
-    /* ===== Improved Modal Style ===== */
-    dialog.modal{border:none;border-radius:22px;padding:0;max-width:760px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
-    dialog.modal::backdrop{background:rgba(10,12,14,.45);backdrop-filter:blur(3px)}
-    .modal .hd{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#f0f7ec}
-    .modal .hd strong{font-size:18px}
-    .close-x{background:transparent;border:none;font-size:24px;cursor:pointer;line-height:1}
-    .modal .bd{padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px 22px}
-    .modal .bd .fld--wide{grid-column:1 / -1}
-    .fld{display:flex;flex-direction:column;gap:6px}
-    .fld label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-    .fld input,.fld textarea{padding:14px 16px;border-radius:14px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:16px;outline:none}
-    .fld input:focus,.fld textarea:focus{border-color:#b7df9f; box-shadow:0 0 0 3px rgba(109,189,69,.18)}
-    .fld textarea{min-height:140px;resize:vertical}
-    .note{color:var(--muted);font-size:12px;margin-top:6px;grid-column:1 / -1}
-    .modal .ft{padding:18px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
-    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
   </style>
 
-  <!-- 🔧 Override petit per assegurar el diàleg al davant -->
- <style>
+  <!-- z-index modal -->
+  <style>
     dialog.modal{ z-index: 10010 !important; }
     dialog.modal::backdrop{ z-index: 10000 !important; }
   </style>
-  
-  <!-- PDF (CDN) + QR (LOCAL COMPILAT) -->
+
+  <!-- PDF (CDN) + QR (UMD via CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <!-- ✅ QR UMD per navegador (substitueix l'script local) -->
   <script type="module">
     import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
-
-    // 🔧 Shim robust: detecta on viu QrCode i exposa-ho a window.qrcodegen
-    const lib =
-      (m && m.QrCode) ? m :
-      (m && m.default && m.default.QrCode) ? m.default :
-      m;
-
+    const lib = (m && m.QrCode) ? m : (m?.default?.QrCode ? m.default : m);
     window.qrcodegen = lib;
   </script>
 </head>
 <body>
   <div class="container">
-
     <header class="bar">
       <a class="back" href="../index.html">← Back to index</a>
-      <div class="brand">
-        <img class="logo" id="logo" alt="Parcsafe">
-      </div>
+      <div class="brand"><img class="logo" id="logo" alt="Parcsafe"></div>
     </header>
 
-    <h1 class="title">
-      Drawer details
-      <span class="drawer-code">C2_CP2_0_I</span>
-    </h1>
+    <h1 class="title">Drawer details <span class="drawer-code">C2_CP2_0_I</span></h1>
 
     <div class="meta">
       <div id="product-name"><strong>Product Name:</strong> loading...</div>
@@ -130,14 +100,13 @@
       <div class="card">
         <h3>Drawer Photo</h3>
         <div class="imgwrap">
-          <!-- 👇 Ara sense src ni onerror: el JS farà fallback jpg/png a images/ i img/ -->
           <img id="drawerImg" alt="Drawer image C2_CP2_0_I" />
         </div>
         <div class="spacer"></div>
         <div class="row">
           <button class="btn" id="uploadPhotoBtn">🖼️ Update Drawer Photo</button>
           <button class="btn ghost" id="refreshImgBtn">Refresh</button>
-          <span class="note">The new image will be saved as <strong>C2_CP2_0_I.jpg</strong> or <strong>.png</strong> in <em>images/</em> and <em>img/</em>.</span>
+          <span class="note">The new image will be saved as <strong>C2_CP2_0_I.png</strong> or <strong>.jpg</strong> in <em>images/</em> and <em>img/</em>.</span>
         </div>
         <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display:none" />
       </div>
@@ -145,7 +114,8 @@
       <div class="card">
         <h3>Cabinet Highlight</h3>
         <div class="imgwrap">
-          <img id="cabImg" src="../images/C2_CP2_cabinet_C2_CP2_0_I.png" alt="Cabinet highlight" onerror="this.onerror=null; this.src='../../images/C2_CP2_cabinet_C2_CP2_0_I.png';" />
+          <img id="cabImg" src="../images/C2_CP2_cabinet_C2_CP2_0_I.png" alt="Cabinet highlight"
+               onerror="this.onerror=null; this.src='../../images/C2_CP2_cabinet_C2_CP2_0_I.png';" />
         </div>
       </div>
     </div>
@@ -237,10 +207,9 @@
     const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    // === QR ESTÀTIC (canvia-ho si vols un altre text/URL) ===
     const QR_STATIC_VALUE = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP2/fitxes/C2_CP2_0_I.html";
 
-    // ===== Robust logo loader (header) =====
+    // Logo header (fallbacks)
     (function loadLogo(){
       const logo = document.getElementById('logo');
       const candidates = [
@@ -252,12 +221,8 @@
         "../../../parcsafe-logo.png"
       ];
       let i = 0;
-      const tryNext = () => {
-        if(i >= candidates.length){ logo.remove(); return; }
-        logo.src = candidates[i++];
-      };
-      logo.onerror = tryNext;
-      tryNext();
+      const tryNext = () => { if(i >= candidates.length){ logo.remove(); return; } logo.src = candidates[i++]; };
+      logo.onerror = tryNext; tryNext();
     })();
 
     const toast = document.getElementById("toast");
@@ -268,26 +233,20 @@
       setTimeout(()=> toast.style.display="none", 2600);
     }
 
+    // CSV loader
     async function loadCSVFromCandidates() {
       const candidates = [
-        "../../stock.csv",
-        "../stock.csv",
-        "../../../stock.csv",
-        "./stock.csv",
-        "/docs/stock.csv",
-        window.location.origin + "/docs/stock.csv",
+        "../../stock.csv","../stock.csv","../../../stock.csv","./stock.csv",
+        "/docs/stock.csv", window.location.origin + "/docs/stock.csv",
       ];
       for (const url of candidates) {
         try {
           const res = await fetch(url + "?t=" + Date.now());
           if (res.ok) {
             const txt = await res.text();
-            if (txt.includes("drawerCode")) {
-              console.log("✅ CSV found at:", url);
-              return txt;
-            }
+            if (txt.includes("drawerCode")) return txt;
           }
-        } catch (err) { console.warn("❌ Not found:", url); }
+        } catch {}
       }
       throw new Error("stock.csv not found via any path");
     }
@@ -366,38 +325,70 @@
       refresh();
     }
 
-    // === Drawer Photo: loader amb fallback JPG/PNG i images/img ===
-    function setDrawerImg({bust=false} = {}) {
-      const el = document.getElementById('drawerImg');
+    // ====== IMATGE DEL CAIXÓ: PNG PRIORITARI + CACHE-BUST + POLL ======
+    const IMG_EXTS_DEFAULT = ['png','jpg','jpeg'];
+
+    function candidateDrawerUrls(preferredExt, bust = false) {
+      const exts = preferredExt
+        ? [preferredExt, ...IMG_EXTS_DEFAULT.filter(e => e !== preferredExt)]
+        : IMG_EXTS_DEFAULT;
       const ts = bust ? `?t=${Date.now()}` : '';
-      const candidates = [
-        `../images/${drawerCode}.jpg${ts}`,
-        `../images/${drawerCode}.png${ts}`,
-        `../../images/${drawerCode}.jpg${ts}`,
-        `../../images/${drawerCode}.png${ts}`,
-        `../img/${drawerCode}.jpg${ts}`,
-        `../img/${drawerCode}.png${ts}`,
-        `../../img/${drawerCode}.jpg${ts}`,
-        `../../img/${drawerCode}.png${ts}`,
+      const bases = [
+        `../images/${drawerCode}`,
+        `../../images/${drawerCode}`,
+        `../img/${drawerCode}`,
+        `../../img/${drawerCode}`,
       ];
-      let i = 0;
-      const tryNext = () => {
-        if (i >= candidates.length) return;
-        el.onerror = () => { i++; tryNext(); };
-        el.src = candidates[i];
-      };
-      tryNext();
+      const urls = [];
+      for (const base of bases) for (const ext of exts) urls.push(`${base}.${ext}${ts}`);
+      return urls;
     }
 
-    // === Upload image ===
+    async function tryLoadInto(imgEl, urls) {
+      for (const url of urls) {
+        const ok = await new Promise(resolve => {
+          const onOk = () => { cleanup(); resolve(true); };
+          const onErr = () => { cleanup(); resolve(false); };
+          function cleanup(){ imgEl.onload = imgEl.onerror = null; }
+          imgEl.onload = onOk; imgEl.onerror = onErr; imgEl.src = url;
+        });
+        if (ok) return url;
+      }
+      throw new Error('No drawer image found in any candidate');
+    }
+
+    async function waitUntilAvailable(urls, timeoutMs = 12000) {
+      const deadline = Date.now() + timeoutMs;
+      while (Date.now() < deadline) {
+        for (const url of urls) {
+          try {
+            const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+            if (res.ok) return url;
+          } catch {}
+        }
+        await new Promise(r => setTimeout(r, 800));
+      }
+      return null;
+    }
+
+    async function setDrawerImg({ preferredExt = null, bust = false } = {}) {
+      const el = document.getElementById('drawerImg');
+      el.style.opacity = '0.3';
+      try {
+        const urls = candidateDrawerUrls(preferredExt, bust);
+        await tryLoadInto(el, urls);
+      } finally {
+        el.style.opacity = '1';
+      }
+    }
+
     const uploadBtn = document.getElementById('uploadPhotoBtn');
     const refreshImgBtn = document.getElementById('refreshImgBtn');
     const fileInput = document.getElementById('fileInput');
 
-    document.addEventListener('DOMContentLoaded', () => setDrawerImg());
-
+    document.addEventListener('DOMContentLoaded', () => setDrawerImg({ preferredExt: 'png' }));
     uploadBtn.addEventListener('click', ()=> fileInput.click());
-    refreshImgBtn.addEventListener('click', ()=> setDrawerImg({bust:true}));
+    refreshImgBtn.addEventListener('click', ()=> setDrawerImg({ preferredExt:'png', bust:true }));
 
     fileInput.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0];
@@ -408,56 +399,27 @@
       const fd = new FormData();
       fd.append('image', file);
       fd.append('drawerCode', drawerCode);
+
+      const isPng = /image\/png/i.test(file.type);
+
       try{
         const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
-        setDrawerImg({bust:true});
+
+        // Espera curt perquè Pages publiqui i força png primer
+        const bustUrls = candidateDrawerUrls(isPng ? 'png' : 'jpg', true);
+        await waitUntilAvailable(bustUrls);
+        await setDrawerImg({ preferredExt: isPng ? 'png' : 'jpg', bust:true });
       }catch(err){
         console.error(err);
         showToast('❌ Error uploading image', '#b3261e');
-      }finally{ fileInput.value = ''; }
-    });
-
-    // === Edit info modal ===
-    const editBtn = document.getElementById('editInfoBtn');
-    const modal = document.getElementById('editModal');
-    const saveInfoBtn = document.getElementById('saveInfoBtn');
-    const fldName = document.getElementById('fldName');
-    const fldCode = document.getElementById('fldCode');
-    const fldDesc = document.getElementById('fldDesc');
-
-    editBtn.addEventListener('click', ()=> modal.showModal());
-    modal.addEventListener('click', (e)=>{
-      const rect = modal.getBoundingClientRect();
-      const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-      if(!inside) modal.close();
-    });
-    saveInfoBtn.addEventListener('click', async (ev)=>{
-      ev.preventDefault();
-      const name = fldName.value.trim();
-      const code = fldCode.value.trim();
-      const desc = fldDesc.value.trim();
-      if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
-      try{
-        const r = await fetch(UPDATE_INFO_ENDPOINT, {
-          method:'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ drawerCode, productName:name, productCode:code, description:desc })
-        });
-        if(!r.ok) throw new Error(await r.text());
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${name}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${code}`;
-        document.getElementById("description-text").textContent = desc;
-        modal.close();
-        showToast('✔️ Product info updated');
-      }catch(err){
-        console.error(err);
-        showToast('❌ Error updating info', '#b3261e');
+      }finally{
+        fileInput.value = '';
       }
     });
 
-    // ===== QR (qrcodegen local) =====
+    // ===== QR (qrcodegen) =====
     const qrBtn = document.getElementById('qrBtn');
     const qrModal = document.getElementById('qrModal');
     const qrClose = document.getElementById('qrClose');
@@ -467,12 +429,7 @@
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     const qrUrlNote = document.getElementById('qrUrlNote');
 
-    const LOGO_CANDIDATES = [
-      "../../parcsafe-logo.png",
-      "../parcsafe-logo.png",
-      "../../../parcsafe-logo.png"
-    ];
-
+    const LOGO_CANDIDATES = ["../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"];
     let qrLogoPromise;
     function loadQrLogo() {
       if (qrLogoPromise) return qrLogoPromise;
@@ -489,10 +446,6 @@
         tryNext();
       });
       return qrLogoPromise;
-    }
-
-    function currentCleanUrl(){
-      return window.location.href.split('#')[0].split('?')[0];
     }
 
     async function drawQR(url){
@@ -562,14 +515,15 @@
       if(!inside) qrModal.close();
     });
 
-    // Copiar enllaç
     copyLinkBtn?.addEventListener('click', async ()=>{
       const url = QR_STATIC_VALUE;
-      try{ await navigator.clipboard.writeText(url); showToast('🔗 Enllaç copiat'); }
-      catch{ const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('🔗 Enllaç copiat'); }
+      try{ await navigator.clipboard.writeText(url); showToast('🔗 Link copied'); }
+      catch{
+        const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); ta.remove(); showToast('🔗 Link copied');
+      }
     });
 
-    // Descarregar PNG
     dlPngBtn?.addEventListener('click', ()=>{
       const a = document.createElement('a');
       a.href = qrCanvas.toDataURL('image/png');
@@ -577,7 +531,6 @@
       a.click();
     });
 
-    // Descarregar PDF
     dlPdfBtn?.addEventListener('click', ()=>{
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ unit:'mm', format:'A4' });
