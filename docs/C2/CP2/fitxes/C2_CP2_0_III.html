@@ -368,34 +368,78 @@
       refresh();
     }
 
-    // === Upload image ===
-    const uploadBtn = document.getElementById('uploadPhotoBtn');
-    const refreshImgBtn = document.getElementById('refreshImgBtn');
-    const fileInput = document.getElementById('fileInput');
-    uploadBtn.addEventListener('click', ()=> fileInput.click());
-    refreshImgBtn.addEventListener('click', ()=> {
-      const el = document.getElementById('drawerImg');
-      el.src = `../images/${drawerCode}.jpg?t=${Date.now()}`;
-    });
-    fileInput.addEventListener('change', async (e)=>{
-      const file = e.target.files?.[0];
-      if(!file) return;
-      if(!/image\/(jpeg|png)/.test(file.type)) return showToast('Only JPG/PNG allowed', '#b3261e');
-      if(file.size > 8*1024*1024) return showToast('Max 8MB image', '#b3261e');
-      const fd = new FormData();
-      fd.append('image', file);
-      fd.append('drawerCode', drawerCode);
-      try{
-        const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
-        if(!r.ok) throw new Error(await r.text());
-        showToast('✔️ Image updated successfully');
-        const el = document.getElementById('drawerImg');
-        el.src = `../images/${drawerCode}.jpg?t=${Date.now()}`;
-      }catch(err){
-        console.error(err);
-        showToast('❌ Error uploading image', '#b3261e');
-      }finally{ fileInput.value = ''; }
-    });
+    /* ====================== Drawer image (JPEG only) ====================== */
+// Versió local per cache-busting persistent
+const IMG_VER_KEY = `imgVer_${drawerCode}`;
+function getImgVersion(){
+  const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10);
+  return isNaN(v) ? 1 : v;
+}
+function bumpImgVersion(){
+  const v = getImgVersion() + 1;
+  localStorage.setItem(IMG_VER_KEY, String(v));
+  return v;
+}
+
+function imageCandidatesWithVersion(version){
+  const ts = `?v=${version}`;
+  return [
+    `../images/${drawerCode}.jpg${ts}`,
+    `../../images/${drawerCode}.jpg${ts}`,
+    `../img/${drawerCode}.jpg${ts}`,
+    `../../img/${drawerCode}.jpg${ts}`,
+  ];
+}
+
+function setDrawerImg(forceBump=false){
+  const el = document.getElementById('drawerImg');
+  const v = forceBump ? bumpImgVersion() : getImgVersion();
+  const candidates = imageCandidatesWithVersion(v);
+  let i = 0;
+  const tryNext = () => {
+    if (i >= candidates.length) return; // queda en blanc si cap carrega
+    el.onerror = () => { i++; tryNext(); };
+    el.src = candidates[i];
+  };
+  tryNext();
+}
+
+// Intenta evitar que tornis a la imatge antiga quan fas Ctrl+F5:
+// - Sempre porta ?v=<localVersion>
+// - En fer "Refresh" o després d'upload, fem bump de versió.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') setDrawerImg(false);
+});
+
+/* ====================== Upload (JPEG only) ====================== */
+const uploadBtn     = document.getElementById('uploadPhotoBtn');
+const refreshImgBtn = document.getElementById('refreshImgBtn');
+const fileInput     = document.getElementById('fileInput');
+
+document.addEventListener('DOMContentLoaded', () => setDrawerImg(false));
+uploadBtn.addEventListener('click', ()=> fileInput.click());
+refreshImgBtn.addEventListener('click', ()=> setDrawerImg(true)); // bump & reload
+
+fileInput.addEventListener('change', async (e)=>{
+  const file = e.target.files?.[0];
+  if(!file) return;
+  if(!/image\/jpe?g/i.test(file.type)) return showToast('JPEG only (.jpg/.jpeg)', '#b3261e');
+  if(file.size > 8*1024*1024) return showToast('Max 8MB image', '#b3261e');
+
+  const fd = new FormData();
+  fd.append('image', file);
+  fd.append('drawerCode', drawerCode);
+  try{
+    const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
+    if(!r.ok) throw new Error(await r.text());
+    showToast('✔️ Image updated successfully');
+    setDrawerImg(true); // bump version after upload
+  }catch(err){
+    console.error(err);
+    showToast('❌ Error uploading image', '#b3261e');
+  }finally{ fileInput.value = ''; }
+});
+
 
     // === Edit info modal ===
     const editBtn = document.getElementById('editInfoBtn');
