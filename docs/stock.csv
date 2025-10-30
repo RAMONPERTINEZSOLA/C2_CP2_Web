@@ -168,14 +168,12 @@ C4_1_VI,21,"VOPAC Ethernet Card AS1622, VOPAC MCB Card AS1620 with female connec
 C4_1_VII,--,--,--,--,10
 C4_2_I,21,LED Strip 24V RGB 14.4W/m,12.01--LS2-10,"Flexible 24V RGB LED strip, 14.4W per meter, used for ambient or decorative lighting in signage or enclosures.",10
 C4_2_II_A,21,"Plastic Floor Cover, Reflective Warning Tape",12.01--PFC-10,"Plastic cover for floor or wall cable holes, provides clean finish and basic protection, Highly visible red reflective tape for marking hazardous areas or improving visibility in low-light conditions",10
-C4_2_II_B,21,"K1 Connector, M16 Plastic Plug",12.01--KCM-10,"Quick splice K1 connector for low-voltage cable joints, allows connection without stripping wires, moisture-resistant,
-Grey M16 plastic plug for sealing holes in enclosures or panels, features external thread for quick installation and secure fit.",10
+C4_2_II_B,21,"K1 Connector, M16 Plastic Plug",12.01--KCM-10,"Quick splice K1 connector for low-voltage cable joints, allows connection without stripping wires, moisture-resistant, Grey M16 plastic plug for sealing holes in enclosures or panels, features external thread for quick installation and secure fit.",10
 C4_2_II_C,21,"Plastic Cover Cap, Rubber Grommet, Flat Head Allen Screw (M4), Cable Gland (M16), Flat Head Allen Screw (M5)",12.01--PCC-10,"White semi-circular cap for concealing open slots or unused ports, Black rubber ring used for cable protection through panel holes, Stainless steel M4 screw with countersunk flat head and hex drive, M16 plastic cable gland for sealing and securing cables on enclosures, Stainless steel M5 screw with countersunk flat head and hex drive",10
 C4_2_III_A,21,Bearing Block Assembly,12.01--BBA-10,"Aluminium square block with integrated ball bearing and hex socket screw, used for rotating shaft support or guiding applications.",10
 C4_2_III_B,21,Aluminium Spacer Block,12.01--ASE-10,"Rectangular aluminium block with central threaded hole, used as a spacer or mounting adapter for structural assemblies.",10
 C4_2_III_C,21,Metal Mounting Bracket,12.01--MMB-10,Steel bracket for mounting components onto vertical or horizontal surfaces. Commonly used in access control or signage systems.,10
-C4_2_IV_A,21,Metal Spacer + Plastic End Cap,12.01--MS+-10,"Metal Spacer: Precision-cut tubular sleeve made of stainless steel or zinc-plated steel. Internally hollow to allow bolt insertion.
-Plastic End Cap: Push-fit cap made from durable white plastic (typically PP or PVC), shaped to fit snugly over the spacer or bolt head.",10
+C4_2_IV_A,21,Metal Spacer + Plastic End Cap,12.01--MS+-10,"Metal Spacer: Precision-cut tubular sleeve made of stainless steel or zinc-plated steel. Internally hollow to allow bolt insertion. Plastic End Cap: Push-fit cap made from durable white plastic (typically PP or PVC), shaped to fit snugly over the spacer or bolt head.",10
 C4_2_IV_B,21,Allen Bolt + Nyloc Nut – Stainless Steel,12.01--AB+-10,Inoxidable M8 bolt with nyloc nut.,10
 C4_2_IV_C,21,Stainless Steel Bolt + Nyloc Nut,12.01--SSA-10,Allen bolt with matching stainless steel nyloc nut.,10
 C4_2_V_A,21,Threaded Mounting Base LBA,12.01--TMO-10,Threaded metal mounting base with 4 holes and welded reinforcement.,10
@@ -186,9 +184,7 @@ C4_2_VI_C,21,Boom Gate Support Arm LBA,12.01--BGS-10,"Adjustable support arm for
 C4_3_I_A,21,AX2 Radar Vehicle Sensor with cable,0.1-ASS-ARV-10,AX2 Radar Vehicle Sensor with cable,10
 C4_3_I_B,21,AX2 Radar Vehicle Detector Bracket,0.1-ASS-ARA-10,AX2 Radar Vehicle Detector Bracket,10
 C4_3_II_A,21,Infrared Beam Sensor Ips-20r,0.1-ASS-IBS-10,Active infrared beam sensor IPS-20R for gate or barrier safety.,10
-C4_3_II_B,21,"Reflective Sensor With Cable
-Infrared Sensor Cylinder Type",0.1-ASS-RSC-10,"Reflective proximity sensor with 4-wire cable for automatic doors or access systems.
-Infrared sensor (cylindrical housing) for presence detection or beam interruption.",10
+C4_3_II_B,21,"Reflective Sensor With Cable Infrared Sensor Cylinder Type",0.1-ASS-RSC-10,"Reflective proximity sensor with 4-wire cable for automatic doors or access systems.Infrared sensor (cylindrical housing) for presence detection or beam interruption.",10
 C4_3_II_C,21,Dual Loop Detector 24v for DIN Rail Mounting,0.1-ASS-DLA-10,Dual Loop Detector 24v for DIN Rail Mounting LD216,10
 C4_3_III_A,21,PIN PAD ACCESS CONTROL,0.1-ACS-PPA-10,PIN PAD ACCESS CONTROL,10
 C4_3_III_B,21,GSM ACCESS CONTROL,0.1-ACS-GAC-10,GSM ACCESS CONTROL,10
@@ -210,8 +206,7 @@ C4_6_II,21,0,#SPILL!,0,10
 C4_7_I,21,0,#SPILL!,0,10
 C4_7_II,21,0,#SPILL!,0,10
 C5_0,25,Rubber Speed Humps,0.1-ACS-RSH-10,"Stack of rubber speed humps with yellow reflective strips,stored on a pallet under a warehouse shelf.",10
-C5_1_I_A,21,4g LTE Modem Modules,0.1-ACS-4LM-10,"4G/LTE modem communication modules stored in a blue warehouse bin, protected with pink bubble wrap.
-",10
+C5_1_I_A,21,4g LTE Modem Modules,0.1-ACS-4LM-10,"4G/LTE modem communication modules stored in a blue warehouse bin, protected with pink bubble wrap.",10
 C5_1_I_B,7,GPS Antennas & Modems,0.1-ACS-GA&-10,"GPS antennas with SMA connectors and Quectel EC25 4G modem modules,organized in a divided blue bin with protective packaging.",10
 C5_1_I_C,21,Blue PCB GPS Modules,0.1-ACS-BPG-10,"Two GPS communication modules with blue PCBs and SMA connectors, stored with mounting accessories in a blue warehouse bin.",10
 C5_1_II_A,21,0,#SPILL!,0,10
