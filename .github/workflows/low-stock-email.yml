@@ -1,15 +1,16 @@
+# .github/workflows/low-stock-email.yml
 name: Email on Low Stock
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'docs/stock.csv'       # es dispara quan es guarda el CSV
+      - 'docs/stock.csv'
   workflow_dispatch:
 
 env:
   STOCK_PATH: docs/stock.csv
-  DEFAULT_MIN_STOCK: "10"      # fallback si la columna minStock no ve al CSV
+  DEFAULT_MIN_STOCK: "10"
   LOGO_PATH: docs/assets/parcsafe-logo.png
 
 jobs:
@@ -34,16 +35,16 @@ jobs:
           COUNT=$(cat count.txt 2>/dev/null || echo 0)
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
-      - name: Send email (SMTP)
+      - name: Send email (Office365 SMTP)
         if: steps.detect.outputs.count != '0'
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
+          server_address: smtp.office365.com
+          server_port: 587
+          secure: true                # STARTTLS amb 587
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "LOW STOCK ALERT"
-          from: "\"STOCK ALERT!!\" <${{ secrets.FROM_EMAIL }}>"
-          to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL }}
-          secure: ${{ secrets.SMTP_SECURE || 'false' }}   # 587→false, 465→true
+          subject: "LOW STOCK ALERT — Parcsafe Warehouse"
+          from: "\"STOCK ALERT!!\" <${{ secrets.SMTP_USERNAME }}>"    # mateixa adreça que l'username
+          to: ${{ secrets.TO_EMAILS || secrets.TO_EMAIL || secrets.MAIL_TO }}
           html_body: file://email_body.html

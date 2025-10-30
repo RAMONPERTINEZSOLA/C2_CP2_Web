@@ -1,9 +1,14 @@
+# .github/workflows/stock-emails.yml
 name: Stock & Info change emails
 
 on:
   push:
     paths:
       - "docs/stock.csv"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   diff-and-email:
@@ -19,13 +24,26 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Prepare current/previous CSV (robust)
+        id: prep
+        shell: bash
+        run: |
+          set -euo pipefail
+          # current
+          git show HEAD:docs/stock.csv > current.csv
+
+          # previous (si no existeix HEAD^ o el fitxer no hi era, crea un CSV buit amb només header)
+          if git rev-parse HEAD^ >/dev/null 2>&1 && git show HEAD^:docs/stock.csv >/dev/null 2>&1; then
+            git show HEAD^:docs/stock.csv > previous.csv
+          else
+            echo "drawerCode,stockQty,productName,productCode,description,minStock" > previous.csv
+          fi
+
       - name: Build email decision & bodies
         id: diff
         shell: bash
         run: |
           set -euo pipefail
-          git show HEAD:docs/stock.csv  > current.csv
-          git show HEAD^:docs/stock.csv > previous.csv
           python3 scripts/diff_mail.py
 
       - name: Show computed flags
@@ -43,7 +61,7 @@ jobs:
             info_update_email.html
           if-no-files-found: ignore
 
-      - name: Debug SMTP connectivity
+      - name: Debug SMTP connectivity (Office365)
         if: always()
         run: |
           echo "Testing smtp.office365.com:587"
