@@ -213,7 +213,7 @@ C5_1_I_A,21,4g LTE Modem Modules,0.1-ACS-4LM-10,"4G/LTE modem communication modu
 C5_1_I_B,21,GPS Antennas & Modems,0.1-ACS-GA&-10,"GPS antennas with SMA connectors and Quectel EC25 4G modem modules, organized in a divided blue bin with protective packaging.",10
 C5_1_I_C,21,Blue PCB GPS Modules,0.1-ACS-BPG-10,"Two GPS communication modules with blue PCBs and SMA connectors, stored with mounting accessories in a blue warehouse bin.",10
 C5_1_II_A,21,0,#SPILL!,0,10
-C5_1_II_B,21,RF Antenna 915MHZ N Male Taoglas,0.1-ACS-RA9-10,"Taoglas Limited RF Antenna, 915 MHz WHIP type with straight N Male connector. Manufacturer part number: TI.16.5F11. Supplied by Digi-Key (PN: 931-1215-ND). RoHS3 compliant, made in Taiwan.",10
+C5_1_II_B,21,RF Antenna 915MHZ N Male Taoglas,0.1-ACS-RA9-10,"Taoglas Limited RF Antenna,915 MHz WHIP type with straight N Male connector. Manufacturer part number: TI.16.5F11. Supplied by Digi-Key (PN: 931-1215-ND). RoHS3 compliant,made in Taiwan.",10
 C5_1_II_C,21,HGV-2409U 2.4GHZ Antenna Box L-com,0.1-ACS-H2A-10,"L-com HGV-2409U outdoor omnidirectional antenna, 2.4 GHz, 9 dBi gain. Includes N-Female connector. Suitable for Wi-Fi and wireless applications. RoHS and CE certified. Made in China.",10
 C5_1_III_A,21,0,#SPILL!,0,10
 C5_1_III_B,21,HGV-2409U Antennas L-com,0.1-ACS-HAL-10,"Multiple L-com HGV-2409U omnidirectional Wi-Fi antennas (2.4 GHz, 9 dBi) stored in a blue warehouse bin. Each unit includes N-female connector and base mount.",10
