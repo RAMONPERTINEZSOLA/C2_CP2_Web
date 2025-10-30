@@ -215,6 +215,7 @@
             </div>
 
             <button class="button" onclick="goToDrawer()">🔎 Search</button>
+            <button class="button" id="btnRefreshThumbs" title="Force refresh of drawer thumbnails">♻️ Refresh</button>
           </div>
         </div>
 
@@ -276,6 +277,8 @@
         <img id="tooltip-img" src="" alt="">
       </div>
     </main>
+    <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e6f3d;color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;display:none;z-index:1000">Refreshed</div>
+
 
     <footer class="footer">
       © Parcsafe · Interactive cabinet map · C3
@@ -298,10 +301,24 @@
       return String(Date.now() % 1e7);
     }
 
+    
+    // Global seed to force refresh manually from index (per session)
+    function getThumbSeed(){
+      let s = sessionStorage.getItem('thumbSeed');
+      if (!s) { s = String(Date.now() % 1e7); sessionStorage.setItem('thumbSeed', s); }
+      return s;
+    }
+    function bumpThumbSeed(){
+      const s = String((parseInt(getThumbSeed(),10)||0) + 1);
+      sessionStorage.setItem('thumbSeed', s);
+      return s;
+    }
+
     // Construeix rutes candidates per a la miniatura del tooltip (ordre de preferència)
     function buildThumbCandidates(code){
       const v = getImgVersion(code);
-      const qs = `?v=${encodeURIComponent(v)}`;
+      const s = getThumbSeed();
+      const qs = `?v=${encodeURIComponent(v)}&s=${encodeURIComponent(s)}`;
       return [
         `img/${code}.jpg${qs}`,
         `images/${code}.jpg${qs}`,
@@ -347,7 +364,7 @@
 
     function showTooltip(evt, code){
       ttCode.textContent = code;
-      ttImg.src = "img/" + code + ".jpg";
+      setImgWithFallback(ttImg, buildThumbCandidates(code));
       targetX = evt.pageX + 16;
       targetY = evt.pageY + 16;
       tt.style.display = "block";
@@ -403,6 +420,14 @@
 
     document.addEventListener('DOMContentLoaded', ()=>{
       setupResponsiveMap('cabinetImg', 'image-map');
+      
+    // Manual refresh button: bumps session seed so next hover refetches images
+    document.getElementById('btnRefreshThumbs')?.addEventListener('click', ()=>{
+      bumpThumbSeed();
+      const toast = document.getElementById('toast');
+      if (toast){ toast.textContent = '🔄 Thumbnails refreshed'; toast.style.display = 'block'; setTimeout(()=> toast.style.display='none', 1800); }
+    });
+
     });
   </script>
 </body>
