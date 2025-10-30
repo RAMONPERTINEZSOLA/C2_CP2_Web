@@ -32,30 +32,24 @@
     .card h3{margin:0 0 12px 0;font-size:16px}
     .hint{color:#475467;font-size:13px;margin:6px 2px 12px}
 
-    /* The image can resize; keep aspect and scale coords */
-    .imgwrap{
-      border:1px dashed #cdd4d9;background:#fafafa;border-radius:12px;
-      position:relative;overflow:hidden;padding:0;
-    }
-    #drawerImg{
-      display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;
-      touch-action:manipulation;
-    }
+    .imgwrap{border:1px dashed #cdd4d9;background:#fafafa;border-radius:12px;position:relative;overflow:hidden;padding:0}
+    #drawerImg{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;touch-action:manipulation}
 
-    /* abans: #tooltip { position:absolute; ... }  */
+    /* Tooltip fix: position:fixed per seguir el cursor */
     #tooltip{
-      position: fixed;           /* <-- així uses pageX/pageY directament */
+      position: fixed;
       display: none;
-      z-index: 10000;            /* per sobre de tot */
+      z-index: 10000;
       background:#0f1b2f; color:#e8f3ff;
       border:1px solid #cfe4ff33; border-radius:12px;
       padding:10px; width:min(320px, 60vw);
       pointer-events:none;
       box-shadow:0 12px 32px rgba(0,0,0,.5); text-align:left;
     }
-
     #tooltip strong{font-size:13px}
     #tooltip img{display:block;margin-top:8px;width:100%;height:auto;border-radius:10px;border:1px solid #ffffff1a;background:#00000050}
+
+    area{cursor:pointer}
   </style>
 </head>
 <body>
@@ -79,13 +73,14 @@
              onerror="this.onerror=null; this.src='../../images/C3_bluedrawer_2R.png';" />
 
         <map name="image-map" id="image-map">
-          <!-- ORIGINAL COORDS (based on the natural pixels of C3_bluedrawer_2R.png) -->
-          <area data-orig="792,730,1279,168" shape="rect" coords="792,730,1279,168"
+          <!-- IMPORTANT: posa les coords originals a data-orig (en píxels naturals) -->
+          <!-- L'script normalitza (left,top,right,bottom) i re-escala responsive -->
+          <area data-orig="792,730,1279,168" shape="rect"
                 href="C3_1_I_A.html"
                 onmouseover="showTooltip(event, 'C3_1_I_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()"
                 alt="C3_1_I_A" title="C3_1_I_A">
 
-          <area data-orig="767,731,295,170" shape="rect" coords="767,731,295,170"
+          <area data-orig="767,731,295,170" shape="rect"
                 href="C3_1_I_B.html"
                 onmouseover="showTooltip(event, 'C3_1_I_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()"
                 alt="C3_1_I_B" title="C3_1_I_B">
@@ -101,34 +96,20 @@
   </div>
 
   <script>
-      /* ==========================
+    /* ==========================
        Utils per cache-busting
        ========================== */
-
-    // L’individual (fitxa) fa bump: imgVer_<drawerCode>.
-    // Aquí només llegim (si no existeix, fem servir Date.now() per forçar refresh).
     function getImgVersion(code){
       const k = `imgVer_${code}`;
       const v = localStorage.getItem(k);
       if (v && /^\d+$/.test(v)) return v;
-      // fallback curt (canvia cada sessió/pàgina)
-      return String(Date.now() % 1e7);
+      return String(Date.now() % 1e7); // fallback curt
     }
-
-    
-    // Global seed to force refresh manually from index (per session)
     function getThumbSeed(){
       let s = sessionStorage.getItem('thumbSeed');
       if (!s) { s = String(Date.now() % 1e7); sessionStorage.setItem('thumbSeed', s); }
       return s;
     }
-    function bumpThumbSeed(){
-      const s = String((parseInt(getThumbSeed(),10)||0) + 1);
-      sessionStorage.setItem('thumbSeed', s);
-      return s;
-    }
-
-    // Construeix rutes candidates per a la miniatura del tooltip (ordre de preferència)
     function buildThumbCandidates(code){
       const v = getImgVersion(code);
       const s = getThumbSeed();
@@ -142,38 +123,22 @@
         `../images/${code}.jpg${qs}`
       ];
     }
-
-    // Carrega la primera que funcioni (via onerror chaining)
     function setImgWithFallback(imgEl, candidates){
       let i = 0;
       const tryNext = () => {
-        if (i >= candidates.length) return; // es queda en blanc si cap va
+        if (i >= candidates.length) return;
         imgEl.onerror = () => { i++; tryNext(); };
         imgEl.src = candidates[i];
       };
       tryNext();
     }
 
-
-    // Search / navigation
-    function goToDrawer() {
-      const code = document.getElementById("searchBox").value.trim();
-      if (!code) return;
-      const url = "fitxes/" + code + ".html";
-      if (code.startsWith("C3_")) {
-        window.location.href = url;
-      } else {
-        alert("Please enter a valid drawer code (e.g. C3_2_IV).");
-      }
-    }
-    document.getElementById("searchBox").addEventListener("keypress", function(e){
-      if (e.key === "Enter") goToDrawer();
-    });
-
-    // Tooltip logic (single instance; follows cursor smoothly)
+    /* ==========================
+       Tooltip (IDs corregits)
+       ========================== */
     const tt = document.getElementById("tooltip");
-    const ttCode = document.getElementById("tooltip-code");
-    const ttImg  = document.getElementById("tooltip-img");
+    const ttCode = document.getElementById("tt-code");  // <-- coincideix amb el DOM
+    const ttImg  = document.getElementById("tt-img");    // <-- coincideix amb el DOM
     let rafId = null, targetX = 0, targetY = 0, curX = 0, curY = 0;
 
     function showTooltip(evt, code){
@@ -190,7 +155,7 @@
     }
     function hideTooltip(){
       tt.style.display = "none";
-      cancelAnimationFrame(rafId);
+      if (rafId) cancelAnimationFrame(rafId);
       rafId = null;
     }
     function animateTooltip(){
@@ -201,14 +166,37 @@
       rafId = requestAnimationFrame(animateTooltip);
     }
 
-    // 📐 Responsive image-map (preserva les coords originals i re-escala)
+    /* ==========================
+       Image-map responsive & robust
+       - Llegeix data-orig si existeix
+       - Normalitza a left,top,right,bottom
+       - Escala segons naturalWidth/Height
+       ========================== */
+    function normalizeRectCoords(arr){
+      // arr = [x1,y1,x2,y2] en qualsevol ordre → [L,T,R,B]
+      const x1 = Number(arr[0]), y1 = Number(arr[1]), x2 = Number(arr[2]), y2 = Number(arr[3]);
+      const L = Math.min(x1, x2);
+      const T = Math.min(y1, y2);
+      const R = Math.max(x1, x2);
+      const B = Math.max(y1, y2);
+      return [L,T,R,B];
+    }
+
     function setupResponsiveMap(imgId, mapName){
       const img = document.getElementById(imgId);
       const map = document.querySelector(`map[name="${mapName}"]`);
+      if (!img || !map) return;
+
       const areas = Array.from(map.querySelectorAll('area'));
 
-      // Desa una còpia de les coords originals a data-*
-      areas.forEach(a => { a.dataset.coordsOriginal = a.coords; });
+      // Desa coords originals normalitzades (si hi ha data-orig la fem servir)
+      areas.forEach(a => {
+        const raw = (a.dataset.orig || a.dataset.coordsOriginal || a.coords || '').split(',').map(Number);
+        if (raw.length === 4 && raw.every(n => !Number.isNaN(n))){
+          const norm = normalizeRectCoords(raw);
+          a.dataset.coordsOriginal = norm.join(',');
+        }
+      });
 
       function rescale(){
         const natW = img.naturalWidth;
@@ -221,9 +209,11 @@
         const scaleY = curH / natH;
 
         areas.forEach(a => {
-          const orig = a.dataset.coordsOriginal.split(',').map(Number);
-          const scaled = orig.map((v,i)=> (i%2===0 ? Math.round(v*scaleX) : Math.round(v*scaleY)));
-          a.coords = scaled.join(',');
+          const base = (a.dataset.coordsOriginal || '').split(',').map(Number);
+          if (base.length === 4){
+            const scaled = base.map((v,i)=> (i%2===0 ? Math.round(v*scaleX) : Math.round(v*scaleY)));
+            a.coords = scaled.join(',');
+          }
         });
       }
 
@@ -233,16 +223,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', ()=>{
-      setupResponsiveMap('cabinetImg', 'image-map');
-      
-    // Manual refresh button: bumps session seed so next hover refetches images
-    document.getElementById('btnRefreshThumbs')?.addEventListener('click', ()=>{
-      bumpThumbSeed();
-      const toast = document.getElementById('toast');
-      if (toast){ toast.textContent = '🔄 Thumbnails refreshed'; toast.style.display = 'block'; setTimeout(()=> toast.style.display='none', 1800); }
+      // 🔧 ID correcte de la imatge
+      setupResponsiveMap('drawerImg', 'image-map');
     });
-
-    });
-</script>
+  </script>
 </body>
 </html>
