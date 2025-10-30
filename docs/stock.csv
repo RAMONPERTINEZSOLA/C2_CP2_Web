@@ -212,7 +212,7 @@ C5_1_I_C,21,Blue PCB GPS Modules,0.1-ACS-BPG-10,Two GPS communication modules wi
 C5_1_II_A,21,0,#SPILL!,0,10
 C5_1_II_B,21,RF Antenna 915MHZ N Male Taoglas,0.1-ACS-RA9-10,Taoglas Limited RF Antenna;915 MHz WHIP type with straight N Male connector. Manufacturer part number: TI.16.5F11. Supplied by Digi-Key (PN: 931-1215-ND). RoHS3 compliant;made in Taiwan.,10
 C5_1_II_C,21,HGV-2409U 2.4GHZ Antenna Box L-com,0.1-ACS-H2A-10,L-com HGV-2409U outdoor omnidirectional antenna; 2.4 GHz; 9 dBi gain. Includes N-Female connector. Suitable for Wi-Fi and wireless applications. RoHS and CE certified. Made in China.,10
-C5_1_III_A,21,0,#SPILL!,0,101
+C5_1_III_A,210,0,#SPILL!,0,101
 C5_1_III_B,21,HGV-2409U Antennas L-com,0.1-ACS-HAL-10,Multiple L-com HGV-2409U omnidirectional Wi-Fi antennas (2.4 GHz; 9 dBi) stored in a blue warehouse bin. Each unit includes N-female connector and base mount.,10
 C5_1_III_C,21,Wifi Antennas Mixed Types L-com,0.1-ACS-WAM-10,L-com outdoor Wi-Fi antennas stored in a blue bin; including both fiberglass (HGV-2409U) and metallic-bodied variants. All with N-female connectors and mounting bases.,10
 C5_1_IV_A,21,TL Sensorv2c Parking Logic Module,16.01-ASS-TSP-10,TL-SENSORV2C Parking Logic Sensor; hardware revision V3A. Used in vehicle detection and parking guidance systems. Units labelled with serial codes and bubble-wrapped for protection.,10
