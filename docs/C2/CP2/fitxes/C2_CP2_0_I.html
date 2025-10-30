@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>C2_CP2_0_I — Parcsafe Drawer</title>
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -63,17 +64,25 @@
       100%{opacity:0;transform:translate(-50%,10px)}
     }
 
+    /* Modals */
     dialog.modal{border:none;border-radius:22px;padding:0;max-width:760px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
     dialog.modal::backdrop{background:rgba(10,12,14,.45);backdrop-filter:blur(3px)}
     .modal .hd{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#f0f7ec}
+    .modal .hd strong{font-size:18px}
+    .close-x{background:transparent;border:none;font-size:24px;cursor:pointer;line-height:1}
     .modal .bd{padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px 22px}
     .modal .bd .fld--wide{grid-column:1 / -1}
     .fld{display:flex;flex-direction:column;gap:6px}
     .fld label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
     .fld input,.fld textarea{padding:14px 16px;border-radius:14px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:16px;outline:none}
+    .fld input:focus,.fld textarea:focus{border-color:#b7df9f; box-shadow:0 0 0 3px rgba(109,189,69,.18)}
     .fld textarea{min-height:140px;resize:vertical}
     .note{color:var(--muted);font-size:12px;margin-top:6px;grid-column:1 / -1}
     .modal .ft{padding:18px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
+
+    /* Z-index per sobre de tot */
+    dialog.modal{ z-index: 10010 !important; }
+    dialog.modal::backdrop{ z-index: 10000 !important; }
     .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
   </style>
 
@@ -87,36 +96,44 @@
 </head>
 <body>
   <div class="container">
+    <!-- Header -->
     <header class="bar">
       <a class="back" href="../index.html">← Back to index</a>
       <div class="brand"><img class="logo" id="logo" alt="Parcsafe"></div>
     </header>
 
+    <!-- Title -->
     <h1 class="title">Drawer details <span class="drawer-code">C2_CP2_0_I</span></h1>
 
+    <!-- Meta -->
     <div class="meta">
       <div id="product-name"><strong>Product Name:</strong> loading...</div>
       <div class="codeWrap">
         <div id="product-code"><strong>Product Code:</strong> loading...</div>
-        <button class="btn secondary" id="editInfoBtn">✏️ Edit Product Info</button>
+        <button class="btn secondary" id="editInfoBtn" type="button">✏️ Edit Product Info</button>
         <button class="btn ghost" id="qrBtn" type="button">📎 QR</button>
       </div>
     </div>
 
+    <!-- Cards -->
     <div class="cards">
+      <!-- Drawer photo -->
       <div class="card">
         <h3>Drawer Photo</h3>
-        <div class="imgwrap"><img id="drawerImg" alt="Drawer image C2_CP2_0_I" /></div>
+        <div class="imgwrap">
+          <img id="drawerImg" alt="Drawer image C2_CP2_0_I" />
+        </div>
         <div class="spacer"></div>
         <div class="row">
-          <button class="btn" id="uploadPhotoBtn">🖼️ Update Drawer Photo</button>
-          <button class="btn ghost" id="refreshImgBtn">Refresh</button>
+          <button class="btn" id="uploadPhotoBtn" type="button">🖼️ Update Drawer Photo</button>
+          <button class="btn ghost" id="refreshImgBtn" type="button">Refresh</button>
           <span class="note">The new image will be saved as <strong>C2_CP2_0_I.jpg</strong> in <em>images/</em> and <em>img/</em>. (JPEG only)</span>
         </div>
-        <!-- 🔒 Només JPEG -->
+        <!-- JPEG only -->
         <input type="file" id="fileInput" accept="image/jpeg" style="display:none" />
       </div>
 
+      <!-- Cabinet highlight -->
       <div class="card">
         <h3>Cabinet Highlight</h3>
         <div class="imgwrap">
@@ -126,11 +143,13 @@
       </div>
     </div>
 
+    <!-- Description -->
     <div class="card" style="margin-top:20px">
       <h3>Description</h3>
       <div id="description-text" style="line-height:1.6">loading...</div>
     </div>
 
+    <!-- Stock -->
     <div class="stock-display" id="stock-display">Loading stock...</div>
 
     <div class="stock-ui" id="stockUI">
@@ -140,11 +159,11 @@
         <span class="pill">New: <strong id="newQty">–</strong></span>
       </div>
       <div class="row" style="margin-top:10px">
-        <button id="minusBtn">−1</button>
-        <button id="plusBtn">+1</button>
+        <button id="minusBtn" type="button">−1</button>
+        <button id="plusBtn" type="button">+1</button>
         <label>Exact: <input id="exactInput" type="number" min="0" step="1" /></label>
-        <button class="secondary" id="resetBtn">Reset</button>
-        <button class="save" id="saveBtn">Save</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <button class="save" id="saveBtn" type="button">Save</button>
       </div>
       <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
     </div>
@@ -152,28 +171,81 @@
     <div id="toast"></div>
   </div>
 
-  <!-- Edit Info Modal (…sense canvis de lògica) -->
-  <dialog class="modal" id="editModal"> … </dialog>
+  <!-- ===================== Edit Info Modal ===================== -->
+  <dialog class="modal" id="editModal">
+    <div class="hd">
+      <strong>Edit product info</strong>
+      <button class="close-x" type="button" onclick="document.getElementById('editModal').close()">✕</button>
+    </div>
+    <form method="dialog" id="editForm">
+      <div class="bd">
+        <div class="fld">
+          <label for="fldName">Product Name</label>
+          <input id="fldName" type="text" required />
+        </div>
+        <div class="fld">
+          <label for="fldCode">Product Code</label>
+          <input id="fldCode" type="text" required />
+        </div>
+        <div class="fld fld--wide">
+          <label for="fldDesc">Description</label>
+          <textarea id="fldDesc" required></textarea>
+        </div>
+        <div class="note">
+          Tip: press <span class="kbd">Esc</span> to close.
+        </div>
+      </div>
+      <div class="ft">
+        <button class="btn ghost" type="button" onclick="document.getElementById('editModal').close()">Cancel</button>
+        <button class="btn" id="saveInfoBtn" value="default" type="submit">Save changes</button>
+      </div>
+    </form>
+  </dialog>
 
-  <!-- QR Modal (…sense canvis rellevants) -->
-  <dialog class="modal" id="qrModal"> … </dialog>
+  <!-- ===================== QR Modal ===================== -->
+  <dialog class="modal" id="qrModal">
+    <div class="hd">
+      <strong>Product QR</strong>
+      <button class="close-x" type="button" id="qrClose">✕</button>
+    </div>
+    <div class="bd">
+      <div class="fld fld--wide" style="align-items:center">
+        <canvas id="qrCanvas" width="1024" height="1024" style="max-width:320px; width:100%; height:auto; border:1px dashed #d0d5d0; border-radius:12px; background:#fff"></canvas>
+        <div class="note" id="qrUrlNote" style="text-align:center; word-break:break-all"></div>
+      </div>
+    </div>
+    <div class="ft">
+      <button class="btn ghost" id="copyLinkBtn" type="button">URL Link</button>
+      <button class="btn ghost" id="dlPngBtn" type="button">Download PNG</button>
+      <button class="btn" id="dlPdfBtn" type="button">Download PDF</button>
+    </div>
+  </dialog>
 
   <script>
-    async function ensureQrLib(timeoutMs = 1000) {
-      const t0 = performance.now();
-      while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
-        if (performance.now() - t0 > timeoutMs) throw new Error("QR lib not ready");
-        await new Promise(r => setTimeout(r, 20));
-      }
-    }
-
+    /* ====================== Const / endpoints ====================== */
     const drawerCode = "C2_CP2_0_I";
     const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
     const QR_STATIC_VALUE = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP2/fitxes/C2_CP2_0_I.html";
 
-    // Logo header (igual)
+    /* ====================== Utils ====================== */
+    async function ensureQrLib(timeoutMs = 1200) {
+      const t0 = performance.now();
+      while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
+        if (performance.now() - t0 > timeoutMs) throw new Error("QR lib not ready");
+        await new Promise(r => setTimeout(r, 20));
+      }
+    }
+    const toast = document.getElementById("toast");
+    function showToast(msg, color="#198754"){
+      toast.textContent = msg;
+      toast.style.backgroundColor = color;
+      toast.style.display = "block";
+      setTimeout(()=> toast.style.display="none", 2600);
+    }
+
+    /* ====================== Logo loader ====================== */
     (function loadLogo(){
       const logo = document.getElementById('logo');
       const candidates = [
@@ -185,18 +257,15 @@
         "../../../parcsafe-logo.png"
       ];
       let i = 0;
-      const tryNext = () => { if(i >= candidates.length){ logo.remove(); return; } logo.src = candidates[i++]; };
-      logo.onerror = tryNext; tryNext();
+      const tryNext = () => {
+        if(i >= candidates.length){ logo.remove(); return; }
+        logo.src = candidates[i++];
+      };
+      logo.onerror = tryNext;
+      tryNext();
     })();
 
-    const toast = document.getElementById("toast");
-    function showToast(msg, color="#198754"){
-      toast.textContent = msg;
-      toast.style.backgroundColor = color;
-      toast.style.display = "block";
-      setTimeout(()=> toast.style.display="none", 2600);
-    }
-
+    /* ====================== CSV loader ====================== */
     async function loadCSVFromCandidates() {
       const candidates = [
         "../../stock.csv","../stock.csv","../../../stock.csv","./stock.csv","/docs/stock.csv",
@@ -214,42 +283,17 @@
       throw new Error("stock.csv not found via any path");
     }
 
-    loadCSVFromCandidates()
-      .then(csv => {
-        const rows = csv.trim().split("\n");
-        const headers = rows[0].split(",");
-        const data = rows.slice(1).map(r => {
-          const vals = r.split(",");
-          return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
-        });
-        const match = data.find(r => (r.drawerCode || "").trim() === drawerCode);
-        if (!match) throw new Error("Drawer not found");
-
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ""}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ""}`;
-        document.getElementById("description-text").textContent = match.description || "";
-
-        const MIN_STOCK = parseInt(match.minStock || "10", 10);
-        document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
-        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
-        initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
-
-        document.getElementById("fldName").value = match.productName || "";
-        document.getElementById("fldCode").value = match.productCode || "";
-        document.getElementById("fldDesc").value = match.description || "";
-      })
-      .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
-
+    /* ====================== Stock UI ====================== */
     function initStockUI(initialQty, MIN_STOCK = 10) {
-      const curEl = document.getElementById('curQty');
+      const curEl   = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
-      const newEl = document.getElementById('newQty');
-      const minus = document.getElementById('minusBtn');
-      const plus = document.getElementById('plusBtn');
-      const exact = document.getElementById('exactInput');
-      const reset = document.getElementById('resetBtn');
-      const save = document.getElementById('saveBtn');
-      const warn = document.getElementById('minWarn');
+      const newEl   = document.getElementById('newQty');
+      const minus   = document.getElementById('minusBtn');
+      const plus    = document.getElementById('plusBtn');
+      const exact   = document.getElementById('exactInput');
+      const reset   = document.getElementById('resetBtn');
+      const save    = document.getElementById('saveBtn');
+      const warn    = document.getElementById('minWarn');
       let cur = initialQty, delta = 0;
 
       function refresh(){
@@ -264,7 +308,7 @@
       }
 
       minus.addEventListener('click', ()=>{ delta -= 1; refresh(); });
-      plus.addEventListener('click', ()=>{ delta += 1; refresh(); });
+      plus.addEventListener('click',  ()=>{ delta += 1; refresh(); });
       exact.addEventListener('input', ()=>{ const v=parseInt(exact.value,10); if(!isNaN(v)){ delta=v-cur; refresh(); }});
       reset.addEventListener('click', ()=>{ delta=0; refresh(); });
 
@@ -285,36 +329,61 @@
           showToast('❌ Error updating stock', '#b3261e');
         }
       });
+
       refresh();
     }
 
-    // === Drawer Photo: **només JPG** (amb cache-buster)
-    function setDrawerImg({bust=false} = {}) {
-      const el = document.getElementById('drawerImg');
-      const ts = bust ? `?t=${Date.now()}` : '';
-      const candidates = [
+    /* ====================== Drawer image (JPEG only) ====================== */
+    // Versió local per cache-busting persistent
+    const IMG_VER_KEY = `imgVer_${drawerCode}`;
+    function getImgVersion(){
+      const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10);
+      return isNaN(v) ? 1 : v;
+    }
+    function bumpImgVersion(){
+      const v = getImgVersion() + 1;
+      localStorage.setItem(IMG_VER_KEY, String(v));
+      return v;
+    }
+
+    function imageCandidatesWithVersion(version){
+      const ts = `?v=${version}`;
+      return [
         `../images/${drawerCode}.jpg${ts}`,
         `../../images/${drawerCode}.jpg${ts}`,
         `../img/${drawerCode}.jpg${ts}`,
         `../../img/${drawerCode}.jpg${ts}`,
       ];
+    }
+
+    function setDrawerImg(forceBump=false){
+      const el = document.getElementById('drawerImg');
+      const v = forceBump ? bumpImgVersion() : getImgVersion();
+      const candidates = imageCandidatesWithVersion(v);
       let i = 0;
       const tryNext = () => {
-        if (i >= candidates.length) return;
+        if (i >= candidates.length) return; // queda en blanc si cap carrega
         el.onerror = () => { i++; tryNext(); };
         el.src = candidates[i];
       };
       tryNext();
     }
 
-    // Upload (JPEG only)
-    const uploadBtn = document.getElementById('uploadPhotoBtn');
-    const refreshImgBtn = document.getElementById('refreshImgBtn');
-    const fileInput = document.getElementById('fileInput');
+    // Intenta evitar que tornis a la imatge antiga quan fas Ctrl+F5:
+    // - Sempre porta ?v=<localVersion>
+    // - En fer "Refresh" o després d'upload, fem bump de versió.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') setDrawerImg(false);
+    });
 
-    document.addEventListener('DOMContentLoaded', () => setDrawerImg());
+    /* ====================== Upload (JPEG only) ====================== */
+    const uploadBtn     = document.getElementById('uploadPhotoBtn');
+    const refreshImgBtn = document.getElementById('refreshImgBtn');
+    const fileInput     = document.getElementById('fileInput');
+
+    document.addEventListener('DOMContentLoaded', () => setDrawerImg(false));
     uploadBtn.addEventListener('click', ()=> fileInput.click());
-    refreshImgBtn.addEventListener('click', ()=> setDrawerImg({bust:true}));
+    refreshImgBtn.addEventListener('click', ()=> setDrawerImg(true)); // bump & reload
 
     fileInput.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0];
@@ -329,14 +398,205 @@
         const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
-        setDrawerImg({bust:true});
+        setDrawerImg(true); // bump version after upload
       }catch(err){
         console.error(err);
         showToast('❌ Error uploading image', '#b3261e');
       }finally{ fileInput.value = ''; }
     });
 
-    // (…QR modal i edició info igual que abans)
+    /* ====================== Edit Info logic ====================== */
+    const editBtn   = document.getElementById('editInfoBtn');
+    const modal     = document.getElementById('editModal');
+    const saveInfoBtn = document.getElementById('saveInfoBtn');
+    const fldName   = document.getElementById('fldName');
+    const fldCode   = document.getElementById('fldCode');
+    const fldDesc   = document.getElementById('fldDesc');
+
+    editBtn.addEventListener('click', ()=> modal.showModal());
+    modal.addEventListener('click', (e)=>{
+      const rect = modal.getBoundingClientRect();
+      const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+      if(!inside) modal.close();
+    });
+
+    saveInfoBtn.addEventListener('click', async (ev)=>{
+      ev.preventDefault();
+      const name = (fldName.value || '').trim();
+      const code = (fldCode.value || '').trim();
+      const desc = (fldDesc.value || '').trim();
+      if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
+      try{
+        const r = await fetch(UPDATE_INFO_ENDPOINT, {
+          method:'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ drawerCode, productName:name, productCode:code, description:desc })
+        });
+        if(!r.ok) throw new Error(await r.text());
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${name}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${code}`;
+        document.getElementById("description-text").textContent = desc;
+        modal.close();
+        showToast('✔️ Product info updated');
+      }catch(err){
+        console.error(err);
+        showToast('❌ Error updating info', '#b3261e');
+      }
+    });
+
+    /* ====================== QR modal ====================== */
+    const qrBtn      = document.getElementById('qrBtn');
+    const qrModal    = document.getElementById('qrModal');
+    const qrClose    = document.getElementById('qrClose');
+    const qrCanvas   = document.getElementById('qrCanvas');
+    const dlPngBtn   = document.getElementById('dlPngBtn');
+    const dlPdfBtn   = document.getElementById('dlPdfBtn');
+    const copyLinkBtn= document.getElementById('copyLinkBtn');
+    const qrUrlNote  = document.getElementById('qrUrlNote');
+
+    const LOGO_CANDIDATES = ["../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"];
+    let qrLogoPromise;
+    function loadQrLogo() {
+      if (qrLogoPromise) return qrLogoPromise;
+      qrLogoPromise = new Promise((resolve) => {
+        let i = 0;
+        const tryNext = () => {
+          if (i >= LOGO_CANDIDATES.length) return resolve(null);
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => { i++; tryNext(); };
+          img.src = LOGO_CANDIDATES[i];
+        };
+        tryNext();
+      });
+      return qrLogoPromise;
+    }
+
+    function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
+
+    async function drawQR(url){
+      const size = 1024;
+      const ctx = qrCanvas.getContext('2d');
+      qrCanvas.width = size; qrCanvas.height = size;
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,size,size);
+
+      const ecc = qrcodegen.QrCode.Ecc.HIGH || qrcodegen.QrCode.Ecc.H;
+      const qr  = qrcodegen.QrCode.encodeText(url, ecc);
+      const modules = qr.size, border = 2;
+      const ppm = Math.floor(size / (modules + border*2));
+      const qrPix = ppm * (modules + border*2);
+      const offset = Math.floor((size - qrPix)/2);
+
+      ctx.fillStyle = '#000000';
+      for(let y=0;y<modules;y++){
+        for(let x=0;x<modules;x++){
+          if(qr.getModule(x,y)){
+            const px = offset + (x+border)*ppm;
+            const py = offset + (y+border)*ppm;
+            ctx.fillRect(px,py,ppm,ppm);
+          }
+        }
+      }
+
+      const logoImg = await loadQrLogo();
+      if (logoImg) {
+        const logoBox = Math.floor(size * 0.22);
+        const cx = size/2, cy = size/2;
+        const r = Math.floor(logoBox/2) + 14;
+
+        ctx.save();
+        ctx.fillStyle = '#FFF';
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+
+        const pad = 18;
+        const w = logoBox - pad*2;
+        const h = logoBox - pad*2;
+
+        const aspect = logoImg.width / logoImg.height;
+        let drawW = w, drawH = w / aspect;
+        if (drawH > h) { drawH = h; drawW = h * aspect; }
+
+        ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
+      }
+    }
+
+    async function openQrModal(){
+      qrUrlNote.textContent = QR_STATIC_VALUE;
+      safeOpenDialog(qrModal);
+      await new Promise(r=>requestAnimationFrame(r));
+      await ensureQrLib();
+      await drawQR(QR_STATIC_VALUE);
+    }
+
+    qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
+    qrClose?.addEventListener('click', ()=> qrModal.close());
+    qrModal?.addEventListener('click', (e)=>{
+      const r = qrModal.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if(!inside) qrModal.close();
+    });
+
+    copyLinkBtn?.addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(QR_STATIC_VALUE); showToast('🔗 Link copied'); }
+      catch{
+        const ta=document.createElement('textarea'); ta.value=QR_STATIC_VALUE;
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+        showToast('🔗 Link copied');
+      }
+    });
+
+    dlPngBtn?.addEventListener('click', ()=>{
+      const a = document.createElement('a');
+      a.href = qrCanvas.toDataURL('image/png');
+      a.download = `${drawerCode}_QR.png`;
+      a.click();
+    });
+
+    dlPdfBtn?.addEventListener('click', ()=>{
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit:'mm', format:'A4' });
+      const png = qrCanvas.toDataURL('image/png');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const box = pageW - margin*2;
+      pdf.addImage(png, 'PNG', margin, margin, box, box);
+      pdf.setFontSize(11);
+      pdf.text(QR_STATIC_VALUE, margin, pageH - margin/2);
+      pdf.save(`${drawerCode}_QR.pdf`);
+    });
+
+    /* ====================== Bootstrapping (CSV → UI) ====================== */
+    loadCSVFromCandidates()
+      .then(csv => {
+        const rows = csv.trim().split("\n");
+        const headers = rows[0].split(",");
+        const data = rows.slice(1).map(r => {
+          const vals = r.split(",");
+          return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
+        });
+        const match = data.find(r => (r.drawerCode || "").trim() === drawerCode);
+        if (!match) throw new Error("Drawer not found");
+
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ""}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ""}`;
+        document.getElementById("description-text").textContent = match.description || "";
+
+        const MIN_STOCK = parseInt(match.minStock || "10", 10);
+        document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
+        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
+        initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
+
+        // Precarrega modal
+        document.getElementById("fldName").value = match.productName || "";
+        document.getElementById("fldCode").value = match.productCode || "";
+        document.getElementById("fldDesc").value = match.description || "";
+      })
+      .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
   </script>
 </body>
 </html>
