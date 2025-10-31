@@ -282,15 +282,69 @@
   </div>
 
   <script>
+    /* ==========================
+       Utils per cache-busting
+       ========================== */
+
+    // L’individual (fitxa) fa bump: imgVer_<drawerCode>.
+    // Aquí només llegim (si no existeix, fem servir Date.now() per forçar refresh).
+    function getImgVersion(code){
+      const k = `imgVer_${code}`;
+      const v = localStorage.getItem(k);
+      if (v && /^\d+$/.test(v)) return v;
+      // fallback curt (canvia cada sessió/pàgina)
+      return String(Date.now() % 1e7);
+    }
+
+    
+    // Global seed to force refresh manually from index (per session)
+    function getThumbSeed(){
+      let s = sessionStorage.getItem('thumbSeed');
+      if (!s) { s = String(Date.now() % 1e7); sessionStorage.setItem('thumbSeed', s); }
+      return s;
+    }
+    function bumpThumbSeed(){
+      const s = String((parseInt(getThumbSeed(),10)||0) + 1);
+      sessionStorage.setItem('thumbSeed', s);
+      return s;
+    }
+
+    // Construeix rutes candidates per a la miniatura del tooltip (ordre de preferència)
+    function buildThumbCandidates(code){
+      const v = getImgVersion(code);
+      const s = getThumbSeed();
+      const qs = `?v=${encodeURIComponent(v)}&s=${encodeURIComponent(s)}`;
+      return [
+        `img/${code}.jpg${qs}`,
+        `images/${code}.jpg${qs}`,
+        `fitxes/img/${code}.jpg${qs}`,
+        `fitxes/images/${code}.jpg${qs}`,
+        `../img/${code}.jpg${qs}`,
+        `../images/${code}.jpg${qs}`
+      ];
+    }
+
+    // Carrega la primera que funcioni (via onerror chaining)
+    function setImgWithFallback(imgEl, candidates){
+      let i = 0;
+      const tryNext = () => {
+        if (i >= candidates.length) return; // es queda en blanc si cap va
+        imgEl.onerror = () => { i++; tryNext(); };
+        imgEl.src = candidates[i];
+      };
+      tryNext();
+    }
+
+
     // Search / navigation
     function goToDrawer() {
       const code = document.getElementById("searchBox").value.trim();
       if (!code) return;
       const url = "fitxes/" + code + ".html";
-      if (code.startsWith("C5_")) {
+      if (code.startsWith("C3_")) {
         window.location.href = url;
       } else {
-        alert("Please enter a valid drawer code (e.g. C5_2_IV).");
+        alert("Please enter a valid drawer code (e.g. C3_2_IV).");
       }
     }
     document.getElementById("searchBox").addEventListener("keypress", function(e){
@@ -305,7 +359,7 @@
 
     function showTooltip(evt, code){
       ttCode.textContent = code;
-      ttImg.src = "img/" + code + ".jpg";
+      setImgWithFallback(ttImg, buildThumbCandidates(code));
       targetX = evt.pageX + 16;
       targetY = evt.pageY + 16;
       tt.style.display = "block";
@@ -328,16 +382,14 @@
       rafId = requestAnimationFrame(animateTooltip);
     }
 
-    // 📐 Responsive image-map (preserva coords originals i re-escala segons mida real de la imatge)
+    // 📐 Responsive image-map (preserva les coords originals i re-escala)
     function setupResponsiveMap(imgId, mapName){
       const img = document.getElementById(imgId);
       const map = document.querySelector(`map[name="${mapName}"]`);
       const areas = Array.from(map.querySelectorAll('area'));
 
       // Desa una còpia de les coords originals a data-*
-      areas.forEach(a => {
-        a.dataset.coordsOriginal = a.coords;
-      });
+      areas.forEach(a => { a.dataset.coordsOriginal = a.coords; });
 
       function rescale(){
         const natW = img.naturalWidth;
@@ -363,7 +415,16 @@
 
     document.addEventListener('DOMContentLoaded', ()=>{
       setupResponsiveMap('cabinetImg', 'image-map');
+      
+    // Manual refresh button: bumps session seed so next hover refetches images
+    document.getElementById('btnRefreshThumbs')?.addEventListener('click', ()=>{
+      bumpThumbSeed();
+      const toast = document.getElementById('toast');
+      if (toast){ toast.textContent = '🔄 Thumbnails refreshed'; toast.style.display = 'block'; setTimeout(()=> toast.style.display='none', 1800); }
     });
+
+    });
+
   </script>
 </body>
 </html>
