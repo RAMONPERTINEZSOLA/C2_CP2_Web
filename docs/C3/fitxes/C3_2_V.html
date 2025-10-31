@@ -101,51 +101,136 @@
   </div>
 
   <script>
-  /* === Responsive image-map scaler === */
-  (function responsiveMap(){
-    const img=document.getElementById('drawerImg');
-    const map=document.getElementById('image-map');
-    const areas=Array.from(map.querySelectorAll('area'));
-    function rescale(){
-      const natW=img.naturalWidth,natH=img.naturalHeight;
-      if(!natW||!natH)return;
-      const curW=img.clientWidth,curH=img.clientHeight;
-      const sx=curW/natW,sy=curH/natH;
-      areas.forEach(a=>{
-        const orig=(a.dataset.orig||a.getAttribute('coords')).split(',').map(Number);
-        const scaled=orig.map((v,i)=>i%2===0?Math.round(v*sx):Math.round(v*sy));
-        a.coords=scaled.join(',');
-      });
+    /* ==========================
+       Utils per cache-busting
+       ========================== */
+    function getImgVersion(code){
+      const k = `imgVer_${code}`;
+      const v = localStorage.getItem(k);
+      if (v && /^\d+$/.test(v)) return v;
+      return String(Date.now() % 1e7); // fallback curt
     }
-    let rAF=null;
-    function onResize(){if(rAF)cancelAnimationFrame(rAF);rAF=requestAnimationFrame(()=>{rAF=null;rescale();});}
-    if(img.complete)rescale();
-    img.addEventListener('load',rescale);
-    window.addEventListener('resize',onResize);
-  })();
+    function getThumbSeed(){
+      let s = sessionStorage.getItem('thumbSeed');
+      if (!s) { s = String(Date.now() % 1e7); sessionStorage.setItem('thumbSeed', s); }
+      return s;
+    }
+    function buildThumbCandidates(code){
+      const v = getImgVersion(code);
+      const s = getThumbSeed();
+      const qs = `?v=${encodeURIComponent(v)}&s=${encodeURIComponent(s)}`;
+      return [
+        `img/${code}.jpg${qs}`,
+        `images/${code}.jpg${qs}`,
+        `fitxes/img/${code}.jpg${qs}`,
+        `fitxes/images/${code}.jpg${qs}`,
+        `../img/${code}.jpg${qs}`,
+        `../images/${code}.jpg${qs}`
+      ];
+    }
+    function setImgWithFallback(imgEl, candidates){
+      let i = 0;
+      const tryNext = () => {
+        if (i >= candidates.length) return;
+        imgEl.onerror = () => { i++; tryNext(); };
+        imgEl.src = candidates[i];
+      };
+      tryNext();
+    }
 
-  /* === Tooltip === */
-  Array.from(document.querySelectorAll('map area')).forEach(a=>a.style.cursor='pointer');
-  const tt=document.getElementById('tooltip');
-  const ttCode=document.getElementById('tt-code');
-  const ttImg=document.getElementById('tt-img');
-  const PAD=16,TT_MAX_W=340,TT_MAX_H=220;
-  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
-  function placeTooltip(evt){
-    const vw=window.innerWidth,vh=window.innerHeight;
-    let x=clamp(evt.pageX+PAD,0,vw-TT_MAX_W);
-    let y=clamp(evt.pageY+PAD,0,vh-TT_MAX_H);
-    tt.style.left=x+'px';
-    tt.style.top=y+'px';
-  }
-  function showTooltip(evt,code){
-    ttCode.textContent=code;
-    ttImg.src="../img/"+code+".jpg";
-    tt.style.display="block";
-    placeTooltip(evt);
-  }
-  function moveTooltip(evt){if(tt.style.display!=="block")return;placeTooltip(evt);}
-  function hideTooltip(){tt.style.display="none";}
+    /* ==========================
+       Tooltip (IDs corregits)
+       ========================== */
+    const tt = document.getElementById("tooltip");
+    const ttCode = document.getElementById("tt-code");  // <-- coincideix amb el DOM
+    const ttImg  = document.getElementById("tt-img");    // <-- coincideix amb el DOM
+    let rafId = null, targetX = 0, targetY = 0, curX = 0, curY = 0;
+
+    function showTooltip(evt, code){
+      ttCode.textContent = code;
+      setImgWithFallback(ttImg, buildThumbCandidates(code));
+      targetX = evt.pageX + 16;
+      targetY = evt.pageY + 16;
+      tt.style.display = "block";
+      animateTooltip();
+    }
+    function moveTooltip(evt){
+      targetX = evt.pageX + 16;
+      targetY = evt.pageY + 16;
+    }
+    function hideTooltip(){
+      tt.style.display = "none";
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    function animateTooltip(){
+      curX += (targetX - curX) * 0.2;
+      curY += (targetY - curY) * 0.2;
+      tt.style.left = curX + "px";
+      tt.style.top  = curY + "px";
+      rafId = requestAnimationFrame(animateTooltip);
+    }
+
+    /* ==========================
+       Image-map responsive & robust
+       - Llegeix data-orig si existeix
+       - Normalitza a left,top,right,bottom
+       - Escala segons naturalWidth/Height
+       ========================== */
+    function normalizeRectCoords(arr){
+      // arr = [x1,y1,x2,y2] en qualsevol ordre → [L,T,R,B]
+      const x1 = Number(arr[0]), y1 = Number(arr[1]), x2 = Number(arr[2]), y2 = Number(arr[3]);
+      const L = Math.min(x1, x2);
+      const T = Math.min(y1, y2);
+      const R = Math.max(x1, x2);
+      const B = Math.max(y1, y2);
+      return [L,T,R,B];
+    }
+
+    function setupResponsiveMap(imgId, mapName){
+      const img = document.getElementById(imgId);
+      const map = document.querySelector(`map[name="${mapName}"]`);
+      if (!img || !map) return;
+
+      const areas = Array.from(map.querySelectorAll('area'));
+
+      // Desa coords originals normalitzades (si hi ha data-orig la fem servir)
+      areas.forEach(a => {
+        const raw = (a.dataset.orig || a.dataset.coordsOriginal || a.coords || '').split(',').map(Number);
+        if (raw.length === 4 && raw.every(n => !Number.isNaN(n))){
+          const norm = normalizeRectCoords(raw);
+          a.dataset.coordsOriginal = norm.join(',');
+        }
+      });
+
+      function rescale(){
+        const natW = img.naturalWidth;
+        const natH = img.naturalHeight;
+        if (!natW || !natH) return;
+
+        const curW = img.clientWidth;
+        const curH = img.clientHeight;
+        const scaleX = curW / natW;
+        const scaleY = curH / natH;
+
+        areas.forEach(a => {
+          const base = (a.dataset.coordsOriginal || '').split(',').map(Number);
+          if (base.length === 4){
+            const scaled = base.map((v,i)=> (i%2===0 ? Math.round(v*scaleX) : Math.round(v*scaleY)));
+            a.coords = scaled.join(',');
+          }
+        });
+      }
+
+      if (img.complete) rescale();
+      img.addEventListener('load', rescale);
+      window.addEventListener('resize', rescale);
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // 🔧 ID correcte de la imatge
+      setupResponsiveMap('drawerImg', 'image-map');
+    });
   </script>
 </body>
 </html>
