@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <title>Parcsafe Stock Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Font Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --ink:#0f1b2f; --muted:#667085; --line:#e6e8eb;
@@ -12,7 +17,10 @@
       --radius:12px;
     }
     *{box-sizing:border-box}
-    body{font-family:'Segoe UI', system-ui, sans-serif; background:var(--bg); margin:0}
+    body{
+      font-family:'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg); margin:0; color:var(--ink);
+    }
     header{background:#fff; padding:20px 0; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,.06)}
     header img{height:120px}
 
@@ -99,7 +107,6 @@
       <a class="card" href="C3/index.html">C3</a>
       <a class="card" href="C4/index.html">C4</a>
       <a class="card" href="C5/index.html">C5</a>
-      <!-- Eliminat el C5 duplicat -->
       <a class="card" href="D1/index.html">D1</a>
       <a class="card" href="D2/index.html">D2</a>
       <a class="card" href="E1/index.html">E1</a>
@@ -113,10 +120,15 @@
 
   <script>
     // ======== CONFIG ========
-    // Endpoint base del teu Worker (o el teu domini amb ruta al Worker)
-    const WORKER_BASE = 'https://stock-api.ramonpertinez.workers.dev/';
-    // Ruta pública del CSV a GitHub Pages
-    const STOCK_PATH  = 'docs/stock.csv';
+    // Base del teu Worker (sense / al final)
+    const WORKER_BASE = 'https://stock-api.ramonpertinez.workers.dev';
+    // Rutes que provarem per baixar el CSV (per evitar 404 segons com serveixi GitHub Pages)
+    const STOCK_CANDIDATES = [
+      'docs/stock.csv',                            // relatiu a /C2_CP2_Web/
+      '/C2_CP2_Web/docs/stock.csv',                // absolut amb prefix del projecte
+      '/docs/stock.csv',                           // per sites on "docs" és arrel del site
+      'stock.csv'                                  // fallback si s’ha mogut a l’arrel
+    ];
     // ========================
 
     const statusLine  = document.getElementById('statusLine');
@@ -129,14 +141,28 @@
       statusLine.className = 'status' + (type ? ' ' + type : '');
     }
 
+    // Helper: prova diverses rutes fins que una respongui 200
+    async function fetchWithFallback(paths){
+      let lastErr = null;
+      for(const p of paths){
+        const url = new URL(p, window.location.href); // resol relatiu/absolut
+        try{
+          const res = await fetch(`${url}?cb=${Date.now()}`, { cache:'no-store' });
+          if(res.ok) return res;
+          lastErr = new Error(`HTTP ${res.status}`);
+        }catch(e){
+          lastErr = e;
+        }
+      }
+      throw lastErr || new Error('Not found');
+    }
+
     // Download: baixa l'última versió evitant caché i força "save as"
     btnDownload.addEventListener('click', async (e)=>{
       e.preventDefault();
       try{
         setStatus('Downloading stock.csv…');
-        const url = `${STOCK_PATH}?cb=${Date.now()}`;
-        const res = await fetch(url, {cache:'no-store'});
-        if(!res.ok) throw new Error('HTTP ' + res.status);
+        const res  = await fetchWithFallback(STOCK_CANDIDATES);
         const blob = await res.blob();
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -170,7 +196,7 @@
         // El Worker espera text pla a /stock/file i fa validació de capçaleres
         const res = await fetch(`${WORKER_BASE}/stock/file`, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain' }, // simple request, sense preflight estrany
+          headers: { 'Content-Type': 'text/plain' },
           body: txt,
           mode: 'cors'
         });
