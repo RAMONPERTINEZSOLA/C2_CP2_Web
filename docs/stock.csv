@@ -162,7 +162,7 @@ C4_1_II,21,Mounting Plate LBA,12.01--MPL-10,Galvanized steel base plate with squ
 C4_1_III,21,Manual Latch Support Arm,12.01--MLS-10,Galvanized rotating support arm with welded base plate; used for manually securing removable boom gates or barriers in parking systems.,10
 C4_1_IV,202,Altivar ATV12H037M2,12.01--AAT-10,0.37 kW variable frequency drive (VFD);200-240V input;for controlling three-phase motors in automation systems,10
 C4_1_V_A,21,0,12.01------10,0,10
-C4_1_V_B,21,TEST223,testttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt,eteeerretest,10
+C4_1_V_B,2,TEST223,testttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt,eteeerretest,10
 C4_1_V_C,21,0,12.01------10,0,10
 C4_1_VI,21,VOPAC Ethernet Card AS1622; VOPAC MCB Card AS1620 with female connectors; HMI Card AS1621 (Tested),12.01--VEC-10,Communication card for AS1622 system; Control board with female connectors for AS1620; Interface card tested for AS1621 system,10
 C4_1_VII,--,--,--,--,10
