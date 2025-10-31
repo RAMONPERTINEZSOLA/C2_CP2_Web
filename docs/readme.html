@@ -4,210 +4,412 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Parcsafe Documentation — Stock Management System</title>
+  <meta name="robots" content="noindex, nofollow" />
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
+    :root{
       --green:#6dbd45;
       --ink:#1f2937;
+      --muted:#667085;
       --bg:#f6f8f7;
       --card:#ffffff;
-      --muted:#667085;
       --radius:14px;
       --shadow:0 6px 18px rgba(0,0,0,.08);
+      --link:#2563eb;
     }
-    *{box-sizing:border-box;}
-    body {
-      font-family:'Poppins',sans-serif;
-      margin:0; display:flex;
-      background:var(--bg); color:var(--ink);
-    }
-    /* Sidebar */
-    nav {
-      width:240px; min-height:100vh;
-      background:#fff; padding:30px 20px;
-      border-right:1px solid #e4e6e8;
-      position:sticky; top:0;
-    }
-    nav img {width:140px; margin-bottom:30px;}
-    nav a {
-      display:block; color:var(--ink);
-      text-decoration:none; font-weight:500;
-      padding:10px 14px; margin:4px 0;
-      border-radius:8px; transition:.2s;
-    }
-    nav a:hover, nav a.active {
-      background:var(--green); color:#fff;
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--ink);
+      background:var(--bg);
     }
 
-    /* Main */
-    main {
-      flex:1;
-      padding:40px 60px;
-      max-width:950px;
-      margin:auto;
+    /* ───────────────── Sidebar (ALWAYS visible) */
+    .layout{
+      display:flex;
     }
-    h1{color:var(--green); font-size:28px; margin-bottom:10px;}
-    h2{color:var(--green); font-size:20px; margin-top:40px;}
-    h3{color:var(--ink); font-size:17px; margin-top:24px;}
-    p,li{color:var(--ink); line-height:1.7;}
+    nav.sidebar{
+      position:fixed; left:0; top:0; bottom:0;
+      width:260px; background:#fff; border-right:1px solid #e5e7eb;
+      padding:24px 16px; overflow:auto; z-index:50;
+    }
+    .brand{display:flex; align-items:center; gap:10px; margin-bottom:18px}
+    .brand img{width:145px; height:auto}
+    .back-btn{
+      display:inline-block; margin:10px 0 18px; padding:10px 14px;
+      background:var(--green); color:#fff; border-radius:10px; text-decoration:none;
+      font-weight:600; box-shadow:0 6px 14px rgba(109,189,69,.22);
+    }
+    .toc a{
+      display:block; padding:10px 12px; border-radius:8px; text-decoration:none;
+      color:var(--ink); font-weight:500; margin:3px 0; transition:.15s;
+    }
+    .toc a:hover{background:#f1f5f9}
+    .toc a.active{background:var(--green); color:#fff}
+
+    /* ───────────────── Main */
+    main{
+      margin-left:260px; /* keep room for fixed sidebar */
+      padding:42px 56px; max-width:1100px;
+    }
+    .card{
+      background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:34px 40px; margin:26px 0;
+    }
+    h1{color:var(--green); font-size:30px; margin:0 0 10px}
+    h2{color:var(--green); font-size:22px; margin:26px 0 12px}
+    h3{color:var(--ink); font-size:18px; margin:22px 0 8px}
+    p,li{line-height:1.75; color:var(--ink)}
+    .lead{color:var(--muted)}
+
+    /* Tables & code */
+    table{width:100%; border-collapse:collapse; margin:14px 0}
+    th{background:var(--green); color:#fff; text-align:left; padding:10px}
+    td{border-bottom:1px solid #e5e7eb; padding:10px; color:var(--muted)}
     code{
-      background:#f2f3f5;
-      border-radius:6px;
-      padding:2px 6px;
-      font-family:monospace;
+      background:#f2f3f5; padding:2px 6px; border-radius:6px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
     pre{
-      background:#0f172a;
-      color:#e2e8f0;
-      padding:15px;
-      border-radius:8px;
-      overflow-x:auto;
-      font-size:0.9em;
+      background:#0f172a; color:#e2e8f0; padding:16px; border-radius:10px; overflow:auto; font-size:.92rem;
     }
-    table{
-      width:100%; border-collapse:collapse; margin:16px 0;
+
+    /* Floating back button (mobile/helper) */
+    .floating-back{
+      position:fixed; right:18px; bottom:18px; z-index:60;
+      background:var(--green); color:#fff; text-decoration:none; font-weight:600;
+      padding:12px 16px; border-radius:999px; box-shadow:0 10px 24px rgba(109,189,69,.35);
     }
-    table th{
-      background:var(--green); color:#fff; text-align:left;
-      padding:10px; font-weight:500;
+
+    footer{color:var(--muted); font-size:13px; text-align:center; margin:40px 0 10px}
+
+    /* Responsive - keep sidebar visible; content gets narrower */
+    @media (max-width:980px){
+      nav.sidebar{width:220px}
+      main{margin-left:220px; padding:28px}
     }
-    table td{
-      border-bottom:1px solid #e2e8f0; padding:10px;
-      color:var(--muted);
-    }
-    footer{
-      text-align:center; padding:30px 10px;
-      font-size:13px; color:var(--muted);
-      margin-top:60px;
-    }
-    @media(max-width:860px){
-      nav{display:none;}
-      main{padding:30px;}
+    @media (max-width:760px){
+      /* Even on mobile we keep the sidebar visible but slimmer */
+      nav.sidebar{width:200px; padding:18px 10px}
+      main{margin-left:200px; padding:24px}
+      .back-btn{display:block; text-align:center}
     }
   </style>
 
   <script>
-    // Highlight active section in sidebar
-    document.addEventListener("DOMContentLoaded",()=>{
-      const sections=document.querySelectorAll("section");
-      const links=document.querySelectorAll("nav a");
-      window.addEventListener("scroll",()=>{
-        let current="";
-        sections.forEach(s=>{
-          const top=s.offsetTop-150;
-          if(pageYOffset>=top){current=s.getAttribute("id");}
+    // Active section highlight
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = [...document.querySelectorAll('.toc a')];
+      const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting){
+            const id = '#' + entry.target.id;
+            links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === id));
+          }
         });
-        links.forEach(a=>{
-          a.classList.remove("active");
-          if(a.getAttribute("href")=="#"+current) a.classList.add("active");
-        });
-      });
+      }, {rootMargin: '-40% 0px -55% 0px', threshold: 0});
+
+      sections.forEach(s => io.observe(s));
     });
   </script>
 </head>
+
 <body>
-  <nav>
-    <img src="assets/parcsafe-logo.png" alt="Parcsafe Logo">
-    <a href="#overview">Overview</a>
-    <a href="#architecture">Architecture</a>
-    <a href="#workflow">Workflow</a>
-    <a href="#worker">Cloudflare Worker</a>
-    <a href="#n8n">n8n Automation</a>
-    <a href="#maintenance">Maintenance</a>
-    <a href="#future">Future Improvements</a>
-    <a href="#author">Author</a>
-  </nav>
+  <div class="layout">
+    <!-- Sidebar (fixed & scrollable) -->
+    <nav class="sidebar">
+      <div class="brand">
+        <img src="assets/parcsafe-logo.png" alt="Parcsafe logo">
+      </div>
+      <a class="back-btn" href="index.html">⬅ Back to Main Menu</a>
 
-  <main>
-    <section id="overview">
-      <h1>Parcsafe Stock Management System</h1>
-      <p>This documentation explains in detail how the <strong>Parcsafe Stock Management System</strong> works, is maintained, and can be extended. The platform is fully serverless, using GitHub Pages, Cloudflare Workers, and optional n8n automation to provide a self-updating warehouse interface with zero infrastructure cost.</p>
-    </section>
+      <div class="toc">
+        <a href="#overview">Overview</a>
+        <a href="#architecture">System Architecture</a>
+        <a href="#data-model">Data Model (CSV)</a>
+        <a href="#api">API Contract</a>
+        <a href="#worker">Cloudflare Worker</a>
+        <a href="#security">Security & Access</a>
+        <a href="#deployment">Deployment & Environments</a>
+        <a href="#github">GitHub & Pages</a>
+        <a href="#frontend">Frontend & UX</a>
+        <a href="#caching">Caching & Performance</a>
+        <a href="#images">Images & Naming</a>
+        <a href="#n8n">n8n Automation (Optional)</a>
+        <a href="#maintenance">Operations & Maintenance</a>
+        <a href="#troubleshooting">Troubleshooting</a>
+        <a href="#faq">FAQ</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#glossary">Glossary</a>
+        <a href="#changelog">Change Log</a>
+        <a href="#author">Author</a>
+      </div>
+    </nav>
 
-    <section id="architecture">
-      <h2>🧠 System Architecture</h2>
-      <table>
-        <tr><th>Component</th><th>Description</th></tr>
-        <tr><td>Frontend (GitHub Pages)</td><td>Interactive interface showing all racks and drawers. Built with HTML, CSS and JS, hosted publicly.</td></tr>
-        <tr><td>Cloudflare Worker</td><td>Receives POST requests, validates them, and updates <code>docs/stock.csv</code> via GitHub API.</td></tr>
-        <tr><td>GitHub Repository</td><td>Contains all project files. Acts as backup and deployment trigger.</td></tr>
-        <tr><td>n8n Workflow (optional)</td><td>Automates file uploads and synchronization between local folders and GitHub.</td></tr>
-      </table>
-    </section>
+    <!-- Main content -->
+    <main>
+      <section id="overview" class="card">
+        <h1>Parcsafe Stock Management System</h1>
+        <p class="lead">
+          This documentation describes how the Parcsafe warehouse stock platform is designed, deployed, and maintained. The system is fully serverless, combining <strong>GitHub Pages</strong> (hosting & UI), a <strong>Cloudflare Worker</strong> (write API to GitHub), and optional <strong>n8n automation</strong> (photo/file syncing). It is engineered to be low-cost, transparent, and resilient.
+        </p>
+        <p>
+          Typical user flow: a teammate opens a drawer page, edits the quantity, and clicks <em>Save</em>. The browser calls the Worker, which updates <code>docs/stock.csv</code> and commits to GitHub. Pages redeploys automatically; the new quantity is visible within seconds. All changes are versioned and auditable.
+        </p>
+      </section>
 
-    <section id="workflow">
-      <h2>⚙️ How the Workflow Operates</h2>
-      <ol>
-        <li>User opens a drawer page (<code>C2_CP2_0_I.html</code>).</li>
-        <li>Changes stock quantity and clicks <strong>Save</strong>.</li>
-        <li>The frontend sends a JSON payload to the Worker API.</li>
-        <li>The Worker commits the update to <code>stock.csv</code>.</li>
-        <li>GitHub Pages redeploys automatically — change visible within seconds.</li>
-      </ol>
-      <p><strong>Average update time:</strong> under 10 seconds.</p>
-    </section>
+      <section id="architecture" class="card">
+        <h2>🧠 System Architecture</h2>
+        <p>
+          The solution is organized into clear layers. Each layer is optional outside its responsibility; coupling is minimal to favor maintenance and evolvability.
+        </p>
+        <table>
+          <tr><th>Component</th><th>Description</th></tr>
+          <tr>
+            <td>Frontend (GitHub Pages)</td>
+            <td>Interactive HTML/CSS/JS site that renders racks & drawers, provides controls, and shows photos & QR codes.</td>
+          </tr>
+          <tr>
+            <td>Cloudflare Worker</td>
+            <td>Stateless API that validates input and updates <code>stock.csv</code> via GitHub API, with CORS enforcement and commit messages.</td>
+          </tr>
+          <tr>
+            <td>GitHub Repository</td>
+            <td>Single source of truth: stores CSV, HTML, images, and Worker code. Triggers GitHub Pages builds.</td>
+          </tr>
+          <tr>
+            <td>n8n (optional)</td>
+            <td>Automation pipeline for local → Git synchronization of photos and docs at a fixed cadence.</td>
+          </tr>
+        </table>
+        <h3>Data Flow (high level)</h3>
+        <ol>
+          <li>User edits quantity → Browser sends <code>POST /stock/item</code> to Worker.</li>
+          <li>Worker patches <code>stock.csv</code> (row match by <code>drawerCode</code>) and commits.</li>
+          <li>Pages rebuild → UI fetches new data → visual update.</li>
+        </ol>
+      </section>
 
-    <section id="worker">
-      <h2>🪄 Cloudflare Worker Setup</h2>
-      <pre><code>npm install -g wrangler
+      <section id="data-model" class="card">
+        <h2>🗃️ Data Model (CSV)</h2>
+        <p>
+          The system uses a single CSV file as the canonical data store. This keeps the stack simple, portable, and auditable. Columns:
+        </p>
+        <table>
+          <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+          <tr><td>drawerCode</td><td>string (ID)</td><td>Unique code: e.g., <code>C2_CP2_0_I</code>. Acts as primary key.</td></tr>
+          <tr><td>stockQty</td><td>integer ≥ 0</td><td>Displayed quantity. API enforces integer semantics.</td></tr>
+          <tr><td>productName</td><td>string</td><td>Human-readable name. Optional but recommended.</td></tr>
+          <tr><td>productCode</td><td>string</td><td>Internal/ERP or vendor reference.</td></tr>
+          <tr><td>description</td><td>string (markdown-safe)</td><td>Short technical description.</td></tr>
+          <tr><td>minStock</td><td>integer ≥ 0</td><td>Threshold for low-stock alerts (if email workflows are re-enabled).</td></tr>
+        </table>
+        <h3>Validation Rules</h3>
+        <ul>
+          <li>Header must match exactly the columns above.</li>
+          <li><code>drawerCode</code> must be unique; case-sensitive.</li>
+          <li>Quantities must be integers; no floats, <code>NaN</code>, or negative numbers.</li>
+          <li>Descriptions should avoid line breaks; use semicolons or dashes for lists.</li>
+        </ul>
+      </section>
+
+      <section id="api" class="card">
+        <h2>🔗 API Contract</h2>
+        <p>The Cloudflare Worker exposes a minimal JSON API. Example endpoint for item update:</p>
+        <pre><code>POST  /stock/item
+Content-Type: application/json
+
+{
+  "drawerCode": "C2_CP2_0_I",
+  "newQty": 7
+}</code></pre>
+        <h3>Responses</h3>
+        <table>
+          <tr><th>Status</th><th>Body</th><th>Meaning</th></tr>
+          <tr><td>200</td><td><code>{"ok":true,"updated":{"drawerCode":"C2_CP2_0_I","stockQty":7}}</code></td><td>Update committed to GitHub.</td></tr>
+          <tr><td>400</td><td><code>{"ok":false,"error":"INVALID_INPUT"}</code></td><td>Missing fields, non-integer, or invalid header.</td></tr>
+          <tr><td>404</td><td><code>{"ok":false,"error":"DRAWER_NOT_FOUND"}</code></td><td>No matching <code>drawerCode</code> in CSV.</td></tr>
+          <tr><td>401/403</td><td><code>{"ok":false,"error":"AUTH"}</code></td><td>Token missing/invalid or repo permission issue.</td></tr>
+          <tr><td>500</td><td><code>{"ok":false,"error":"GITHUB_WRITE_FAILED"}</code></td><td>Commit or API failure; retry.</td></tr>
+        </table>
+        <p><strong>CORS:</strong> only approved origins are allowed (site domain). Requests must include <code>Content-Type: application/json</code>.</p>
+      </section>
+
+      <section id="worker" class="card">
+        <h2>🪄 Cloudflare Worker</h2>
+        <h3>Deploy</h3>
+        <pre><code>npm install -g wrangler
 wrangler login
 wrangler deploy
 wrangler secret put GH_TOKEN</code></pre>
-      <p>The Worker authenticates to GitHub using a Fine-grained Personal Access Token with read/write permissions to the repository <code>C2_CP2_Web</code>.</p>
-      <p>Once deployed, it exposes a public endpoint such as:<br>
-      <code>https://stock-api.parcsafe.workers.dev/stock/item</code></p>
-    </section>
+        <p><strong>Secrets:</strong> <code>GH_TOKEN</code> must be a fine-grained GitHub token with <em>Contents: Read &amp; Write</em> for this repository.</p>
+        <h3>Commit Messages</h3>
+        <pre><code>chore(stock): C2_CP2_0_I → 7</code></pre>
+        <h3>Error Handling</h3>
+        <ul>
+          <li>Graceful JSON error payloads (see API table).</li>
+          <li>Hard validation prevents corrupted CSV commits.</li>
+          <li>Rate limiting and logging can be added if needed.</li>
+        </ul>
+      </section>
 
-    <section id="n8n">
-      <h2>🧩 n8n Workflow Integration</h2>
-      <p>The optional <strong>n8n automation</strong> continuously checks a target folder for new or modified files and uploads them automatically to GitHub.</p>
-      <ul>
-        <li>Runs on schedule (every 30–60 seconds).</li>
-        <li>Normalizes filenames and routes them to the correct directory.</li>
-        <li>Performs Pull → Add → Commit → Push steps autonomously.</li>
-      </ul>
-      <p>This workflow can run locally or on an n8n cloud instance for continuous updates — ensuring that photos and assets stay perfectly synchronized.</p>
-    </section>
+      <section id="security" class="card">
+        <h2>🔒 Security & Access</h2>
+        <ul>
+          <li><strong>Token location:</strong> never hard-coded. Stored via Cloudflare Secrets KV only.</li>
+          <li><strong>Least privilege:</strong> token limited to this repo; no organization-wide scope.</li>
+          <li><strong>CORS:</strong> requests accepted only from the production origin.</li>
+          <li><strong>Auditability:</strong> each update is a commit tied to a Worker identity.</li>
+          <li><strong>Recovery:</strong> in case of token compromise, revoke and re-issue immediately; no downtime apart from redeploy.</li>
+        </ul>
+      </section>
 
-    <section id="maintenance">
-      <h2>🧰 Maintenance Tips</h2>
-      <ul>
-        <li>Renew the GitHub token regularly via <code>wrangler secret put GH_TOKEN</code>.</li>
-        <li>Backup <code>stock.csv</code> weekly.</li>
-        <li>Compress images before upload (max 1 MB recommended).</li>
-        <li>Review repo size and structure every few months.</li>
-      </ul>
-      <h3>Troubleshooting</h3>
-      <table>
-        <tr><th>Issue</th><th>Solution</th></tr>
-        <tr><td>401 Unauthorized</td><td>Renew the GitHub token secret.</td></tr>
-        <tr><td>Worker not responding</td><td>Redeploy using <code>wrangler deploy</code>.</td></tr>
-        <tr><td>Changes not visible</td><td>Force-refresh (Ctrl+F5) or wait a few minutes.</td></tr>
-      </table>
-    </section>
+      <section id="deployment" class="card">
+        <h2>🚀 Deployment & Environments</h2>
+        <h3>Environments</h3>
+        <ul>
+          <li><strong>Production:</strong> GitHub Pages default branch + Cloudflare Worker bound to the prod domain.</li>
+          <li><strong>Staging (optional):</strong> use a separate branch & Worker route; update <code>ORIGIN</code> accordingly.</li>
+        </ul>
+        <h3>Ownership Transfer</h3>
+        <ol>
+          <li>Move repo to <em>Parcsafe</em> GitHub organization.</li>
+          <li>Deploy Worker under corporate Cloudflare account.</li>
+          <li>Recreate <code>GH_TOKEN</code> under a shared automation account.</li>
+          <li>Update endpoints in JS if the Worker URL changes.</li>
+        </ol>
+      </section>
 
-    <section id="future">
-      <h2>🚀 Future Improvements</h2>
-      <ul>
-        <li>Add a dashboard interface to edit <code>stock.csv</code> directly.</li>
-        <li>Integrate user authentication for internal control.</li>
-        <li>Re-enable n8n for automatic photo uploads.</li>
-        <li>Connect with Circontrol & NWave IoT systems.</li>
-      </ul>
-    </section>
+      <section id="github" class="card">
+        <h2>🐙 GitHub & Pages</h2>
+        <ul>
+          <li>Pages builds automatically from the default branch.</li>
+          <li>Each update to <code>stock.csv</code> triggers a rebuild; cache is short-lived.</li>
+          <li>Use PRs for bigger content changes; fast-forward commits for single-line updates.</li>
+        </ul>
+      </section>
 
-    <section id="author">
-      <h2>👤 Author</h2>
-      <p><strong>Developed by:</strong> Ramon Pertíñez Solà<br>
-      Electrical Engineer & Automation Specialist<br>
-      Brisbane, Australia — 2025<br>
-      <a href="mailto:ramonpertinezsola@gmail.com">ramonpertinezsola@gmail.com</a></p>
-    </section>
+      <section id="frontend" class="card">
+        <h2>🖥️ Frontend & UX</h2>
+        <h3>Drawer Pages</h3>
+        <ul>
+          <li>Each drawer page exposes a <em>Save</em> action that posts to the Worker.</li>
+          <li>After success, the UI updates immediately (optimistic) and confirms with a toast.</li>
+          <li>Error toasts are explicit and guide the user to retry or contact support.</li>
+        </ul>
+        <h3>Accessibility</h3>
+        <ul>
+          <li>High-contrast green for primary actions.</li>
+          <li>Buttons have clear focus styles; labels use semantic HTML.</li>
+        </ul>
+      </section>
 
-    <footer>
-      © 2025 Parcsafe — Internal Technical Documentation · Version 1.0
-    </footer>
-  </main>
+      <section id="caching" class="card">
+        <h2>⚡ Caching & Performance</h2>
+        <ul>
+          <li>Use cache-busting via a small <code>version.json</code> if aggressive CDN caching is observed.</li>
+          <li>Prefer responsive images (intrinsic size) to reduce layout shift.</li>
+          <li>Lazy-load large photos in non-critical views.</li>
+        </ul>
+      </section>
+
+      <section id="images" class="card">
+        <h2>🖼️ Images & Naming</h2>
+        <ul>
+          <li>Use JPG for photos; PNG only for UI assets (logos, icons).</li>
+          <li>Recommended max size: 1MB per image. Compress before commit.</li>
+          <li>Naming convention: <code>PARCsafe-[NNN]-BP-2022.jpg</code> or <code>C2_CP2_0_I.jpg</code> matching drawer code.</li>
+          <li>Store in rack-specific folders to keep repo organized.</li>
+        </ul>
+      </section>
+
+      <section id="n8n" class="card">
+        <h2>🧩 n8n Automation (Optional)</h2>
+        <p>
+          The n8n workflow keeps photos and files synced from a local folder to the repo. It’s useful for high-throughput photo updates and removes manual Git steps.
+        </p>
+        <h3>Flow</h3>
+        <ol>
+          <li>Cron trigger every 30–60 seconds.</li>
+          <li>Detect new/changed files; normalize filenames.</li>
+          <li>Route to correct destination folder.</li>
+          <li>Git Pull → Add → Commit → Push.</li>
+        </ol>
+        <h3>Operations</h3>
+        <ul>
+          <li>Run locally on a warehouse PC (auto-start) or in n8n Cloud.</li>
+          <li>Keep credentials in environment variables; never in the workflow JSON.</li>
+        </ul>
+      </section>
+
+      <section id="maintenance" class="card">
+        <h2>🧰 Operations & Maintenance</h2>
+        <ul>
+          <li>Rotate the GitHub token every 6–12 months.</li>
+          <li>Weekly backup of <code>stock.csv</code> (export as CSV + commit tag).</li>
+          <li>Quarterly image sweep: compress and remove orphaned assets.</li>
+          <li>Document any endpoint or secret changes in this file (Changelog).</li>
+        </ul>
+      </section>
+
+      <section id="troubleshooting" class="card">
+        <h2>🩺 Troubleshooting</h2>
+        <table>
+          <tr><th>Issue</th><th>Cause</th><th>Fix</th></tr>
+          <tr><td>401 Unauthorized</td><td>Token missing/expired</td><td>Run <code>wrangler secret put GH_TOKEN</code> with a fresh token</td></tr>
+          <tr><td>CSV not updating</td><td>Wrong <code>drawerCode</code> or invalid header</td><td>Verify header & PK; check API response</td></tr>
+          <tr><td>Worker down</td><td>Suspended account or mis-deploy</td><td>Re-deploy with Wrangler; check Cloudflare logs</td></tr>
+          <tr><td>Page stale</td><td>Cache</td><td>Hard refresh (Ctrl+F5) or bump <code>version.json</code></td></tr>
+        </table>
+      </section>
+
+      <section id="faq" class="card">
+        <h2>❓ FAQ</h2>
+        <h3>Can we add new columns to CSV?</h3>
+        <p>Yes, but the Worker must be updated to preserve column order and validation. Keep backward compatibility by treating new columns as optional.</p>
+        <h3>Can we restrict edits to internal users only?</h3>
+        <p>Yes: add a signed token or session layer on the frontend, and validate in the Worker.</p>
+      </section>
+
+      <section id="roadmap" class="card">
+        <h2>🗺️ Roadmap</h2>
+        <ul>
+          <li>Inline CSV editor dashboard with auth.</li>
+          <li>Audit trail view (who changed what, when).</li>
+          <li>Automated WebP/AVIF optimization pipeline.</li>
+          <li>Integration with Circontrol / NWave data sources.</li>
+        </ul>
+      </section>
+
+      <section id="glossary" class="card">
+        <h2>📚 Glossary</h2>
+        <p><strong>DrawerCode</strong>: Unique identifier of a drawer (e.g., <code>C2_CP2_0_I</code>).</p>
+        <p><strong>Worker</strong>: Serverless function hosted on Cloudflare that updates the repo.</p>
+        <p><strong>Pages</strong>: GitHub static hosting for the site.</p>
+      </section>
+
+      <section id="changelog" class="card">
+        <h2>📝 Change Log</h2>
+        <ul>
+          <li><strong>v1.0</strong> — Initial corporate documentation, fixed sidebar, back-to-menu button, extended technical sections.</li>
+        </ul>
+      </section>
+
+      <section id="author" class="card">
+        <h2>👤 Author</h2>
+        <p><strong>Developed by:</strong> Ramon Pertíñez Solà — Electrical Engineer & Automation Specialist.</p>
+        <p>Brisbane, Australia — 2025 · <a href="mailto:ramonpertinezsola@gmail.com">ramonpertinezsola@gmail.com</a></p>
+      </section>
+
+      <footer>© 2025 Parcsafe — Internal Technical Documentation · Version 1.0</footer>
+    </main>
+  </div>
+
+  <!-- Floating quick back button (extra) -->
+  <a class="floating-back" href="index.html" title="Back to Main Menu">Main Menu</a>
 </body>
 </html>
