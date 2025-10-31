@@ -214,7 +214,7 @@
         if(!res.ok || data?.error){
           throw new Error(data?.error || `HTTP ${res.status}`);
         }
-        setStatus('Upload OK ✅ — stock.csv actualitzat.', 'ok');
+        setStatus('Upload OK ✅ — stock.csv.', 'ok');
         fileInput.value = '';
       }catch(err){
         console.error(err);
