@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Parcsafe Documentation — Stock Management System</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green:#6dbd45;
+      --ink:#1f2937;
+      --bg:#f6f8f7;
+      --card:#ffffff;
+      --muted:#667085;
+      --radius:14px;
+      --shadow:0 6px 18px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box;}
+    body {
+      font-family:'Poppins',sans-serif;
+      margin:0; display:flex;
+      background:var(--bg); color:var(--ink);
+    }
+    /* Sidebar */
+    nav {
+      width:240px; min-height:100vh;
+      background:#fff; padding:30px 20px;
+      border-right:1px solid #e4e6e8;
+      position:sticky; top:0;
+    }
+    nav img {width:140px; margin-bottom:30px;}
+    nav a {
+      display:block; color:var(--ink);
+      text-decoration:none; font-weight:500;
+      padding:10px 14px; margin:4px 0;
+      border-radius:8px; transition:.2s;
+    }
+    nav a:hover, nav a.active {
+      background:var(--green); color:#fff;
+    }
+
+    /* Main */
+    main {
+      flex:1;
+      padding:40px 60px;
+      max-width:950px;
+      margin:auto;
+    }
+    h1{color:var(--green); font-size:28px; margin-bottom:10px;}
+    h2{color:var(--green); font-size:20px; margin-top:40px;}
+    h3{color:var(--ink); font-size:17px; margin-top:24px;}
+    p,li{color:var(--ink); line-height:1.7;}
+    code{
+      background:#f2f3f5;
+      border-radius:6px;
+      padding:2px 6px;
+      font-family:monospace;
+    }
+    pre{
+      background:#0f172a;
+      color:#e2e8f0;
+      padding:15px;
+      border-radius:8px;
+      overflow-x:auto;
+      font-size:0.9em;
+    }
+    table{
+      width:100%; border-collapse:collapse; margin:16px 0;
+    }
+    table th{
+      background:var(--green); color:#fff; text-align:left;
+      padding:10px; font-weight:500;
+    }
+    table td{
+      border-bottom:1px solid #e2e8f0; padding:10px;
+      color:var(--muted);
+    }
+    footer{
+      text-align:center; padding:30px 10px;
+      font-size:13px; color:var(--muted);
+      margin-top:60px;
+    }
+    @media(max-width:860px){
+      nav{display:none;}
+      main{padding:30px;}
+    }
+  </style>
+
+  <script>
+    // Highlight active section in sidebar
+    document.addEventListener("DOMContentLoaded",()=>{
+      const sections=document.querySelectorAll("section");
+      const links=document.querySelectorAll("nav a");
+      window.addEventListener("scroll",()=>{
+        let current="";
+        sections.forEach(s=>{
+          const top=s.offsetTop-150;
+          if(pageYOffset>=top){current=s.getAttribute("id");}
+        });
+        links.forEach(a=>{
+          a.classList.remove("active");
+          if(a.getAttribute("href")=="#"+current) a.classList.add("active");
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <nav>
+    <img src="assets/parcsafe-logo.png" alt="Parcsafe Logo">
+    <a href="#overview">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#workflow">Workflow</a>
+    <a href="#worker">Cloudflare Worker</a>
+    <a href="#n8n">n8n Automation</a>
+    <a href="#maintenance">Maintenance</a>
+    <a href="#future">Future Improvements</a>
+    <a href="#author">Author</a>
+  </nav>
+
+  <main>
+    <section id="overview">
+      <h1>Parcsafe Stock Management System</h1>
+      <p>This documentation explains in detail how the <strong>Parcsafe Stock Management System</strong> works, is maintained, and can be extended. The platform is fully serverless, using GitHub Pages, Cloudflare Workers, and optional n8n automation to provide a self-updating warehouse interface with zero infrastructure cost.</p>
+    </section>
+
+    <section id="architecture">
+      <h2>🧠 System Architecture</h2>
+      <table>
+        <tr><th>Component</th><th>Description</th></tr>
+        <tr><td>Frontend (GitHub Pages)</td><td>Interactive interface showing all racks and drawers. Built with HTML, CSS and JS, hosted publicly.</td></tr>
+        <tr><td>Cloudflare Worker</td><td>Receives POST requests, validates them, and updates <code>docs/stock.csv</code> via GitHub API.</td></tr>
+        <tr><td>GitHub Repository</td><td>Contains all project files. Acts as backup and deployment trigger.</td></tr>
+        <tr><td>n8n Workflow (optional)</td><td>Automates file uploads and synchronization between local folders and GitHub.</td></tr>
+      </table>
+    </section>
+
+    <section id="workflow">
+      <h2>⚙️ How the Workflow Operates</h2>
+      <ol>
+        <li>User opens a drawer page (<code>C2_CP2_0_I.html</code>).</li>
+        <li>Changes stock quantity and clicks <strong>Save</strong>.</li>
+        <li>The frontend sends a JSON payload to the Worker API.</li>
+        <li>The Worker commits the update to <code>stock.csv</code>.</li>
+        <li>GitHub Pages redeploys automatically — change visible within seconds.</li>
+      </ol>
+      <p><strong>Average update time:</strong> under 10 seconds.</p>
+    </section>
+
+    <section id="worker">
+      <h2>🪄 Cloudflare Worker Setup</h2>
+      <pre><code>npm install -g wrangler
+wrangler login
+wrangler deploy
+wrangler secret put GH_TOKEN</code></pre>
+      <p>The Worker authenticates to GitHub using a Fine-grained Personal Access Token with read/write permissions to the repository <code>C2_CP2_Web</code>.</p>
+      <p>Once deployed, it exposes a public endpoint such as:<br>
+      <code>https://stock-api.parcsafe.workers.dev/stock/item</code></p>
+    </section>
+
+    <section id="n8n">
+      <h2>🧩 n8n Workflow Integration</h2>
+      <p>The optional <strong>n8n automation</strong> continuously checks a target folder for new or modified files and uploads them automatically to GitHub.</p>
+      <ul>
+        <li>Runs on schedule (every 30–60 seconds).</li>
+        <li>Normalizes filenames and routes them to the correct directory.</li>
+        <li>Performs Pull → Add → Commit → Push steps autonomously.</li>
+      </ul>
+      <p>This workflow can run locally or on an n8n cloud instance for continuous updates — ensuring that photos and assets stay perfectly synchronized.</p>
+    </section>
+
+    <section id="maintenance">
+      <h2>🧰 Maintenance Tips</h2>
+      <ul>
+        <li>Renew the GitHub token regularly via <code>wrangler secret put GH_TOKEN</code>.</li>
+        <li>Backup <code>stock.csv</code> weekly.</li>
+        <li>Compress images before upload (max 1 MB recommended).</li>
+        <li>Review repo size and structure every few months.</li>
+      </ul>
+      <h3>Troubleshooting</h3>
+      <table>
+        <tr><th>Issue</th><th>Solution</th></tr>
+        <tr><td>401 Unauthorized</td><td>Renew the GitHub token secret.</td></tr>
+        <tr><td>Worker not responding</td><td>Redeploy using <code>wrangler deploy</code>.</td></tr>
+        <tr><td>Changes not visible</td><td>Force-refresh (Ctrl+F5) or wait a few minutes.</td></tr>
+      </table>
+    </section>
+
+    <section id="future">
+      <h2>🚀 Future Improvements</h2>
+      <ul>
+        <li>Add a dashboard interface to edit <code>stock.csv</code> directly.</li>
+        <li>Integrate user authentication for internal control.</li>
+        <li>Re-enable n8n for automatic photo uploads.</li>
+        <li>Connect with Circontrol & NWave IoT systems.</li>
+      </ul>
+    </section>
+
+    <section id="author">
+      <h2>👤 Author</h2>
+      <p><strong>Developed by:</strong> Ramon Pertíñez Solà<br>
+      Electrical Engineer & Automation Specialist<br>
+      Brisbane, Australia — 2025<br>
+      <a href="mailto:ramonpertinezsola@gmail.com">ramonpertinezsola@gmail.com</a></p>
+    </section>
+
+    <footer>
+      © 2025 Parcsafe — Internal Technical Documentation · Version 1.0
+    </footer>
+  </main>
+</body>
+</html>
