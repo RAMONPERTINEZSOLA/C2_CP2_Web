@@ -113,15 +113,16 @@
 
   <script>
     // ======== CONFIG ========
-    // Canvia això al teu endpoint real (Cloudflare Worker / n8n / API pròpia)
-    const WORKER_ENDPOINT = 'https://your-stock-worker.example.com/upload'; // POST {csv, message}
-    const STOCK_PATH = 'docs/stock.csv'; // ruta pública del CSV al repo (GitHub Pages)
+    // Endpoint base del teu Worker (o el teu domini amb ruta al Worker)
+    const WORKER_BASE = 'https://stock-api.ramonpertinez.workers.dev/';
+    // Ruta pública del CSV a GitHub Pages
+    const STOCK_PATH  = 'docs/stock.csv';
     // ========================
 
-    const statusLine = document.getElementById('statusLine');
-    const fileInput  = document.getElementById('fileInput');
-    const btnUpload  = document.getElementById('btnUpload');
-    const btnDownload= document.getElementById('btnDownload');
+    const statusLine  = document.getElementById('statusLine');
+    const fileInput   = document.getElementById('fileInput');
+    const btnUpload   = document.getElementById('btnUpload');
+    const btnDownload = document.getElementById('btnDownload');
 
     function setStatus(msg, type=''){
       statusLine.textContent = msg;
@@ -150,10 +151,9 @@
       }
     });
 
-    // Upload: obre selector
+    // Upload → el teu Worker /stock/file (rep text/plain)
     btnUpload.addEventListener('click', ()=> fileInput.click());
 
-    // Llegeix i envia al Worker
     fileInput.addEventListener('change', async ()=>{
       const file = fileInput.files[0];
       if(!file) return;
@@ -164,24 +164,23 @@
       }
       try{
         setStatus('Uploading stock.csv…');
-        const text = await file.text();
 
-        // Envia al teu backend (ajusta a l’estructura que esperi el teu Worker)
-        const res = await fetch(WORKER_ENDPOINT, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({
-            csv: text,
-            message: `Upload from homepage at ${new Date().toISOString()}`
-          })
+        const txt = await file.text(); // CSV en cru
+
+        // El Worker espera text pla a /stock/file i fa validació de capçaleres
+        const res = await fetch(`${WORKER_BASE}/stock/file`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' }, // simple request, sense preflight estrany
+          body: txt,
+          mode: 'cors'
         });
 
-        if(!res.ok){
-          const msg = await res.text().catch(()=>res.statusText);
-          throw new Error(msg || ('HTTP ' + res.status));
+        const data = await res.json().catch(()=> ({}));
+        if(!res.ok || data?.error){
+          throw new Error(data?.error || `HTTP ${res.status}`);
         }
 
-        setStatus('Upload OK ✅  — refresh a la resta de pàgines si cal.', 'ok');
+        setStatus('Upload OK ✅ — stock.csv actualitzat.', 'ok');
         fileInput.value = '';
       }catch(err){
         console.error(err);
@@ -193,7 +192,7 @@
     const allFitxes = [];
     function addFitxes(list){ allFitxes.push(...list); }
 
-    const searchBox = document.getElementById('searchBox');
+    const searchBox   = document.getElementById('searchBox');
     const resultsList = document.getElementById('resultsList');
 
     function updateResults(){
