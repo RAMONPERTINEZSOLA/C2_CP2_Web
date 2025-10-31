@@ -1,1 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Interactive Cabinet MAP A</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green:#6dbd45; --green-2:#5aa83a; --ink:#1f2937; --muted:#6b7280;
+      --bg1:#0b1220; --bg2:#0f182b; --card:rgba(255,255,255,.08); --card-border:rgba(255,255,255,.16);
+      --ring:rgba(109,189,69,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:#eef2ff;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #19325f33, transparent 60%),
+        radial-gradient(1000px 600px at 110% 20%, #2a5a2a30, transparent 55%),
+        radial-gradient(800px 600px at 30% 120%, #255a9c26, transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+    body::before{
+      content:""; position:fixed; inset:0;
+      background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);
+      background-size:28px 28px; pointer-events:none; opacity:.25;
+    }
+    .page{min-height:100%;display:flex;flex-direction:column}
+
+    .top-bar{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+      background:linear-gradient(180deg,rgba(10,16,28,.7),rgba(10,16,28,.35));border-bottom:1px solid #ffffff14}
+    .top-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:12px 16px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-weight:600}
+    .brand img.logo{height:34px;width:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+    .back-button{margin-left:auto;display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#bfe3c3;font-weight:600;font-size:14px;
+      padding:8px 12px;border-radius:999px;border:1px solid #bfe3c322;background:#ffffff08;transition:.2s ease}
+    .back-button:hover{transform:translateY(-1px);border-color:#bfe3c348}
+
+    .container{max-width:1100px;margin:28px auto 40px;padding:16px;width:100%}
+    .card{background:var(--card);border:1px solid var(--card-border);border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}
+    .card-header{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #ffffff1a;
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0))}
+    .title{font-size:20px;font-weight:700;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+    .title .dot{width:8px;height:8px;border-radius:999px;background:var(--green);box-shadow:0 0 0 6px var(--ring)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .button{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-weight:600;
+      text-decoration:none;color:#04210f;background:linear-gradient(180deg,#a8e68b,#6ccc49);
+      box-shadow:inset 0 1px 0 #ffffff99,0 6px 18px rgba(109,189,69,.35);transition:transform .15s ease, box-shadow .2s ease;white-space:nowrap}
+    .button:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 #ffffffaa,0 10px 22px rgba(109,189,69,.45)}
+    .search{position:relative}
+    .search input{width:260px;max-width:60vw;background:#ffffff10;color:#e7f5eb;border:1px solid #ffffff2a;outline:none;
+      padding:10px 38px 10px 12px;border-radius:12px;font-weight:500;transition:border-color .2s ease, background .2s ease}
+    .search input::placeholder{color:#cfe0d4}
+    .search input:focus{border-color:#bfe3c345;background:#ffffff14}
+    .search .kbd{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;color:#d7f0dc;opacity:.85;
+      padding:2px 6px;border:1px solid #d7f0dc55;background:#d7f0dc15;border-radius:6px}
+
+    .card-body{padding:18px 20px 24px}
+    .hint{color:#d5e7da;font-size:13px;margin:0 0 12px 2px}
+
+    .cabinet-wrap{width:min(100%, 980px);margin:0 auto;border-radius:12px;border:1px solid #ffffff1a;box-shadow:0 8px 24px rgba(0,0,0,.35);overflow:hidden;background:#0b1626}
+    .cabinet{display:block;max-width:100%;height:auto}
+
+    #tooltip{position:absolute;display:none;z-index:60;background:#0f1b2f;color:#e8f3ff;border:1px solid #cfe4ff33;border-radius:12px;
+      padding:10px;width:320px;pointer-events:none;box-shadow:0 12px 32px rgba(0,0,0,.5);text-align:left}
+    #tooltip strong{font-size:13px}
+    #tooltip img{display:block;margin-top:8px;width:100%;height:auto;border-radius:10px;border:1px solid #ffffff1a;background:#00000050}
+
+    .footer{max-width:1100px;margin:18px auto 48px;color:var(--muted);font-size:12px;padding:0 16px;text-align:center}
+
+    @media (max-width:640px){
+      .title{font-size:18px}
+      .search input{width:220px}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="top-bar">
+      <div class="top-inner">
+        <a class="brand" href="#">
+          <img class="logo" src="../parcsafe-logo.png" alt="Parcsafe" />
+          <span>Parcsafe — A</span>
+        </a>
+
+        <a class="back-button" href="../index.html" title="Back to main">
+          <img src="../back_arrow.png" alt="" style="height:20px;width:auto;filter:brightness(1.2)" />
+          Back to main
+        </a>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <div class="card-header">
+          <div class="title">
+            <span class="dot" aria-hidden="true"></span>
+            <span>Interactive Cabinet — A</span>
+          </div>
+
+          <div class="actions">
+            <div class="search">
+              <input id="searchBox" type="text" placeholder="Introdueix codi (p. ex. A3_2)" />
+              <span class="kbd">Enter</span>
+            </div>
+            <button class="button" onclick="goToDrawer()">🔎 Search</button>
+            <button class="button" id="btnRefreshThumbs" title="Force refresh of drawer thumbnails">♻️ Refresh</button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <p class="hint">Clica un calaix per obrir la fitxa</p>
+
+          <div class="cabinet-wrap">
+            <img id="cabinetImg" class="cabinet" src="A.png" alt="Cabinet A" usemap="#image-map">
+          </div>
+
+          <map name="image-map">
+            <!-- A1_* -->
+            <area alt="A1_0" title="A1_0" href="fitxes/A1_0.html" coords="2053,810,1634,631" shape="rect" onmouseover="showTooltip(event,'A1_0')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A1_1" title="A1_1" href="fitxes/A1_1.html" coords="1636,469,2057,602" shape="rect" onmouseover="showTooltip(event,'A1_1')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A1_2" title="A1_2" href="fitxes/A1_2.html" coords="1638,317,2057,444" shape="rect" onmouseover="showTooltip(event,'A1_2')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A1_3" title="A1_3" href="fitxes/A1_3.html" coords="1638,162,2063,287" shape="rect" onmouseover="showTooltip(event,'A1_3')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A1_4" title="A1_4" href="fitxes/A1_4.html" coords="1632,0,2057,133" shape="rect" onmouseover="showTooltip(event,'A1_4')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+            <!-- A2_* -->
+            <area alt="A2_0" title="A2_0" href="fitxes/A2_0.html" coords="1239,624,1612,808" shape="rect" onmouseover="showTooltip(event,'A2_0')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A2_1" title="A2_1" href="fitxes/A2_1.html" coords="1237,471,1605,593" shape="rect" onmouseover="showTooltip(event,'A2_1')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A2_2" title="A2_2" href="fitxes/A2_2.html" coords="1239,315,1608,447" shape="rect" onmouseover="showTooltip(event,'A2_2')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A2_3" title="A2_3" href="fitxes/A2_3.html" coords="1237,158,1612,287" shape="rect" onmouseover="showTooltip(event,'A2_3')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A2_4" title="A2_4" href="fitxes/A2_4.html" coords="1237,6,1614,129" shape="rect" onmouseover="showTooltip(event,'A2_4')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+            <!-- A3_* -->
+            <area alt="A3_0" title="A3_0" href="fitxes/A3_0.html" coords="830,630,1211,810" shape="rect" onmouseover="showTooltip(event,'A3_0')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A3_1" title="A3_1" href="fitxes/A3_1.html" coords="838,471,1211,598" shape="rect" onmouseover="showTooltip(event,'A3_1')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A3_2" title="A3_2" href="fitxes/A3_2.html" coords="838,318,1202,444" shape="rect" onmouseover="showTooltip(event,'A3_2')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A3_3" title="A3_3" href="fitxes/A3_3.html" coords="841,171,1209,291" shape="rect" onmouseover="showTooltip(event,'A3_3')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A3_4" title="A3_4" href="fitxes/A3_4.html" coords="832,6,1207,134" shape="rect" onmouseover="showTooltip(event,'A3_4')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+            <!-- A4_* -->
+            <area alt="A4_0" title="A4_0" href="fitxes/A4_0.html" coords="439,628,810,810" shape="rect" onmouseover="showTooltip(event,'A4_0')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A4_1" title="A4_1" href="fitxes/A4_1.html" coords="440,469,812,600" shape="rect" onmouseover="showTooltip(event,'A4_1')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A4_2" title="A4_2" href="fitxes/A4_2.html" coords="437,313,808,444" shape="rect" onmouseover="showTooltip(event,'A4_2')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A4_3" title="A4_3" href="fitxes/A4_3.html" coords="440,171,806,287" shape="rect" onmouseover="showTooltip(event,'A4_3')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A4_4" title="A4_4" href="fitxes/A4_4.html" coords="439,4,808,136" shape="rect" onmouseover="showTooltip(event,'A4_4')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+            <!-- A5_* -->
+            <area alt="A5_0" title="A5_0" href="fitxes/A5_0.html" coords="29,315,413,808" shape="rect" onmouseover="showTooltip(event,'A5_0')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A5_1" title="A5_1" href="fitxes/A5_1.html" coords="25,164,415,291" shape="rect" onmouseover="showTooltip(event,'A5_1')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="A5_2" title="A5_2" href="fitxes/A5_2.html" coords="23,2,415,140" shape="rect" onmouseover="showTooltip(event,'A5_2')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+          </map>
+        </div>
+      </section>
+
+      <div id="tooltip">
+        <strong id="tooltip-code">—</strong>
+        <img id="tooltip-img" src="" alt="">
+      </div>
+    </main>
+
+    <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e6f3d;color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;display:none;z-index:1000">
+      Refreshed
+    </div>
+
+    <footer class="footer">
+      © Parcsafe · Interactive cabinet map · A
+    </footer>
+  </div>
+
+  <script>
+    // ===== Cache-busting helpers (igual que C3) =====
+    function getImgVersion(code){
+      const k = `imgVer_${code}`;
+      const v = localStorage.getItem(k);
+      if (v && /^\d+$/.test(v)) return v;
+      return String(Date.now() % 1e7);
+    }
+    function getThumbSeed(){
+      let s = sessionStorage.getItem('thumbSeed');
+      if (!s) { s = String(Date.now() % 1e7); sessionStorage.setItem('thumbSeed', s); }
+      return s;
+    }
+    function bumpThumbSeed(){
+      const s = String((parseInt(getThumbSeed(),10)||0) + 1);
+      sessionStorage.setItem('thumbSeed', s);
+      return s;
+    }
+    function buildThumbCandidates(code){
+      const v = getImgVersion(code);
+      const s = getThumbSeed();
+      const qs = `?v=${encodeURIComponent(v)}&s=${encodeURIComponent(s)}`;
+      return [
+        `img/${code}.jpg${qs}`,
+        `images/${code}.jpg${qs}`,
+        `fitxes/img/${code}.jpg${qs}`,
+        `fitxes/images/${code}.jpg${qs}`,
+        `../img/${code}.jpg${qs}`,
+        `../images/${code}.jpg${qs}`
+      ];
+    }
+    function setImgWithFallback(imgEl, candidates){
+      let i = 0;
+      const tryNext = () => {
+        if (i >= candidates.length) return;
+        imgEl.onerror = () => { i++; tryNext(); };
+        imgEl.src = candidates[i];
+      };
+      tryNext();
+    }
+
+    // ===== Search A_* =====
+    function goToDrawer(){
+      const code = document.getElementById("searchBox").value.trim();
+      if (!code) return;
+      if (code.startsWith("A")) {
+        window.location.href = "fitxes/" + code + ".html";
+      } else {
+        alert("Introdueix un codi vàlid (p. ex. A3_2).");
+      }
+    }
+    document.getElementById("searchBox").addEventListener("keypress", e => { if (e.key === "Enter") goToDrawer(); });
+
+    // ===== Tooltip =====
+    const tt = document.getElementById("tooltip");
+    const ttCode = document.getElementById("tooltip-code");
+    const ttImg  = document.getElementById("tooltip-img");
+    let rafId = null, targetX = 0, targetY = 0, curX = 0, curY = 0;
+
+    function showTooltip(evt, code){
+      ttCode.textContent = code;
+      setImgWithFallback(ttImg, buildThumbCandidates(code));
+      targetX = evt.pageX + 16; targetY = evt.pageY + 16;
+      tt.style.display = "block";
+      animateTooltip();
+    }
+    function moveTooltip(evt){ targetX = evt.pageX + 16; targetY = evt.pageY + 16; }
+    function hideTooltip(){ tt.style.display = "none"; cancelAnimationFrame(rafId); rafId = null; }
+    function animateTooltip(){
+      curX += (targetX - curX) * 0.2; curY += (targetY - curY) * 0.2;
+      tt.style.left = curX + "px"; tt.style.top = curY + "px";
+      rafId = requestAnimationFrame(animateTooltip);
+    }
+
+    // ===== Responsive image-map =====
+    function setupResponsiveMap(imgId, mapName){
+      const img = document.getElementById(imgId);
+      const map = document.querySelector(`map[name="${mapName}"]`);
+      const areas = Array.from(map.querySelectorAll('area'));
+      areas.forEach(a => { a.dataset.coordsOriginal = a.coords; });
+      function rescale(){
+        const natW = img.naturalWidth, natH = img.naturalHeight;
+        if (!natW || !natH) return;
+        const curW = img.clientWidth, curH = img.clientHeight;
+        const sx = curW / natW, sy = curH / natH;
+        areas.forEach(a => {
+          const orig = a.dataset.coordsOriginal.split(',').map(Number);
+          const scaled = orig.map((v,i)=> (i%2===0 ? Math.round(v*sx) : Math.round(v*sy)));
+          a.coords = scaled.join(',');
+        });
+      }
+      if (img.complete) rescale();
+      img.addEventListener('load', rescale);
+      window.addEventListener('resize', rescale);
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      setupResponsiveMap('cabinetImg','image-map');
+      document.getElementById('btnRefreshThumbs')?.addEventListener('click', ()=>{
+        bumpThumbSeed();
+        const toast = document.getElementById('toast');
+        if (toast){ toast.textContent = '🔄 Thumbnails refreshed'; toast.style.display = 'block'; setTimeout(()=> toast.style.display='none', 1800); }
+      });
+    });
+  </script>
+</body>
+</html>
 
