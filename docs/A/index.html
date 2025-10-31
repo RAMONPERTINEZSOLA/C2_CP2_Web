@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Interactive Cabinet MAP A</title>
+  <title>Interactive Cabinet MAP — A</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -86,7 +86,7 @@
       <div class="top-inner">
         <a class="brand" href="#">
           <img class="logo" src="../parcsafe-logo.png" alt="Parcsafe" />
-          <span>Parcsafe — A</span>
+          <span>Parcsafe — Rack A</span>
         </a>
 
         <a class="back-button" href="../index.html" title="Back to main">
@@ -106,7 +106,7 @@
 
           <div class="actions">
             <div class="search">
-              <input id="searchBox" type="text" placeholder="Introdueix codi (p. ex. A3_2)" />
+              <input id="searchBox" type="text" placeholder="Enter drawer code (e.g. A3_2)" />
               <span class="kbd">Enter</span>
             </div>
             <button class="button" onclick="goToDrawer()">🔎 Search</button>
@@ -115,7 +115,7 @@
         </div>
 
         <div class="card-body">
-          <p class="hint">Clica un calaix per obrir la fitxa</p>
+          <p class="hint">Click a drawer to open its product page.</p>
 
           <div class="cabinet-wrap">
             <img id="cabinetImg" class="cabinet" src="A.png" alt="Cabinet A" usemap="#image-map">
@@ -169,12 +169,12 @@
     </div>
 
     <footer class="footer">
-      © Parcsafe · Interactive cabinet map · A
+      © Parcsafe · Interactive cabinet map · Rack A
     </footer>
   </div>
 
   <script>
-    // ===== Cache-busting helpers (igual que C3) =====
+    // ===== Cache-busting helpers =====
     function getImgVersion(code){
       const k = `imgVer_${code}`;
       const v = localStorage.getItem(k);
@@ -214,14 +214,14 @@
       tryNext();
     }
 
-    // ===== Search A_* =====
+    // ===== Search (A_*) =====
     function goToDrawer(){
       const code = document.getElementById("searchBox").value.trim();
       if (!code) return;
-      if (code.startsWith("A")) {
+      if (/^A\d+_\d+/.test(code) || code.startsWith("A")) {
         window.location.href = "fitxes/" + code + ".html";
       } else {
-        alert("Introdueix un codi vàlid (p. ex. A3_2).");
+        alert("Please enter a valid code (e.g. A3_2).");
       }
     }
     document.getElementById("searchBox").addEventListener("keypress", e => { if (e.key === "Enter") goToDrawer(); });
@@ -280,4 +280,3 @@
   </script>
 </body>
 </html>
-
