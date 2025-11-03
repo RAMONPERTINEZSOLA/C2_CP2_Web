@@ -6,22 +6,26 @@
 <title>Parcsafe — 8×2 QR Labels</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    /* Sheet: 8 rows × 2 cols (16 labels) */
-    --rows:8; --cols:2;
+:root{
+  --rows:8; --cols:2;
 
-    /* Calibrate to your sheet (mm). Now: labels TOUCH each other */
-    --page-mt:10mm; --page-mr:8mm; --page-mb:10mm; --page-ml:8mm;
-    --gap-x:0mm; --gap-y:0mm;           /* ← no gutter between labels */
-    --label-pad:4mm;
+  /* page margins (mm) */
+  --page-mt:10mm; --page-mr:8mm; --page-mb:10mm; --page-ml:8mm;
 
-    /* Sizes inside each label */
-    --code-font:6.5mm;                  /* bigger code text */
-    --qr-size:32mm;                      /* bigger QR square */
+  /* labels touch each other */
+  --gap-x:0mm; --gap-y:0mm;
 
-    --ink:#0f1b2f; --muted:#667085; --bg:#f5f7f8; --card:#fff;
-    --green:#6dbd45; --line:#e6e8eb;
-  }
+  --label-pad:4mm;
+  --code-font:6.5mm;
+  --qr-size:32mm;
+
+  /* NEW: tiny safety to avoid overflow rounding */
+  --fudge:0.8mm;
+
+  --ink:#0f1b2f; --muted:#667085; --bg:#f5f7f8; --card:#fff;
+  --green:#6dbd45; --line:#e6e8eb;
+}
+
   *{box-sizing:border-box}
   body{margin:0;font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
 
@@ -45,34 +49,42 @@
   .panel .row{display:flex;gap:8px;margin-top:12px}
 
   /* A4 preview sheet */
-  .sheet{
-    width:210mm;height:297mm;background:#fff;margin:0 auto;
-    padding:var(--page-mt) var(--page-mr) var(--page-mb) var(--page-ml);
-    box-shadow:0 8px 24px rgba(0,0,0,.12)
-  }
-  .grid{
-    display:grid;width:100%;height:100%;
-    grid-template-columns:repeat(var(--cols),1fr);
-    grid-template-rows:repeat(var(--rows),1fr);
-    gap:var(--gap-y) var(--gap-x); /* 0mm → touching */
-  }
-  .label{
-    border:0.25mm dashed #d9dde3;   /* guide (not printed) */
-    border-radius:0;                 /* no rounding so they touch clean */
-    padding:var(--label-pad);
-    display:flex;align-items:center;justify-content:space-between;gap:6mm;
-  }
+.sheet{
+  width:210mm; height:297mm; background:#fff; margin:0 auto;
+  padding:var(--page-mt) var(--page-mr) var(--page-mb) var(--page-ml);
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+  overflow:hidden;              /* NEW: no overflow outside A4 */
+}
+
+.grid{
+  display:grid; width:calc(100% - var(--fudge)); /* NEW: tiny shrink */
+  height:calc(100% - var(--fudge));              /* NEW: tiny shrink */
+  grid-template-columns:repeat(var(--cols),1fr);
+  grid-template-rows:repeat(var(--rows),1fr);
+  gap:var(--gap-y) var(--gap-x); /* 0mm → touching */
+}
+
+.label{
+  /* switched from border→outline so it doesn't affect sizing */
+  outline:0.25mm dashed #d9dde3;  /* NEW */
+  border:none;                     /* NEW */
+  border-radius:0;
+  padding:var(--label-pad);
+  display:flex; align-items:center; justify-content:space-between; gap:6mm;
+}
+
   .label .codeBig{font-weight:800;font-size:var(--code-font);letter-spacing:.25mm;word-break:break-word}
   .label .qrWrap{width:var(--qr-size);height:var(--qr-size);display:flex;align-items:center;justify-content:center}
   .label canvas{width:100%;height:100%}
 
-  @media print{
-    @page{size:A4;margin:0}
-    header,.panel{display:none !important}
-    body{background:#fff}
-    .sheet{box-shadow:none;margin:0}
-    .label{border:none} /* guides not printed */
-  }
+ @media print{
+  @page{ size:A4; margin:0 }
+  header, .panel{ display:none !important }
+  body{ background:#fff }
+  .sheet{ box-shadow:none; margin:0 }
+  .label{ outline:none }    /* NEW: no guides on paper */
+}
+
 </style>
 </head>
 <body>
