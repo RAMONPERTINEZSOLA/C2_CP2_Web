@@ -4,67 +4,67 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Parcsafe — Etiquetes 8×2 amb QR</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
 
 <style>
   :root{
-    /* Configuració base */
+    /* Full adhesiu 8×2 */
     --rows:8; --cols:2;
-    --page-margin-top:10mm;
-    --page-margin-bottom:10mm;
-    --page-margin-left:8mm;
-    --page-margin-right:8mm;
+
+    /* Calibratge mm → ajusta segons el teu paper */
+    --page-mt:10mm; --page-mr:8mm; --page-mb:10mm; --page-ml:8mm;
     --gap-x:6mm; --gap-y:6mm;
     --label-pad:3mm;
 
     --ink:#0f1b2f; --muted:#667085; --bg:#f5f7f8; --card:#fff;
-    --green:#6dbd45; --green2:#5aa83a;
+    --green:#6dbd45; --green2:#5aa83a; --line:#e6e8eb;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--ink)}
+  body{margin:0;font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
 
-  header{
-    background:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;
-    box-shadow:0 2px 8px rgba(0,0,0,.06)
-  }
+  header{background:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
   header h1{margin:0;font-size:18px}
-  .btn{
-    background:linear-gradient(#7ad354,#5aa83a);border:none;color:#fff;font-weight:600;
-    padding:10px 16px;border-radius:10px;cursor:pointer;transition:.2s
-  }
-  .btn:hover{background:linear-gradient(#8ee45d,#69c04b)}
+  .btn{background:linear-gradient(#7ad354,#5aa83a);border:none;color:#0b1f0b;font-weight:700;padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:0 6px 14px rgba(109,189,69,.24)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
 
-  main{max-width:1100px;margin:20px auto;padding:0 20px;display:grid;grid-template-columns:320px 1fr;gap:20px}
+  main{max-width:1200px;margin:20px auto;padding:0 20px;display:grid;grid-template-columns:340px 1fr;gap:20px}
 
-  .panel{background:#fff;border:1px solid #e0e3e8;border-radius:14px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
-  .panel h2{margin:0 0 12px;font-size:16px}
-  .panel input,.panel textarea{width:100%;padding:8px 10px;border:1px solid #d0d5dd;border-radius:8px;margin-bottom:10px}
+  /* Panell esquerre: selector de productes */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+  .panel h2{margin:0 0 10px;font-size:16px}
+  .search{width:100%;padding:10px 12px;border:1px solid #d0d5dd;border-radius:10px;margin-bottom:10px}
+  .list{max-height:60vh;overflow:auto;border:1px solid #eef0f3;border-radius:12px}
+  .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f2f5;cursor:pointer;background:#fff}
+  .item:hover{background:#f7fbf5}
+  .code{font-weight:700}
+  .name{color:var(--muted);font-size:12px}
+  .panel .row{display:flex;gap:8px;margin-top:12px}
 
+  /* Full previsualització A4 */
   .sheet{
     width:210mm;height:297mm;background:#fff;margin:0 auto;
-    padding:var(--page-margin-top) var(--page-margin-right) var(--page-margin-bottom) var(--page-margin-left);
-    box-shadow:0 6px 20px rgba(0,0,0,.1)
+    padding:var(--page-mt) var(--page-mr) var(--page-mb) var(--page-ml);
+    box-shadow:0 8px 24px rgba(0,0,0,.12)
   }
   .grid{
-    display:grid;
+    display:grid;width:100%;height:100%;
     grid-template-columns:repeat(var(--cols),1fr);
     grid-template-rows:repeat(var(--rows),1fr);
     gap:var(--gap-y) var(--gap-x);
-    width:100%;height:100%;
   }
   .label{
-    border:0.25mm dashed #ddd;border-radius:6px;
-    padding:var(--label-pad);
-    display:flex;align-items:center;justify-content:space-between;
+    border:0.25mm dashed #d9dde3;border-radius:7px;padding:var(--label-pad);
+    display:flex;align-items:center;justify-content:space-between;gap:6mm;
   }
-  .code{
-    font-weight:700;font-size:5mm;line-height:1.1;margin-right:5mm;word-break:break-word;
-  }
-  .qr{width:22mm;height:22mm}
+  .label .codeBig{font-weight:800;font-size:5mm;letter-spacing:.2mm;word-break:break-word}
+  .label .qrWrap{width:22mm;height:22mm;display:flex;align-items:center;justify-content:center}
+  .label canvas{width:100%;height:100%}
+
+  /* Impressió */
   @media print{
     @page{size:A4;margin:0}
-    header,.panel{display:none!important}
+    header,.panel{display:none !important}
     body{background:#fff}
     .sheet{box-shadow:none;margin:0}
     .label{border:none}
@@ -75,23 +75,25 @@
 
 <header>
   <h1>Parcsafe · Etiquetes 8×2 amb QR</h1>
-  <div>
-    <button class="btn" id="fill16">Repetir fins a 16</button>
+  <div style="display:flex;gap:8px">
+    <button class="btn ghost" id="undoBtn">Desfer últim</button>
+    <button class="btn ghost" id="clearBtn">Neteja</button>
     <button class="btn" id="printBtn">Descarrega PDF</button>
   </div>
 </header>
 
 <main>
+  <!-- Selector de productes (des de stock.csv) -->
   <section class="panel">
-    <h2>1) Selecció de calaixos</h2>
-    <textarea id="codes" placeholder="C2_CP2_0_I, C2_CP2_1_I, ..."></textarea>
-    <button class="btn" id="apply">Aplica a la graella</button>
-    <button class="btn" style="background:#ccc;color:#000" id="clear">Neteja</button>
-
-    <h2 style="margin-top:20px">2) Plantilla QR</h2>
-    <input type="text" id="qrTpl" value="https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP2/fitxes/{CODE}.html">
+    <h2>1) Afegeix productes a la fulla</h2>
+    <input class="search" id="search" placeholder="Cerca per codi o nom…" />
+    <div class="list" id="list"></div>
+    <div class="row">
+      <small class="name">Clica un producte per afegir-lo al següent adhesiu buit (ordre 1→2→3→4… per files).</small>
+    </div>
   </section>
 
+  <!-- Full d’adhesius -->
   <section>
     <div class="sheet">
       <div id="grid" class="grid"></div>
@@ -99,51 +101,195 @@
   </section>
 </main>
 
-<script>
-/* QR simple */
-!function(){function e(e){this.data=e}function t(e){this.data=e,this.make()}t.prototype.make=function(){var t=document.createElement("canvas"),n=t.getContext("2d"),r=256;n.fillStyle="#fff",n.fillRect(0,0,r,r);var o=r/29;for(var i=0;i<29;i++)for(var a=0;a<29;a++)Math.random()<.35&&(n.fillStyle="#000",n.fillRect(a*o,i*o,o,o));this.canvas=t};window.SimpleQR=function(e,n){t.prototype.make();e.innerHTML="",e.appendChild(t.prototype.canvas)}}();
+<!-- jsPDF + Nayuki QR (mateix que als productes) -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script type="module">
+  import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
+  const lib = (m && m.QrCode) ? m : ((m && m.default && m.default.QrCode) ? m.default : m);
+  window.qrcodegen = lib;
+</script>
 
-const grid=document.getElementById('grid');
-const codesArea=document.getElementById('codes');
-const qrTpl=document.getElementById('qrTpl');
-const fill16=document.getElementById('fill16');
-const apply=document.getElementById('apply');
-const clear=document.getElementById('clear');
-const printBtn=document.getElementById('printBtn');
+<script>
+/* ====== utilitats ====== */
+const grid = document.getElementById('grid');
+const list = document.getElementById('list');
+const search = document.getElementById('search');
+const undoBtn = document.getElementById('undoBtn');
+const clearBtn = document.getElementById('clearBtn');
+const printBtn = document.getElementById('printBtn');
+
+const LOGO_CANDIDATES = ["./parcsafe-logo.png","../parcsafe-logo.png","../../parcsafe-logo.png"];
+let logoImg = null;
 
 function ensureGrid(){
   grid.innerHTML='';
   for(let i=0;i<16;i++){
-    const div=document.createElement('div');
-    div.className='label';
-    div.innerHTML=`<div class="code" data-code></div><div class="qr" data-qr></div>`;
-    grid.appendChild(div);
+    const cell=document.createElement('div');
+    cell.className='label';
+    cell.innerHTML = `
+      <div class="codeBig" data-code></div>
+      <div class="qrWrap"><canvas data-qr width="440" height="440"></canvas></div>
+    `;
+    grid.appendChild(cell);
   }
 }
-function parseCodes(raw){return(raw||'').split(/[\s,;]+/g).map(s=>s.trim()).filter(Boolean)}
-function payloadFor(code){return(qrTpl.value||'').replaceAll('{CODE}',code)}
-function render(codes){
-  ensureGrid();
-  const cells=[...grid.querySelectorAll('.label')];
-  for(let i=0;i<Math.min(codes.length,cells.length);i++){
-    const cell=cells[i],code=codes[i];
-    cell.querySelector('[data-code]').textContent=code;
-    const qrEl=cell.querySelector('[data-qr]');
-    qrEl.innerHTML='';
-    new QRCode(qrEl,{text:payloadFor(code),width:qrEl.clientWidth,height:qrEl.clientHeight});
-  }
-}
-apply.onclick=()=>render(parseCodes(codesArea.value));
-clear.onclick=()=>{codesArea.value='';ensureGrid()};
-fill16.onclick=()=>{
-  let c=parseCodes(codesArea.value);if(c.length===0)return;
-  while(c.length<16)c.push(c[c.length-1]);
-  codesArea.value=c.join('\n');render(c);
-};
-printBtn.onclick=()=>window.print();
-
 ensureGrid();
+
+function firstEmptyIndex(){
+  const cells=[...grid.querySelectorAll('[data-code]')];
+  return cells.findIndex(c => !c.textContent.trim());
+}
+
+function generateProductUrl(drawerCode){
+  // Ex.: C2_CP2_11_I  →  /C2/CP2/fitxes/C2_CP2_11_I.html
+  const parts = drawerCode.split('_');
+  const rack=parts[0]||''; const section=parts[1]||'';
+  const base = 'https://ramonpertinezsola.github.io/C2_CP2_Web';
+  return `${base}/${rack}/${section}/fitxes/${drawerCode}.html`;
+}
+
+function loadLogo(){
+  return new Promise(resolve=>{
+    let i=0;
+    const tryNext=()=>{
+      if(i>=LOGO_CANDIDATES.length) return resolve(null);
+      const img=new Image(); img.crossOrigin='anonymous';
+      img.onload=()=>resolve(img);
+      img.onerror=()=>{i++; tryNext();};
+      img.src=LOGO_CANDIDATES[i];
+    };
+    tryNext();
+  });
+}
+
+async function drawQR(canvas, url){
+  // Mateix estil que a les fitxes
+  while(!(window.qrcodegen && window.qrcodegen.QrCode)) {
+    await new Promise(r=>setTimeout(r,20));
+  }
+  const size = canvas.width; // 440
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,size,size);
+
+  const ecc = qrcodegen.QrCode.Ecc.HIGH || qrcodegen.QrCode.Ecc.H;
+  const qr = qrcodegen.QrCode.encodeText(url, ecc);
+  const modules = qr.size, border = 2;
+  const ppm = Math.floor(size / (modules + border*2));
+  const qrPix = ppm * (modules + border*2);
+  const offset = Math.floor((size - qrPix)/2);
+
+  ctx.fillStyle = '#000';
+  for(let y=0;y<modules;y++){
+    for(let x=0;x<modules;x++){
+      if(qr.getModule(x,y)){
+        const px = offset + (x+border)*ppm;
+        const py = offset + (y+border)*ppm;
+        ctx.fillRect(px,py,ppm,ppm);
+      }
+    }
+  }
+
+  if(logoImg === null) logoImg = await loadLogo();
+  if(logoImg){
+    const box = Math.floor(size * 0.22);
+    const cx = size/2, cy = size/2;
+    const r = Math.floor(box/2) + 10;
+    ctx.save();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); ctx.restore();
+
+    const pad = 14, w = box - pad*2, h = box - pad*2;
+    const aspect = logoImg.width / logoImg.height;
+    let dw = w, dh = w/aspect; if(dh>h){ dh=h; dw=h*aspect; }
+    ctx.drawImage(logoImg, cx-dw/2, cy-dh/2, dw, dh);
+  }
+}
+
+async function placeLabel(drawerCode){
+  const idx = firstEmptyIndex();
+  if(idx === -1) return; // ple
+  const cell = grid.children[idx];
+  cell.querySelector('[data-code]').textContent = drawerCode;
+  const url = generateProductUrl(drawerCode);
+  await drawQR(cell.querySelector('[data-qr]'), url);
+  placedStack.push(idx); // per poder desfer
+}
+
+function clearSheet(){ ensureGrid(); placedStack.length=0; }
+function undoLast(){
+  const idx = placedStack.pop();
+  if(idx===undefined) return;
+  const cell = grid.children[idx];
+  cell.querySelector('[data-code]').textContent='';
+  const ctx = cell.querySelector('[data-qr]').getContext('2d');
+  ctx.clearRect(0,0,440,440);
+}
+
+printBtn.onclick = ()=> window.print();
+clearBtn.onclick = clearSheet;
+undoBtn.onclick = undoLast;
+
+const placedStack = []; // historial d’índexs omplerts
+
+/* ====== carregar stock.csv i muntar la llista ====== */
+async function loadCSV(){
+  const candidates = [
+    "./stock.csv","../stock.csv","../../stock.csv",
+    "/docs/stock.csv", location.origin + "/docs/stock.csv"
+  ];
+  for(const url of candidates){
+    try{
+      const res = await fetch(url + "?t=" + Date.now());
+      if(res.ok){
+        const txt = await res.text();
+        if(txt.includes('drawerCode')) return txt;
+      }
+    }catch{}
+  }
+  throw new Error("No s'ha pogut carregar stock.csv");
+}
+
+function parseCSV(txt){
+  const rows = txt.trim().split(/\r?\n/);
+  const head = rows[0].split(',').map(s=>s.trim());
+  return rows.slice(1).map(line=>{
+    const cols = line.split(',');
+    const obj={}; head.forEach((h,i)=>obj[h]= (cols[i]||'').trim());
+    return obj;
+  }).filter(r=>r.drawerCode);
+}
+
+function renderList(items){
+  list.innerHTML='';
+  for(const r of items){
+    const div=document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <div>
+        <div class="code">${r.drawerCode}</div>
+        <div class="name">${r.productName||''}</div>
+      </div>
+      <button class="btn">Afegir</button>
+    `;
+    div.querySelector('button').onclick = ()=> placeLabel(r.drawerCode);
+    list.appendChild(div);
+  }
+}
+
+let allItems=[];
+loadCSV()
+ .then(txt=>{ allItems = parseCSV(txt); renderList(allItems); })
+ .catch(()=>{ list.innerHTML = '<div class="item"><div>Error carregant stock.csv</div></div>'; });
+
+search.addEventListener('input', ()=>{
+  const q = search.value.trim().toLowerCase();
+  if(!q) return renderList(allItems);
+  const f = allItems.filter(r =>
+    (r.drawerCode||'').toLowerCase().includes(q) ||
+    (r.productName||'').toLowerCase().includes(q)
+  );
+  renderList(f);
+});
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </body>
 </html>
