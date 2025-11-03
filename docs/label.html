@@ -1,23 +1,26 @@
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Parcsafe — Etiquetes 8×2 amb QR</title>
+<title>Parcsafe — 8×2 QR Labels</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
-
 <style>
   :root{
-    /* Full adhesiu 8×2 */
+    /* Sheet: 8 rows × 2 cols (16 labels) */
     --rows:8; --cols:2;
 
-    /* Calibratge mm → ajusta segons el teu paper */
+    /* Calibrate to your sheet (mm). Now: labels TOUCH each other */
     --page-mt:10mm; --page-mr:8mm; --page-mb:10mm; --page-ml:8mm;
-    --gap-x:6mm; --gap-y:6mm;
-    --label-pad:3mm;
+    --gap-x:0mm; --gap-y:0mm;           /* ← no gutter between labels */
+    --label-pad:4mm;
+
+    /* Sizes inside each label */
+    --code-font:6.5mm;                  /* bigger code text */
+    --qr-size:32mm;                      /* bigger QR square */
 
     --ink:#0f1b2f; --muted:#667085; --bg:#f5f7f8; --card:#fff;
-    --green:#6dbd45; --green2:#5aa83a; --line:#e6e8eb;
+    --green:#6dbd45; --line:#e6e8eb;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
@@ -30,18 +33,18 @@
 
   main{max-width:1200px;margin:20px auto;padding:0 20px;display:grid;grid-template-columns:340px 1fr;gap:20px}
 
-  /* Panell esquerre: selector de productes */
+  /* Left panel */
   .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
   .panel h2{margin:0 0 10px;font-size:16px}
   .search{width:100%;padding:10px 12px;border:1px solid #d0d5dd;border-radius:10px;margin-bottom:10px}
-  .list{max-height:60vh;overflow:auto;border:1px solid #eef0f3;border-radius:12px}
-  .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f2f5;cursor:pointer;background:#fff}
+  .list{max-height:60vh;overflow:auto;border:1px solid #eef0f3;border-radius:12px;background:#fff}
+  .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f2f5;cursor:pointer}
   .item:hover{background:#f7fbf5}
   .code{font-weight:700}
   .name{color:var(--muted);font-size:12px}
   .panel .row{display:flex;gap:8px;margin-top:12px}
 
-  /* Full previsualització A4 */
+  /* A4 preview sheet */
   .sheet{
     width:210mm;height:297mm;background:#fff;margin:0 auto;
     padding:var(--page-mt) var(--page-mr) var(--page-mb) var(--page-ml);
@@ -51,49 +54,50 @@
     display:grid;width:100%;height:100%;
     grid-template-columns:repeat(var(--cols),1fr);
     grid-template-rows:repeat(var(--rows),1fr);
-    gap:var(--gap-y) var(--gap-x);
+    gap:var(--gap-y) var(--gap-x); /* 0mm → touching */
   }
   .label{
-    border:0.25mm dashed #d9dde3;border-radius:7px;padding:var(--label-pad);
+    border:0.25mm dashed #d9dde3;   /* guide (not printed) */
+    border-radius:0;                 /* no rounding so they touch clean */
+    padding:var(--label-pad);
     display:flex;align-items:center;justify-content:space-between;gap:6mm;
   }
-  .label .codeBig{font-weight:800;font-size:5mm;letter-spacing:.2mm;word-break:break-word}
-  .label .qrWrap{width:22mm;height:22mm;display:flex;align-items:center;justify-content:center}
+  .label .codeBig{font-weight:800;font-size:var(--code-font);letter-spacing:.25mm;word-break:break-word}
+  .label .qrWrap{width:var(--qr-size);height:var(--qr-size);display:flex;align-items:center;justify-content:center}
   .label canvas{width:100%;height:100%}
 
-  /* Impressió */
   @media print{
     @page{size:A4;margin:0}
     header,.panel{display:none !important}
     body{background:#fff}
     .sheet{box-shadow:none;margin:0}
-    .label{border:none}
+    .label{border:none} /* guides not printed */
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Parcsafe · Etiquetes 8×2 amb QR</h1>
+  <h1>Parcsafe · 8×2 QR Labels</h1>
   <div style="display:flex;gap:8px">
-    <button class="btn ghost" id="undoBtn">Desfer últim</button>
-    <button class="btn ghost" id="clearBtn">Neteja</button>
-    <button class="btn" id="printBtn">Descarrega PDF</button>
+    <button class="btn ghost" id="undoBtn">Undo last</button>
+    <button class="btn ghost" id="clearBtn">Clear all</button>
+    <button class="btn" id="printBtn">Download PDF</button>
   </div>
 </header>
 
 <main>
-  <!-- Selector de productes (des de stock.csv) -->
+  <!-- Product picker (from stock.csv) -->
   <section class="panel">
-    <h2>1) Afegeix productes a la fulla</h2>
-    <input class="search" id="search" placeholder="Cerca per codi o nom…" />
+    <h2>1) Add products to the sheet</h2>
+    <input class="search" id="search" placeholder="Search by drawer code or product name…" />
     <div class="list" id="list"></div>
     <div class="row">
-      <small class="name">Clica un producte per afegir-lo al següent adhesiu buit (ordre 1→2→3→4… per files).</small>
+      <small class="name">Click a product to place it in the next empty label (row-wise order).</small>
     </div>
   </section>
 
-  <!-- Full d’adhesius -->
+  <!-- Sheet -->
   <section>
     <div class="sheet">
       <div id="grid" class="grid"></div>
@@ -101,7 +105,7 @@
   </section>
 </main>
 
-<!-- jsPDF + Nayuki QR (mateix que als productes) -->
+<!-- jsPDF + Nayuki QR (same as product pages) -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script type="module">
   import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
@@ -110,7 +114,7 @@
 </script>
 
 <script>
-/* ====== utilitats ====== */
+/* ----- DOM refs ----- */
 const grid = document.getElementById('grid');
 const list = document.getElementById('list');
 const search = document.getElementById('search');
@@ -118,6 +122,7 @@ const undoBtn = document.getElementById('undoBtn');
 const clearBtn = document.getElementById('clearBtn');
 const printBtn = document.getElementById('printBtn');
 
+/* ----- Logo (same candidates as product pages) ----- */
 const LOGO_CANDIDATES = ["./parcsafe-logo.png","../parcsafe-logo.png","../../parcsafe-logo.png"];
 let logoImg = null;
 
@@ -128,7 +133,7 @@ function ensureGrid(){
     cell.className='label';
     cell.innerHTML = `
       <div class="codeBig" data-code></div>
-      <div class="qrWrap"><canvas data-qr width="440" height="440"></canvas></div>
+      <div class="qrWrap"><canvas data-qr width="640" height="640"></canvas></div>
     `;
     grid.appendChild(cell);
   }
@@ -141,7 +146,7 @@ function firstEmptyIndex(){
 }
 
 function generateProductUrl(drawerCode){
-  // Ex.: C2_CP2_11_I  →  /C2/CP2/fitxes/C2_CP2_11_I.html
+  // C2_CP2_11_I → /C2/CP2/fitxes/C2_CP2_11_I.html
   const parts = drawerCode.split('_');
   const rack=parts[0]||''; const section=parts[1]||'';
   const base = 'https://ramonpertinezsola.github.io/C2_CP2_Web';
@@ -163,11 +168,11 @@ function loadLogo(){
 }
 
 async function drawQR(canvas, url){
-  // Mateix estil que a les fitxes
+  // identical style to product QR
   while(!(window.qrcodegen && window.qrcodegen.QrCode)) {
     await new Promise(r=>setTimeout(r,20));
   }
-  const size = canvas.width; // 440
+  const size = canvas.width; // 640
   const ctx = canvas.getContext('2d');
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,size,size);
 
@@ -193,12 +198,12 @@ async function drawQR(canvas, url){
   if(logoImg){
     const box = Math.floor(size * 0.22);
     const cx = size/2, cy = size/2;
-    const r = Math.floor(box/2) + 10;
+    const r = Math.floor(box/2) + 12;
     ctx.save();
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); ctx.restore();
 
-    const pad = 14, w = box - pad*2, h = box - pad*2;
+    const pad = 16, w = box - pad*2, h = box - pad*2;
     const aspect = logoImg.width / logoImg.height;
     let dw = w, dh = w/aspect; if(dh>h){ dh=h; dw=h*aspect; }
     ctx.drawImage(logoImg, cx-dw/2, cy-dh/2, dw, dh);
@@ -207,12 +212,12 @@ async function drawQR(canvas, url){
 
 async function placeLabel(drawerCode){
   const idx = firstEmptyIndex();
-  if(idx === -1) return; // ple
+  if(idx === -1) return; // full
   const cell = grid.children[idx];
   cell.querySelector('[data-code]').textContent = drawerCode;
   const url = generateProductUrl(drawerCode);
   await drawQR(cell.querySelector('[data-qr]'), url);
-  placedStack.push(idx); // per poder desfer
+  placedStack.push(idx);
 }
 
 function clearSheet(){ ensureGrid(); placedStack.length=0; }
@@ -222,16 +227,17 @@ function undoLast(){
   const cell = grid.children[idx];
   cell.querySelector('[data-code]').textContent='';
   const ctx = cell.querySelector('[data-qr]').getContext('2d');
-  ctx.clearRect(0,0,440,440);
+  ctx.clearRect(0,0,640,640);
 }
 
+/* Actions */
 printBtn.onclick = ()=> window.print();
 clearBtn.onclick = clearSheet;
 undoBtn.onclick = undoLast;
 
-const placedStack = []; // historial d’índexs omplerts
+const placedStack = [];
 
-/* ====== carregar stock.csv i muntar la llista ====== */
+/* ----- Load stock.csv and build list ----- */
 async function loadCSV(){
   const candidates = [
     "./stock.csv","../stock.csv","../../stock.csv",
@@ -246,7 +252,7 @@ async function loadCSV(){
       }
     }catch{}
   }
-  throw new Error("No s'ha pogut carregar stock.csv");
+  throw new Error("Failed to load stock.csv");
 }
 
 function parseCSV(txt){
@@ -269,7 +275,7 @@ function renderList(items){
         <div class="code">${r.drawerCode}</div>
         <div class="name">${r.productName||''}</div>
       </div>
-      <button class="btn">Afegir</button>
+      <button class="btn">Add</button>
     `;
     div.querySelector('button').onclick = ()=> placeLabel(r.drawerCode);
     list.appendChild(div);
@@ -279,7 +285,7 @@ function renderList(items){
 let allItems=[];
 loadCSV()
  .then(txt=>{ allItems = parseCSV(txt); renderList(allItems); })
- .catch(()=>{ list.innerHTML = '<div class="item"><div>Error carregant stock.csv</div></div>'; });
+ .catch(()=>{ list.innerHTML = '<div class="item"><div>stock.csv not found</div></div>'; });
 
 search.addEventListener('input', ()=>{
   const q = search.value.trim().toLowerCase();
