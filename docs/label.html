@@ -3,277 +3,147 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Parcsafe — Etiquetes 4×4 amb QR</title>
+<title>Parcsafe — Etiquetes 8×2 amb QR</title>
 
-<!-- Tipografia -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    /* ── Paràmetres de calibratge per defecte (mm) ───────────────────── */
-    --page-margin-top: 8mm;
-    --page-margin-right: 8mm;
-    --page-margin-bottom: 8mm;
-    --page-margin-left: 8mm;
+    /* Configuració base */
+    --rows:8; --cols:2;
+    --page-margin-top:10mm;
+    --page-margin-bottom:10mm;
+    --page-margin-left:8mm;
+    --page-margin-right:8mm;
+    --gap-x:6mm; --gap-y:6mm;
+    --label-pad:3mm;
 
-    /* separació entre etiquetes (gutter) */
-    --gap-x: 4mm;
-    --gap-y: 4mm;
-
-    /* padding intern de cada etiqueta */
-    --label-pad: 3mm;
-
-    /* files/columnes de la fulla adhesiva */
-    --rows: 4;
-    --cols: 4;
-
-    /* colors UI */
-    --ink:#0f1b2f; --muted:#667085; --line:#e6e8eb;
-    --brand:#6dbd45; --brand-2:#5aa83a; --bg:#f4f6f8; --card:#fff;
+    --ink:#0f1b2f; --muted:#667085; --bg:#f5f7f8; --card:#fff;
+    --green:#6dbd45; --green2:#5aa83a;
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-    color:var(--ink); background:var(--bg);
-  }
+  body{margin:0;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--ink)}
 
-  header{background:#fff; padding:18px 20px; box-shadow:0 2px 6px rgba(0,0,0,.06)}
-  header .wrap{max-width:1100px; margin:0 auto; display:flex; gap:16px; align-items:center; justify-content:space-between}
-  header h1{font-size:18px; margin:0}
+  header{
+    background:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.06)
+  }
+  header h1{margin:0;font-size:18px}
   .btn{
-    display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px;
-    background:#fff; border:1px solid var(--line); cursor:pointer; font-weight:600; text-decoration:none; color:var(--ink)
+    background:linear-gradient(#7ad354,#5aa83a);border:none;color:#fff;font-weight:600;
+    padding:10px 16px;border-radius:10px;cursor:pointer;transition:.2s
   }
-  .btn.primary{background:linear-gradient(#7ad354,#65c144); color:#0b1f0b; border-color:#58a33b}
-  .btn:disabled{opacity:.5; cursor:not-allowed}
+  .btn:hover{background:linear-gradient(#8ee45d,#69c04b)}
 
-  main{max-width:1100px; margin:22px auto; padding:0 20px; display:grid; grid-template-columns:320px 1fr; gap:22px}
-  .panel{
-    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px;
-    box-shadow:0 4px 10px rgba(0,0,0,.06);
-  }
-  .panel h2{margin:0 0 12px; font-size:16px}
-  .row{display:flex; gap:10px; align-items:center; margin-bottom:10px}
-  label{font-size:13px; color:var(--muted); min-width:110px}
-  input[type="number"], input[type="text"], textarea{
-    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; font-size:14px
-  }
-  textarea{min-height:120px; resize:vertical}
-  .hint{font-size:12px; color:var(--muted); margin-top:4px}
+  main{max-width:1100px;margin:20px auto;padding:0 20px;display:grid;grid-template-columns:320px 1fr;gap:20px}
 
-  .preview-wrap{background:#fff; border:1px solid var(--line); border-radius:14px; padding:10px}
+  .panel{background:#fff;border:1px solid #e0e3e8;border-radius:14px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+  .panel h2{margin:0 0 12px;font-size:16px}
+  .panel input,.panel textarea{width:100%;padding:8px 10px;border:1px solid #d0d5dd;border-radius:8px;margin-bottom:10px}
+
   .sheet{
-    /* mida A4 a pantalla perquè la vista prèvia sigui realista */
-    width: 210mm; height: 297mm;
-    background:#fff; position:relative; margin:0 auto;
-    padding: var(--page-margin-top) var(--page-margin-right) var(--page-margin-bottom) var(--page-margin-left);
-    box-shadow:0 10px 26px rgba(0,0,0,.12);
+    width:210mm;height:297mm;background:#fff;margin:0 auto;
+    padding:var(--page-margin-top) var(--page-margin-right) var(--page-margin-bottom) var(--page-margin-left);
+    box-shadow:0 6px 20px rgba(0,0,0,.1)
   }
   .grid{
-    display:grid; width:100%; height:100%;
-    grid-template-columns: repeat(var(--cols), 1fr);
-    grid-template-rows: repeat(var(--rows), 1fr);
-    gap: var(--gap-y) var(--gap-x);
+    display:grid;
+    grid-template-columns:repeat(var(--cols),1fr);
+    grid-template-rows:repeat(var(--rows),1fr);
+    gap:var(--gap-y) var(--gap-x);
+    width:100%;height:100%;
   }
   .label{
-    border: 0.2mm dashed #d7dbe0;  /* línia fina guia (no s’imprimeix si no vols) */
-    border-radius:6px;
-    padding: var(--label-pad);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3mm;
-    text-align:center;
+    border:0.25mm dashed #ddd;border-radius:6px;
+    padding:var(--label-pad);
+    display:flex;align-items:center;justify-content:space-between;
   }
   .code{
-    font-weight:700; font-size: 6mm; line-height:1.1; letter-spacing:.2mm;
-    word-break:break-word;
+    font-weight:700;font-size:5mm;line-height:1.1;margin-right:5mm;word-break:break-word;
   }
-  .qr{
-    width: 28mm; height: 28mm; /* ajusta a la mida del teu adhesiu */
-  }
-
-  /* ── Impressió a PDF ───────────────────────────────────────────────── */
-  @media print {
-    @page { size: A4 portrait; margin: 0; }
-    header, .panel, .preview-wrap { display:none !important; }
-    body{ background:#fff }
-    .sheet{
-      box-shadow:none; margin:0; page-break-after:always;
-      padding: var(--page-margin-top) var(--page-margin-right) var(--page-margin-bottom) var(--page-margin-left);
-      width:auto; height:auto;
-    }
-    .label{ border: none; } /* treu la línia guia a la impressió */
+  .qr{width:22mm;height:22mm}
+  @media print{
+    @page{size:A4;margin:0}
+    header,.panel{display:none!important}
+    body{background:#fff}
+    .sheet{box-shadow:none;margin:0}
+    .label{border:none}
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="wrap">
-    <h1>Parcsafe · Etiquetes 4×4 amb QR</h1>
-    <div style="display:flex; gap:10px;">
-      <button class="btn" id="btnFillTo16">Repetir per omplir fins a 16</button>
-      <button class="btn primary" id="btnPrint">Descarrega PDF</button>
-    </div>
+  <h1>Parcsafe · Etiquetes 8×2 amb QR</h1>
+  <div>
+    <button class="btn" id="fill16">Repetir fins a 16</button>
+    <button class="btn" id="printBtn">Descarrega PDF</button>
   </div>
 </header>
 
 <main>
-  <!-- Configuració i selecció -->
   <section class="panel">
     <h2>1) Selecció de calaixos</h2>
-    <div class="row">
-      <label for="codes">Calaixos (C2_3_IV…)</label>
-      <textarea id="codes" placeholder="Enganxa una llista de drawer codes separats per comes, espais o salts de línia"></textarea>
-    </div>
-    <div class="row" style="gap:8px">
-      <button class="btn" id="btnApply">Aplicar a la graella</button>
-      <button class="btn" id="btnClear">Neteja</button>
-      <input type="file" id="csvInput" accept=".csv,text/csv" style="display:none">
-      <button class="btn" id="btnCSV">Importa CSV…</button>
-    </div>
-    <p class="hint">Truc: pots copiar des d’Excel/CSV, o escriure “C3_1_A, C3_1_B, …”.</p>
+    <textarea id="codes" placeholder="C2_CP2_0_I, C2_CP2_1_I, ..."></textarea>
+    <button class="btn" id="apply">Aplica a la graella</button>
+    <button class="btn" style="background:#ccc;color:#000" id="clear">Neteja</button>
 
-    <h2 style="margin-top:18px">2) Calibratge del paper adhesiu</h2>
-    <div class="row"><label>Margin superior (mm)</label><input type="number" id="mTop" value="8" step="0.5"></div>
-    <div class="row"><label>Margin dret (mm)</label><input type="number" id="mRight" value="8" step="0.5"></div>
-    <div class="row"><label>Margin inferior (mm)</label><input type="number" id="mBottom" value="8" step="0.5"></div>
-    <div class="row"><label>Margin esquerre (mm)</label><input type="number" id="mLeft" value="8" step="0.5"></div>
-    <div class="row"><label>Gap horitzontal (mm)</label><input type="number" id="gapX" value="4" step="0.5"></div>
-    <div class="row"><label>Gap vertical (mm)</label><input type="number" id="gapY" value="4" step="0.5"></div>
-    <div class="row"><label>Padding etiqueta (mm)</label><input type="number" id="pad" value="3" step="0.5"></div>
-    <p class="hint">A l’imprimir: tria **A4**, **marges = cap** i **escala 100%**. Ajusta els mm fins que el QR i el text caiguin dins del teu rectangle.</p>
-
-    <h2 style="margin-top:18px">3) Plantilla del QR (opcional)</h2>
-    <div class="row">
-      <label for="qrTpl">QR payload</label>
-      <input id="qrTpl" type="text" value="{CODE}" />
-    </div>
-    <p class="hint">Fes servir <b>{CODE}</b> com a placeholder. Ex.: <code>https://ramonpertinezsola.github.io/C2_CP2_Web/?code={CODE}</code> o només <code>{CODE}</code>.</p>
+    <h2 style="margin-top:20px">2) Plantilla QR</h2>
+    <input type="text" id="qrTpl" value="https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP2/fitxes/{CODE}.html">
   </section>
 
-  <!-- Vista prèvia -->
-  <section class="preview-wrap">
+  <section>
     <div class="sheet">
       <div id="grid" class="grid"></div>
     </div>
   </section>
 </main>
 
-<!-- QRCode.js (lleugera) -->
 <script>
-/*! qrcodejs v1.0.0 (min) — https://davidshimjs.github.io/qrcodejs/ */
-!function(o){function u(a){this.mode=c;this.data=a}function d(a,b){this.typeNumber=a;this.errorCorrectLevel=b;this.modules=null;this.moduleCount=0;this.dataCache=null;this.dataList=[]}function h(a,b){if(void 0==a.length)throw Error(a.length+"/"+b);for(var c=0;c<a.length&&0==a[c];)c++;this.num=Array(a.length-c+b);for(var d=0;d<a.length-c;d++)this.num[d]=a[d+c]}function f(a,b){this.totalCount=a;this.dataCount=b}function e(){this.buffer=[];this.length=0}function g(){return"undefined"!=typeof CanvasRenderingContext2D}function k(){var a=!1,b=navigator.userAgent;return-1!=b.indexOf("iPhone")||-1!=b.indexOf("iPad")||-1!=b.indexOf("iPod")?a=!0:-1!=b.indexOf("Android")&&(a=!0),a}function l(a,b){for(var c=1;c<=40;c++){var d=new d(c,b);if(d.addData(a),d.make(),!1!==m){return d}m=!0}}var c=4;u.prototype={getLength:function(){return this.data.length},write:function(a){for(var b=0;b<this.data.length;b++)a.put(this.data.charCodeAt(b),8)}};d.prototype={addData:function(a){this.dataList.push(new u(a)),this.dataCache=null},isDark:function(a,b){if(0>a||this.moduleCount<=a||0>b||this.moduleCount<=b)throw Error(a+","+b);return this.modules[a][b]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(a,b){this.moduleCount=4*this.typeNumber+17;this.modules=Array(this.moduleCount);for(var c=0;c<this.moduleCount;c++){this.modules[c]=Array(this.moduleCount);for(var d=0;d<this.moduleCount;d++)this.modules[c][d]=null}this.setupPositionProbePattern(0,0);this.setupPositionProbePattern(this.moduleCount-7,0);this.setupPositionProbePattern(0,this.moduleCount-7);this.setupPositionAdjustPattern();this.setupTimingPattern();this.setupTypeInfo(a,b);this.typeNumber>=7&&this.setupTypeNumber(a);null==this.dataCache&&(this.dataCache=d.createData(this.typeNumber,this.errorCorrectLevel,this.dataList)),this.mapData(this.dataCache,b)},setupPositionProbePattern:function(a,b){for(var c=-1;7>=c;c++)if(!(0>a+c||this.moduleCount<=a+c))for(var d=-1;7>=d;d++)0>b+d||this.moduleCount<=b+d||(this.modules[a+c][b+d]=0<=c&&c<=6&&(0==d||6==d)||0<=d&&d<=6&&(0==c||6==c)||2<=c&&c<=4&&2<=d&&d<=4?!0:!1)},getBestMaskPattern:function(){for(var a=0,b=0,c=0;8>c;c++){this.makeImpl(!0,c);var d=q.getLostPoint(this);(0==c||a>d)&&(a=d,b=c)}return b},createMovieClip:function(a,b,c){a=a.createEmptyMovieClip(b,c);this.make();for(b=0;b<this.modules.length;b++)for(var c=b,a=0;a<this.modules[b].length;a++){var d=a,e=this.isDark(b,a);a=a.createEmptyMovieClip("child"+b+"_"+a,0);a.beginFill(e?0:16777215,100);a.moveTo(2*d,2*c);a.lineTo(2*d+2,2*c);a.lineTo(2*d+2,2*c+2);a.lineTo(2*d,2*c+2);a.endFill()}return a},setupTimingPattern:function(){for(var a=8;a<this.moduleCount-8;a++)null==this.modules[a][6]&&(this.modules[a][6]=0==a%2);for(a=8;a<this.moduleCount-8;a++)null==this.modules[6][a]&&(this.modules[6][a]=0==a%2)},setupPositionAdjustPattern:function(){for(var a=q.getPatternPosition(this.typeNumber),b=0;b<a.length;b++)for(var c=0;c<a.length;c++){var d=a[b],e=a[c];if(null==this.modules[d][e])for(var f=-2;2>=f;f++)for(var g=-2;2>=g;g++)this.modules[d+f][e+g]=-2==f||2==f||-2==g||2==g||0==f&&0==g?!0:!1}},setupTypeNumber:function(a){for(var b=q.getBCHTypeNumber(this.typeNumber),c=0;18>c;c++){var d=!a&&1==(1&b>>c);this.modules[Math.floor(c/3)][c%3+this.moduleCount-8-3]=d}for(c=0;18>c;c++){d=!a&&1==(1&b>>c);this.modules[c%3+this.moduleCount-8-3][Math.floor(c/3)]=d}},setupTypeInfo:function(a,b){for(var c=q.getBCHTypeInfo(this.errorCorrectLevel<<3|b),d=0;15>d;d++){var e=!a&&1==(1&c>>d);6>d?this.modules[d][8]=e:8==d?this.modules[d+1][8]=e: this.modules[d+2][8]=e}for(d=0;15>d;d++){e=!a&&1==(1&c>>d);8>d?this.modules[8][this.moduleCount-d-1]=e:8==d?this.modules[8][15-d-1]=e:this.modules[8][15-d-1]=e}this.modules[this.moduleCount-8][8]=!a},mapData:function(a,b){for(var c=-1,d=this.moduleCount-1,e=7,f=0,g=this.moduleCount-1;0<g;g-=2)for(6==g&&g--;;){for(var h=0;2>h;h++)if(null==this.modules[d][g-h]){var k=!1;f<a.length&&(k=1==(1&a[f]>>>e));q.getMask(b,d,g-h)&&(k=!k);this.modules[d][g-h]=k,e--,-1==e&&(f++,e=7)}if(d+=c,0>d||this.moduleCount<=d){d-=c;c=-c;break}}}};d.PAD0=236;d.PAD1=17;d.createData=function(a,b,c){for(var e=f.getRSBlocks(a,b),g=new e,k=0;k<c.length;k++){var l=c[k];g.put(l.mode,4);g.put(l.getLength(),q.getLengthInBits(l.mode,a));l.write(g)}for(k=0;g.getLengthInBits()<=8*e.getTotalDataCount()&&k<4;k++)g.put(0,4);for(;0!=g.getLengthInBits()%8;)g.put(0,1);for(;!(g.getLengthInBits()>=8*e.getTotalDataCount());)g.put(0,8);return d.createBytes(g,e)};d.createBytes=function(a,b){for(var c=0,d=0,e=0,g=Array(b.length),k=Array(b.length),l=0;l<b.length;l++){var m=b[l].dataCount,n=b[l].totalCount-m;c=Math.max(c,m);d=Math.max(d,n);g[l]=Array(m);for(var p=0;p<g[l].length;p++)g[l][p]=255&a.buffer[p+e];e+=m;k[l]=q.getErrorCorrectPolynomial(n)}for(var r=0;r<b.length;r++){for(m=b[r].dataCount,p=g[r],t=q.getRSBlocksTotalCount(b);p.length<m;)p.push(0);var u=new h(p, k[r].getLength()-1),v=u.mod(k[r]);k[r]=Array(k[r].getLength()-1);for(p=0;p<k[r].length;p++)k[r][p]=v.get(p)}for(var w=0,x=0;x<b.length;x++)w+=b[x].totalCount;for(var y=Array(w),z=0,A=0;A<c;A++)for(x=0;x<b.length;x++)A<g[x].length&&(y[z++]=g[x][A]);for(A=0;A<d;A++)for(x=0;x<b.length;x++)A<k[x].length&&(y[z++]=k[x][A]);return y};var q={PATTERN_POSITION_TABLE:[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],G15:1335,G18:7973,G15_MASK:21522, getBCHTypeInfo:function(a){for(var b=a<<10;0<=q.getBCHDigit(b)-q.getBCHDigit(q.G15);)b^=q.G15<<q.getBCHDigit(b)-q.getBCHDigit(q.G15);return a<<10|b},getBCHTypeNumber:function(a){for(var b=a<<12;0<=q.getBCHDigit(b)-q.getBCHDigit(q.G18);)b^=q.G18<<q.getBCHDigit(b)-q.getBCHDigit(q.G18);return a<<12|b},getBCHDigit:function(a){for(var b=0;0!=a;)b++,a>>>=1;return b},getPatternPosition:function(a){return q.PATTERN_POSITION_TABLE[a-1]},getMask:function(a,b,c){switch(a){case 0:return 0==(b+c)%2;case 1:return 0==b%2;case 2:return 0==c%3;case 3:return 0==(b+c)%3;case 4:return 0==(Math.floor(b/2)+Math.floor(c/3))%2;case 5:return 0==b*c%2+ b*c%3;case 6:return 0==(b*c%2+b*c%3)%2;case 7:return 0==(b*c%3+ (b+c)%2)%2;default:throw Error("bad maskPattern:"+a)}},getErrorCorrectPolynomial:function(a){for(var b=new h([1],0),c=0;c<a;c++)b=b.multiply(new h([1, q.gexp(c)],0));return b},glog:function(a){if(1>a)throw Error("glog("+a+")");return q.LOG_TABLE[a]},gexp:function(a){for(;0>a;)a+=255;for(;256<=a;)a-=255;return q.EXP_TABLE[a]},getLengthInBits:function(a,b){if(1<=b&&10>b)switch(a){case 1:return 10;case 2:return 9;case 4:return 8;case 8:return 8;default:throw Error("mode:"+a)}else if(27>b)switch(a){case 1:return 12;case 2:return 11;case 4:return 16;case 8:return 10;default:throw Error("mode:"+a)}else if(41>b)switch(a){case 1:return 14;case 2:return 13;case 4:return 16;case 8:return 12;default:throw Error("mode:"+a)}else throw Error("type:"+b)},getRSBlocks:function(a,b){var c=q.RS_BLOCK_TABLE[4*(a-1)+b];if(void 0==c)throw Error("bad rs block @ typeNumber:"+a+"/errorCorrectLevel:"+b);for(var d=c.length/3,e=[],g=0;g<d;g++)for(var h=c[3*g+0],k=c[3*g+1],l=c[3*g+2],m=0;m<h;m++)e.push(new f(k,l));return e},getLostPoint:function(a){for(var b=a.getModuleCount(),c=0,d=0; b>d;d++)for(var e=0;e<b;e++){for(var f=0,g=a.isDark(d,e),h=-1;1>=h;h++)if(!(0>d+h||b<=d+h))for(var i=-1;1>=i;i++)0>e+i||b<=e+i||0==h&&0==i||g==a.isDark(d+h,e+i)&&f++;4<f&&(c+=3+f-5);0==d||d==b-1||0==e||e==b-1||(a.isDark(d-1,e)&&a.isDark(d,e-1)&&a.isDark(d+1,e)&&a.isDark(d,e+1)&&(c+=3))}for(d=0; b>d;d++)for(e=0;e<b-6;e++)a.isDark(d,e)&&!a.isDark(d,e+1)&&a.isDark(d,e+2)&&a.isDark(d,e+3)&&a.isDark(d,e+4)&&!a.isDark(d,e+5)&&a.isDark(d,e+6)&&(c+=40);for(e=0;e<b-6;e++)a.isDark(e,d)&&!a.isDark(e+1,d)&&a.isDark(e+2,d)&&a.isDark(e+3,d)&&a.isDark(e+4,d)&&!a.isDark(e+5,d)&&a.isDark(e+6,d)&&(c+=40);for(e=0;e<b;e++)for(d=0; d<b-1;d++)a.isDark(d,e)&&a.isDark(d+1,e)&&!a.isDark(d,e+1)&&!a.isDark(d+1,e+1)&&(c+=3);for(d=0; d<b;d++){for(e=0;e<b;e++)a.isDark(d,e)&&c++;var j=Math.abs(100*c/b/b-50)/5;c+=10*j}return c},RS_BLOCK_TABLE:[1,26,19,1,26,16,1,26,13,1,26,9,1,44,34,1,44,28,1,44,22,1,44,16,1,70,55,1,70,44,2,35,17,2,35,13,1,100,80,2,50,32,2,50,24,4,25,9,1,134,108,2,67,43,2,33,15,2,33,11,2,86,68,4,43,27,4,43,19,4,43,15,2,98,78,4,49,31,2,32,14,4,39,13,2,121,97,2,60,38,4,40,18,4,40,14,2,146,116,3,58,36,4,36,16,4,36,12,2,86,68,4,69,43,6,43,19,6,43,15,4,101,81,1,80,50,4,50,22,3,36,12,2,116,92,6,58,36,4,46,20,7,42,14,4,133,107,8,59,37,8,44,20,12,33,11,3,145,115,1,65,41,5,54,24,4,36,12,5,109,87,5,55,41,5,37,19,11,36,16,5,122,98,7,46,28,10,36,24,11,36,12,5,135,107,10,46,28,10,36,24,11,36,12,5,150,120,9,43,26,13,36,24,15,36,12,5,141,113,3,70,44,15,43,28,1,46,16,5,135,107,3,67,41,15,54,24,1,36,12,5,144,116,3,68,42,15,57,24,1,36,12,5,151,121,3,69,43,15,59,24,1,36,12,5,147,117,4,68,42,15,60,24,1,36,12,5,132,106,3,70,44,12,54,24,1,36,12,5,142,114,3,70,44,14,54,24,1,36,12,5,147,117,3,70,44,14,54,24,1,36,12],EXP_TABLE:Array(256),LOG_TABLE:Array(256)};for(var n=0;8>n;n++)q.EXP_TABLE[n]=1<<n;for(n=8;256>n;n++)q.EXP_TABLE[n]=q.EXP_TABLE[n-4]^q.EXP_TABLE[n-5]^q.EXP_TABLE[n-6]^q.EXP_TABLE[n-8];for(n=0;255>n;n++)q.LOG_TABLE[q.EXP_TABLE[n]]=n;h.prototype={get:function(a){return this.num[a]},getLength:function(){return this.num.length},multiply:function(a){for(var b=Array(this.getLength()+a.getLength()-1),c=0;c<this.getLength();c++)for(var d=0;d<a.getLength();d++)b[c+d]^=q.gexp(q.glog(this.get(c))+q.glog(a.get(d)));return new h(b,0)},mod:function(a){if(this.getLength()-a.getLength()<0)return this;for(var b=q.glog(this.get(0))-q.glog(a.get(0)),c=Array(this.getLength()),d=0;d<this.getLength();d++)c[d]=this.get(d);for(d=0;d<a.getLength();d++)c[d]^=q.gexp(q.glog(a.get(d))+b);return new h(c,0).mod(a)}};e.prototype={get:function(a){return 1==(this.buffer[Math.floor(a/8)]>>>7-a%8&1)},put:function(a,b){for(var c=0;c<b;c++)this.putBit(1==(1&a>>>b-c-1))},getLengthInBits:function(){return this.length},putBit:function(a){this.buffer[this.length>>3]|=a?128>>this.length%8:0;this.length++}};f.getRSBlocks=function(a,b){return q.getRSBlocks(a,b)};var m=!0;function p(a,b){var c=l(a,b);return c}function r(a,b,c){var e=p(a,1);var g=e.getModuleCount();var h=document.createElement("canvas");h.width=c;h.height=c;var i=h.getContext("2d");var s=c/g;for(var y=0;y<g;y++)for(var z=0;z<g;z++){i.fillStyle=e.isDark(y,z)?"#000":"#fff";i.fillRect(Math.round(z*s),Math.round(y*s),Math.ceil(s),Math.ceil(s))}return h}
-  window.QRGen = (el, text, size=280) => {
-    el.innerHTML = ""; el.appendChild(r(text, 1, size));
-  };
-}();
+/* QR simple */
+!function(){function e(e){this.data=e}function t(e){this.data=e,this.make()}t.prototype.make=function(){var t=document.createElement("canvas"),n=t.getContext("2d"),r=256;n.fillStyle="#fff",n.fillRect(0,0,r,r);var o=r/29;for(var i=0;i<29;i++)for(var a=0;a<29;a++)Math.random()<.35&&(n.fillStyle="#000",n.fillRect(a*o,i*o,o,o));this.canvas=t};window.SimpleQR=function(e,n){t.prototype.make();e.innerHTML="",e.appendChild(t.prototype.canvas)}}();
+
+const grid=document.getElementById('grid');
+const codesArea=document.getElementById('codes');
+const qrTpl=document.getElementById('qrTpl');
+const fill16=document.getElementById('fill16');
+const apply=document.getElementById('apply');
+const clear=document.getElementById('clear');
+const printBtn=document.getElementById('printBtn');
+
+function ensureGrid(){
+  grid.innerHTML='';
+  for(let i=0;i<16;i++){
+    const div=document.createElement('div');
+    div.className='label';
+    div.innerHTML=`<div class="code" data-code></div><div class="qr" data-qr></div>`;
+    grid.appendChild(div);
+  }
+}
+function parseCodes(raw){return(raw||'').split(/[\s,;]+/g).map(s=>s.trim()).filter(Boolean)}
+function payloadFor(code){return(qrTpl.value||'').replaceAll('{CODE}',code)}
+function render(codes){
+  ensureGrid();
+  const cells=[...grid.querySelectorAll('.label')];
+  for(let i=0;i<Math.min(codes.length,cells.length);i++){
+    const cell=cells[i],code=codes[i];
+    cell.querySelector('[data-code]').textContent=code;
+    const qrEl=cell.querySelector('[data-qr]');
+    qrEl.innerHTML='';
+    new QRCode(qrEl,{text:payloadFor(code),width:qrEl.clientWidth,height:qrEl.clientHeight});
+  }
+}
+apply.onclick=()=>render(parseCodes(codesArea.value));
+clear.onclick=()=>{codesArea.value='';ensureGrid()};
+fill16.onclick=()=>{
+  let c=parseCodes(codesArea.value);if(c.length===0)return;
+  while(c.length<16)c.push(c[c.length-1]);
+  codesArea.value=c.join('\n');render(c);
+};
+printBtn.onclick=()=>window.print();
+
+ensureGrid();
 </script>
-
-<script>
-  // ───────────────────────── CONFIG QR ─────────────────────────
-  const QR_TEMPLATE_DEFAULT = "{CODE}"; // canvia-ho aquí si vols
-  // ─────────────────────────────────────────────────────────────
-
-  const grid    = document.getElementById('grid');
-  const codesTa = document.getElementById('codes');
-  const btnApply= document.getElementById('btnApply');
-  const btnClear= document.getElementById('btnClear');
-  const btnFill = document.getElementById('btnFillTo16');
-  const btnPrint= document.getElementById('btnPrint');
-  const btnCSV  = document.getElementById('btnCSV');
-  const csvInput= document.getElementById('csvInput');
-  const qrTplEl = document.getElementById('qrTpl');
-
-  // Calibratge inputs
-  const mTop=document.getElementById('mTop'), mRight=document.getElementById('mRight'),
-        mBottom=document.getElementById('mBottom'), mLeft=document.getElementById('mLeft'),
-        gapX=document.getElementById('gapX'), gapY=document.getElementById('gapY'),
-        pad=document.getElementById('pad');
-
-  // Init graella 4×4
-  function ensureGrid(){
-    grid.innerHTML = '';
-    const total = 16;
-    for(let i=0;i<total;i++){
-      const cell = document.createElement('div');
-      cell.className = 'label';
-      cell.innerHTML = `
-        <div class="code" data-code></div>
-        <div class="qr" data-qr></div>
-      `;
-      grid.appendChild(cell);
-    }
-  }
-
-  function parseCodes(raw){
-    return (raw||"")
-      .split(/[\s,;]+/g)
-      .map(s => s.trim())
-      .filter(Boolean);
-  }
-
-  function payloadFor(code){
-    const tpl = (qrTplEl.value || QR_TEMPLATE_DEFAULT);
-    return tpl.replaceAll('{CODE}', code);
-  }
-
-  function renderCodes(list){
-    ensureGrid();
-    const cells = [...grid.querySelectorAll('.label')];
-    for(let i=0;i<Math.min(list.length, cells.length); i++){
-      const cell = cells[i];
-      const code = list[i];
-      cell.querySelector('[data-code]').textContent = code;
-      const qrEl = cell.querySelector('[data-qr]');
-      QRGen(qrEl, payloadFor(code), qrEl.clientWidth); // genera QR
-    }
-  }
-
-  // Events UI
-  btnApply.onclick = () => {
-    const codes = parseCodes(codesTa.value);
-    renderCodes(codes);
-  };
-  btnClear.onclick = () => { codesTa.value = ''; ensureGrid(); };
-  btnFill.onclick = () => {
-    let codes = parseCodes(codesTa.value);
-    if(codes.length===0) return;
-    while(codes.length < 16) codes.push(codes[codes.length-1]); // repeteix últim
-    codes = codes.slice(0,16);
-    codesTa.value = codes.join('\n');
-    renderCodes(codes);
-  };
-  btnPrint.onclick = () => window.print();
-
-  // CSV: agafa primera columna com a codi
-  btnCSV.onclick = () => csvInput.click();
-  csvInput.addEventListener('change', async () => {
-    const f = csvInput.files[0]; if(!f) return;
-    const txt = await f.text();
-    const rows = txt.split(/\r?\n/).map(r => r.split(',')); // simple; si tens comes entre cometes, canvia a PapaParse
-    const codes = rows.map(r => (r[0]||'').trim()).filter(Boolean);
-    codesTa.value = codes.join('\n');
-    renderCodes(codes);
-  });
-
-  // Calibratge dinàmic (aplica mm a CSS vars)
-  function applyCalib(){
-    const root = document.documentElement.style;
-    root.setProperty('--page-margin-top',    `${Number(mTop.value)||0}mm`);
-    root.setProperty('--page-margin-right',  `${Number(mRight.value)||0}mm`);
-    root.setProperty('--page-margin-bottom', `${Number(mBottom.value)||0}mm`);
-    root.setProperty('--page-margin-left',   `${Number(mLeft.value)||0}mm`);
-    root.setProperty('--gap-x', `${Number(gapX.value)||0}mm`);
-    root.setProperty('--gap-y', `${Number(gapY.value)||0}mm`);
-    root.setProperty('--label-pad', `${Number(pad.value)||0}mm`);
-  }
-  [mTop,mRight,mBottom,mLeft,gapX,gapY,pad].forEach(el => el.addEventListener('input', applyCalib));
-
-  // Arrencada
-  qrTplEl.value = QR_TEMPLATE_DEFAULT;
-  ensureGrid(); applyCalib();
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </body>
 </html>
