@@ -80,54 +80,33 @@
     .modal .ft{padding:18px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
     .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
 
-      /* Disposició sense superposar: figures amb marc i estil com .imgwrap */
-    .imggrid{
-      display:grid;
-      gap:12px;
-    }
+    .imggrid{ display:grid; gap:12px; }
     .imggrid.two-cols{ grid-template-columns: 1fr 1fr; }
-    .imggrid figure{
-      margin:0;
-      border:1px dashed #cdd4d9;
-      background:#fafafa;
-      border-radius:12px;
-      overflow:hidden;
-    }
-    .imggrid figure img{
-      display:block;
-      width:100%;
-      height:auto;
-      object-fit:contain;
-    }
+    .imggrid figure{ margin:0; border:1px dashed #cdd4d9; background:#fafafa; border-radius:12px; overflow:hidden; }
+    .imggrid figure img{ display:block; width:100%; height:auto; object-fit:contain; }
 
-    /* Responsive: sota 900px passa a una columna */
     @media (max-width: 900px){
       .imggrid.two-cols{ grid-template-columns: 1fr; }
     }
   </style>
 
   <!-- 🔧 Override petit per assegurar el diàleg al davant -->
- <style>
+  <style>
     dialog.modal{ z-index: 10010 !important; }
     dialog.modal::backdrop{ z-index: 10000 !important; }
   </style>
   
-<!-- PDF (CDN) + QR (LOCAL COMPILAT) -->
+  <!-- PDF (CDN) + QR (LOCAL COMPILAT) -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <!-- ✅ QR UMD per navegador (substitueix l'script local) -->
   <script type="module">
     import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
-
-    // 🔧 Shim robust: detecta on viu QrCode i exposa-ho a window.qrcodegen
     const lib =
       (m && m.QrCode) ? m :
       (m && m.default && m.default.QrCode) ? m.default :
       m;
-
     window.qrcodegen = lib;
   </script>
-
-
 </head>
 <body>
   <div class="container">
@@ -169,21 +148,20 @@
       </div>
 
       <div class="card">
-      <h3>Cabinet Highlight</h3>
-      <div class="imggrid two-cols">
-        <figure>
-          <img src="../images/A1_blackdrawer_1R.jpg"
-              alt="Drawer base"
-              onerror="this.onerror=null; this.src='../../images/A1_blackdrawer_1R.jpg';">
-        </figure>
-        <figure>
-          <img src="../images/A1_rack_A1_0.jpg"
-              alt="Rack view"
-              onerror="this.onerror=null; this.src='../../images/A1_rack_A1_0.jpg';">
-        </figure>
+        <h3>Cabinet Highlight</h3>
+        <div class="imggrid two-cols">
+          <figure>
+            <img src="../images/A1_blackdrawer_1R.jpg"
+                 alt="Drawer base"
+                 onerror="this.onerror=null; this.src='../../images/A1_blackdrawer_1R.jpg';">
+          </figure>
+          <figure>
+            <img src="../images/A1_rack_A1_0.jpg"
+                 alt="Rack view"
+                 onerror="this.onerror=null; this.src='../../images/A1_rack_A1_0.jpg';">
+          </figure>
+        </div>
       </div>
-    </div>
-
     </div>
 
     <div class="card" style="margin-top:20px">
@@ -241,6 +219,33 @@
     </form>
   </dialog>
 
+  <!-- ✅ DUPLICATE WARNING MODAL (NOU) -->
+  <dialog class="modal" id="dupModal">
+    <div class="hd">
+      <strong>⚠️ Product warning</strong>
+      <button class="close-x" aria-label="Close" id="dupClose">✕</button>
+    </div>
+    <div class="bd" style="grid-template-columns:1fr; gap:14px">
+      <div class="fld fld--wide">
+        <label>Message</label>
+        <div id="dupMsg" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;line-height:1.5">
+          ATENCIÓ: Aquest producte ja existeix en altres calaixos.
+        </div>
+      </div>
+      <div class="fld fld--wide">
+        <label>Stock overview</label>
+        <div id="dupStats" style="background:#f7f9fb;border:1px solid #e6edf3;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
+      </div>
+      <div class="note">
+        Tria el procés: <strong>PRODUCTE EXISTENT</strong> per vincular a l’existent (manté nom canònic), o <strong>PRODUCTE NOU</strong> per crear-ne un de nou al calaix actual.
+      </div>
+    </div>
+    <div class="ft">
+      <button class="btn ghost" id="dupNew">Crear PRODUCTE NOU</button>
+      <button class="btn" id="dupExisting">Afegir PRODUCTE EXISTENT</button>
+    </div>
+  </dialog>
+
   <!-- QR MODAL -->
   <dialog class="modal" id="qrModal">
     <div class="hd">
@@ -271,9 +276,8 @@
 
     const drawerCode = "A1_0";
     const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
-    const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
-    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    // === QR ESTÀTIC (canvia-ho si vols un altre text/URL) ===
+    const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinezsola.workers.dev/upload-image"; // (si cal, torna al teu domini)
+    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinezsola.workers.dev/update-item-info";
     const QR_STATIC_VALUE = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
 
     // ===== Robust logo loader (header) =====
@@ -288,10 +292,7 @@
         "../../../parcsafe-logo.png"
       ];
       let i = 0;
-      const tryNext = () => {
-        if(i >= candidates.length){ logo.remove(); return; }
-        logo.src = candidates[i++];
-      };
+      const tryNext = () => { if(i >= candidates.length){ logo.remove(); return; } logo.src = candidates[i++]; };
       logo.onerror = tryNext;
       tryNext();
     })();
@@ -306,24 +307,16 @@
 
     async function loadCSVFromCandidates() {
       const candidates = [
-        "../../stock.csv",
-        "../stock.csv",
-        "../../../stock.csv",
-        "./stock.csv",
-        "/docs/stock.csv",
-        window.location.origin + "/docs/stock.csv",
+        "../../stock.csv","../stock.csv","../../../stock.csv","./stock.csv","/docs/stock.csv",window.location.origin + "/docs/stock.csv",
       ];
       for (const url of candidates) {
         try {
           const res = await fetch(url + "?t=" + Date.now());
           if (res.ok) {
             const txt = await res.text();
-            if (txt.includes("drawerCode")) {
-              console.log("✅ CSV found at:", url);
-              return txt;
-            }
+            if (txt.includes("drawerCode")) { return txt; }
           }
-        } catch (err) { console.warn("❌ Not found:", url); }
+        } catch (_) {}
       }
       throw new Error("stock.csv not found via any path");
     }
@@ -402,19 +395,10 @@
       refresh();
     }
 
-           /* ====================== Drawer image (JPEG only) ====================== */
-    // Versió local per cache-busting persistent
+    // ====================== Drawer image (JPEG only) ======================
     const IMG_VER_KEY = `imgVer_${drawerCode}`;
-    function getImgVersion(){
-      const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10);
-      return isNaN(v) ? 1 : v;
-    }
-    function bumpImgVersion(){
-      const v = getImgVersion() + 1;
-      localStorage.setItem(IMG_VER_KEY, String(v));
-      return v;
-    }
-
+    function getImgVersion(){ const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10); return isNaN(v) ? 1 : v; }
+    function bumpImgVersion(){ const v = getImgVersion() + 1; localStorage.setItem(IMG_VER_KEY, String(v)); return v; }
     function imageCandidatesWithVersion(version){
       const ts = `?v=${version}`;
       return [
@@ -424,35 +408,24 @@
         `../../img/${drawerCode}.jpg${ts}`,
       ];
     }
-
     function setDrawerImg(forceBump=false){
       const el = document.getElementById('drawerImg');
       const v = forceBump ? bumpImgVersion() : getImgVersion();
       const candidates = imageCandidatesWithVersion(v);
       let i = 0;
-      const tryNext = () => {
-        if (i >= candidates.length) return; // queda en blanc si cap carrega
-        el.onerror = () => { i++; tryNext(); };
-        el.src = candidates[i];
-      };
+      const tryNext = () => { if (i >= candidates.length) return; el.onerror = () => { i++; tryNext(); }; el.src = candidates[i]; };
       tryNext();
     }
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') setDrawerImg(false); });
 
-    // Intenta evitar que tornis a la imatge antiga quan fas Ctrl+F5:
-    // - Sempre porta ?v=<localVersion>
-    // - En fer "Refresh" o després d'upload, fem bump de versió.
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') setDrawerImg(false);
-    });
-
-    /* ====================== Upload (JPEG only) ====================== */
+    // Upload (JPEG)
     const uploadBtn     = document.getElementById('uploadPhotoBtn');
     const refreshImgBtn = document.getElementById('refreshImgBtn');
     const fileInput     = document.getElementById('fileInput');
 
     document.addEventListener('DOMContentLoaded', () => setDrawerImg(false));
     uploadBtn.addEventListener('click', ()=> fileInput.click());
-    refreshImgBtn.addEventListener('click', ()=> setDrawerImg(true)); // bump & reload
+    refreshImgBtn.addEventListener('click', ()=> setDrawerImg(true));
 
     fileInput.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0];
@@ -467,16 +440,14 @@
         const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
-        setDrawerImg(true); // bump version after upload
+        setDrawerImg(true);
       }catch(err){
         console.error(err);
         showToast('❌ Error uploading image', '#b3261e');
       }finally{ fileInput.value = ''; }
     });
 
-
-
-    // === Edit info modal ===
+    // === Edit info modal + DUP WARNING flux ===
     const editBtn = document.getElementById('editInfoBtn');
     const modal = document.getElementById('editModal');
     const saveInfoBtn = document.getElementById('saveInfoBtn');
@@ -484,35 +455,126 @@
     const fldCode = document.getElementById('fldCode');
     const fldDesc = document.getElementById('fldDesc');
 
+    // Duplicate modal refs
+    const dupModal = document.getElementById('dupModal');
+    const dupMsg   = document.getElementById('dupMsg');
+    const dupStats = document.getElementById('dupStats');
+    const dupClose = document.getElementById('dupClose');
+    const dupExistingBtn = document.getElementById('dupExisting');
+    const dupNewBtn      = document.getElementById('dupNew');
+
     editBtn.addEventListener('click', ()=> modal.showModal());
     modal.addEventListener('click', (e)=>{
       const rect = modal.getBoundingClientRect();
       const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
       if(!inside) modal.close();
     });
-    saveInfoBtn.addEventListener('click', async (ev)=>{
+
+    dupClose.addEventListener('click', ()=> dupModal.close());
+    dupModal.addEventListener('click', (e)=>{
+      const r = dupModal.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if(!inside) dupModal.close();
+    });
+
+    function renderDupStats(body){
+      const lines = (body?.aggregate?.perLine || [])
+        .map(x => `- ${x.drawerCode} → qty: ${x.qty}${x.productName ? ' | ' + x.productName : ''}`)
+        .join('<br>');
+      return `
+        <div><strong>productCode:</strong> ${body?.productCode || ''}</div>
+        <div><strong>Línies:</strong> ${body?.aggregate?.countLines ?? 0}</div>
+        <div><strong>STOCK TOTAL:</strong> ${body?.aggregate?.totalQty ?? 0}</div>
+        <hr>
+        <div style="font-weight:600; margin:4px 0">Detall per línia</div>
+        <div>${lines || '(cap)'}</div>
+      `;
+    }
+
+    async function postUpdateInfo(payload){
+      const r = await fetch(UPDATE_INFO_ENDPOINT, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+      return r;
+    }
+
+    async function attemptSaveInfo({ mode = null, confirmDuplicate = false, forceName = null } = {}){
+      const name = (forceName ?? fldName.value).trim();
+      const code = fldCode.value.trim();
+      const desc = fldDesc.value.trim();
+
+      const payload = { drawerCode, productName:name, productCode:code, description:desc };
+      if (mode) payload.mode = mode;
+      if (confirmDuplicate) payload.confirmDuplicate = true;
+
+      const res = await postUpdateInfo(payload);
+
+      // OK → actualitza UI
+      if (res.ok) {
+        const body = await res.json().catch(()=> ({}));
+        const updated = body?.drawerUpdated || {};
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${updated.productName || name}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${updated.productCode || code}`;
+        document.getElementById("description-text").textContent = updated.description || desc;
+        modal.close();
+        dupModal.close();
+        showToast('✔️ Product info updated');
+        return { done:true };
+      }
+
+      // 409 WARNING duplicat
+      if (res.status === 409) {
+        const body = await res.json().catch(()=> ({}));
+
+        // Cas inconsistencia de nom per a EXISTING: ajustem automàticament i reintentem
+        if (body?.error && body?.expectedProductName) {
+          const expected = String(body.expectedProductName || '').trim();
+          if (expected) {
+            // forcem nom canònic i reintentem amb mateix mode EXISTING + confirm
+            return attemptSaveInfo({ mode:'EXISTING', confirmDuplicate:true, forceName: expected });
+          }
+        }
+
+        if (body?.warning) {
+          dupMsg.textContent = body.message || 'ATENCIÓ: Producte existent en altres calaixos.';
+          dupStats.innerHTML = renderDupStats(body);
+          // Obrim modal i deixem que l'usuari decideixi
+          try { dupModal.showModal(); } catch { dupModal.setAttribute('open',''); }
+
+          // Un cop obert, configurem els botons una sola vegada per evitar multi-handlers
+          dupExistingBtn.onclick = async () => {
+            await attemptSaveInfo({ mode:'EXISTING', confirmDuplicate:true });
+          };
+          dupNewBtn.onclick = async () => {
+            await attemptSaveInfo({ mode:'NEW', confirmDuplicate:true });
+          };
+          return { done:false, warned:true };
+        }
+
+        // Altres 409 sense warning → error normal
+        showToast('❌ Conflict updating info', '#b3261e');
+        return { done:false };
+      }
+
+      // Altres errors
+      const text = await res.text().catch(()=> 'Error');
+      console.error(text);
+      showToast('❌ Error updating info', '#b3261e');
+      return { done:false };
+    }
+
+    const saveInfoBtnHandler = async (ev)=>{
       ev.preventDefault();
       const name = fldName.value.trim();
       const code = fldCode.value.trim();
       const desc = fldDesc.value.trim();
       if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
-      try{
-        const r = await fetch(UPDATE_INFO_ENDPOINT, {
-          method:'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ drawerCode, productName:name, productCode:code, description:desc })
-        });
-        if(!r.ok) throw new Error(await r.text());
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${name}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${code}`;
-        document.getElementById("description-text").textContent = desc;
-        modal.close();
-        showToast('✔️ Product info updated');
-      }catch(err){
-        console.error(err);
-        showToast('❌ Error updating info', '#b3261e');
-      }
-    });
+      await attemptSaveInfo(); // primer intent sense flags; gestionarà 409 si cal
+    };
+
+    saveInfoBtn.addEventListener('click', saveInfoBtnHandler);
 
     // ===== QR (qrcodegen local) =====
     const qrBtn = document.getElementById('qrBtn');
@@ -524,14 +586,11 @@
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     const qrUrlNote = document.getElementById('qrUrlNote');
 
-    // Prova diverses rutes de logo fins que una funcioni
     const LOGO_CANDIDATES = [
-      "../../parcsafe-logo.png",
-      "../parcsafe-logo.png",
-      "../../../parcsafe-logo.png"
+      "../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"
     ];
 
-    let qrLogoPromise; // cache perquè només es provi una vegada
+    let qrLogoPromise;
     function loadQrLogo() {
       if (qrLogoPromise) return qrLogoPromise;
       qrLogoPromise = new Promise((resolve) => {
@@ -549,9 +608,7 @@
       return qrLogoPromise;
     }
 
-    function currentCleanUrl(){
-      return window.location.href.split('#')[0].split('?')[0];
-    }
+    function currentCleanUrl(){ return window.location.href.split('#')[0].split('?')[0]; }
 
     async function drawQR(url){
       const size = 1024;
@@ -559,8 +616,7 @@
       qrCanvas.width = size; qrCanvas.height = size;
       ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,size,size);
 
-      // Genera QR amb la llibreria local
-      const ecc = qrcodegen.QrCode.Ecc.HIGH || qrcodegen.QrCode.Ecc.H; // compat
+      const ecc = qrcodegen.QrCode.Ecc.HIGH || qrcodegen.QrCode.Ecc.H;
       const qr  = qrcodegen.QrCode.encodeText(url, ecc);
       const modules = qr.size, border = 2;
       const ppm = Math.floor(size / (modules + border*2));
@@ -578,29 +634,19 @@
         }
       }
 
-      // Logo central (si existeix)
       const logoImg = await loadQrLogo();
       if (logoImg) {
         const logoBox = Math.floor(size * 0.22);
         const cx = size/2, cy = size/2;
         const r = Math.floor(logoBox/2) + 14;
-
-        // disc blanc sota el logo
-        ctx.save();
-        ctx.fillStyle = '#FFF';
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI*2);
-        ctx.fill();
-        ctx.restore();
+        ctx.save(); ctx.fillStyle = '#FFF'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill(); ctx.restore();
 
         const pad = 18;
         const w = logoBox - pad*2;
         const h = logoBox - pad*2;
-
         const aspect = logoImg.width / logoImg.height;
         let drawW = w, drawH = w / aspect;
         if (drawH > h) { drawH = h; drawW = h * aspect; }
-
         ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
       }
     }
@@ -608,11 +654,12 @@
     function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function openQrModal(){
-      qrUrlNote.textContent = QR_STATIC_VALUE;
+      const url = QR_STATIC_VALUE;
+      document.getElementById('qrUrlNote').textContent = url;
       safeOpenDialog(qrModal);
       await new Promise(r=>requestAnimationFrame(r));
       await ensureQrLib();
-      await drawQR(QR_STATIC_VALUE);
+      await drawQR(url);
     }
 
     qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
