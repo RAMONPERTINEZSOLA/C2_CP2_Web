@@ -101,10 +101,7 @@
   <!-- ✅ QR UMD per navegador (substitueix l'script local) -->
   <script type="module">
     import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
-    const lib =
-      (m && m.QrCode) ? m :
-      (m && m.default && m.default.QrCode) ? m.default :
-      m;
+    const lib = (m && m.QrCode) ? m : (m && m.default && m.default.QrCode) ? m.default : m;
     window.qrcodegen = lib;
   </script>
 </head>
@@ -127,7 +124,7 @@
       <div id="product-name"><strong>Product Name:</strong> loading...</div>
       <div class="codeWrap">
         <div id="product-code"><strong>Product Code:</strong> loading...</div>
-        <button class="btn secondary" id="editInfoBtn">✏️ Edit Product Info</button>
+        <button class="btn secondary" id="editInfoBtn" type="button">✏️ Edit Product Info</button>
         <button class="btn ghost" id="qrBtn" type="button">📎 QR</button>
       </div>
     </div>
@@ -136,12 +133,13 @@
       <div class="card">
         <h3>Drawer Photo</h3>
         <div class="imgwrap">
-          <img id="drawerImg" src="../images/A1_0.jpg" alt="Drawer image A1_0" onerror="this.onerror=null; this.src='../../images/A1_0.jpg';" />
+          <img id="drawerImg" src="../images/A1_0.jpg" alt="Drawer image A1_0"
+               onerror="this.onerror=null; this.src='../../images/A1_0.jpg';" />
         </div>
         <div class="spacer"></div>
         <div class="row">
-          <button class="btn" id="uploadPhotoBtn">🖼️ Update Drawer Photo</button>
-          <button class="btn ghost" id="refreshImgBtn">Refresh</button>
+          <button class="btn" id="uploadPhotoBtn" type="button">🖼️ Update Drawer Photo</button>
+          <button class="btn ghost" id="refreshImgBtn" type="button">Refresh</button>
           <span class="note">The new image will be renamed to <strong>A1_0.jpg</strong> automatically.</span>
         </div>
         <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display:none" />
@@ -151,13 +149,11 @@
         <h3>Cabinet Highlight</h3>
         <div class="imggrid two-cols">
           <figure>
-            <img src="../images/A1_blackdrawer_1R.jpg"
-                 alt="Drawer base"
+            <img src="../images/A1_blackdrawer_1R.jpg" alt="Drawer base"
                  onerror="this.onerror=null; this.src='../../images/A1_blackdrawer_1R.jpg';">
           </figure>
           <figure>
-            <img src="../images/A1_rack_A1_0.jpg"
-                 alt="Rack view"
+            <img src="../images/A1_rack_A1_0.jpg" alt="Rack view"
                  onerror="this.onerror=null; this.src='../../images/A1_rack_A1_0.jpg';">
           </figure>
         </div>
@@ -178,11 +174,11 @@
         <span class="pill">New: <strong id="newQty">–</strong></span>
       </div>
       <div class="row" style="margin-top:10px">
-        <button id="minusBtn">−1</button>
-        <button id="plusBtn">+1</button>
+        <button id="minusBtn" type="button">−1</button>
+        <button id="plusBtn"  type="button">+1</button>
         <label>Exact: <input id="exactInput" type="number" min="0" step="1" /></label>
-        <button class="secondary" id="resetBtn">Reset</button>
-        <button class="save" id="saveBtn">Save</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <button class="save" id="saveBtn" type="button">Save</button>
       </div>
       <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
     </div>
@@ -195,7 +191,7 @@
     <form method="dialog" id="editForm">
       <div class="hd">
         <strong>Edit product info</strong>
-        <button class="close-x" value="cancel" aria-label="Close">✕</button>
+        <button class="close-x" value="cancel" aria-label="Close" type="button">✕</button>
       </div>
       <div class="bd">
         <div class="fld">
@@ -213,17 +209,17 @@
         <div class="note">Tip: press <span class="kbd">Esc</span> to close.</div>
       </div>
       <div class="ft">
-        <button class="btn ghost" value="cancel">Cancel</button>
-        <button class="btn" id="saveInfoBtn" value="default">Save changes</button>
+        <button class="btn ghost" value="cancel" type="button">Cancel</button>
+        <button class="btn" id="saveInfoBtn" type="button">Save changes</button>
       </div>
     </form>
   </dialog>
 
-  <!-- ✅ DUPLICATE WARNING MODAL (NOU) -->
+  <!-- ✅ DUPLICATE WARNING MODAL -->
   <dialog class="modal" id="dupModal">
     <div class="hd">
       <strong>⚠️ Product warning</strong>
-      <button class="close-x" aria-label="Close" id="dupClose">✕</button>
+      <button class="close-x" aria-label="Close" id="dupClose" type="button">✕</button>
     </div>
     <div class="bd" style="grid-template-columns:1fr; gap:14px">
       <div class="fld fld--wide">
@@ -241,8 +237,8 @@
       </div>
     </div>
     <div class="ft">
-      <button class="btn ghost" id="dupNew">Crear PRODUCTE NOU</button>
-      <button class="btn" id="dupExisting">Afegir PRODUCTE EXISTENT</button>
+      <button class="btn ghost" id="dupNew" type="button">Crear PRODUCTE NOU</button>
+      <button class="btn" id="dupExisting" type="button">Afegir PRODUCTE EXISTENT</button>
     </div>
   </dialog>
 
@@ -250,7 +246,7 @@
   <dialog class="modal" id="qrModal">
     <div class="hd">
       <strong>Product QR</strong>
-      <button class="close-x" value="cancel" aria-label="Close" id="qrClose">✕</button>
+      <button class="close-x" value="cancel" aria-label="Close" id="qrClose" type="button">✕</button>
     </div>
     <div class="bd">
       <div class="fld fld--wide" style="align-items:center">
@@ -275,12 +271,13 @@
     }
 
     const drawerCode = "A1_0";
-    const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
-    const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinezsola.workers.dev/upload-image"; // (si cal, torna al teu domini)
-    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinezsola.workers.dev/update-item-info";
-    const QR_STATIC_VALUE = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
+    // 🔧 Unifica domini del Worker
+    const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
+    const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
+    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
+    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
 
-    // ===== Robust logo loader (header) =====
+    // ===== Logo loader =====
     (function loadLogo(){
       const logo = document.getElementById('logo');
       const candidates = [
@@ -455,6 +452,9 @@
     const fldCode = document.getElementById('fldCode');
     const fldDesc = document.getElementById('fldDesc');
 
+    // Evita submit implícit del form dialog
+    document.getElementById('editForm')?.addEventListener('submit', (e) => e.preventDefault());
+
     // Duplicate modal refs
     const dupModal = document.getElementById('dupModal');
     const dupMsg   = document.getElementById('dupMsg');
@@ -511,7 +511,6 @@
 
       const res = await postUpdateInfo(payload);
 
-      // OK → actualitza UI
       if (res.ok) {
         const body = await res.json().catch(()=> ({}));
         const updated = body?.drawerUpdated || {};
@@ -524,15 +523,18 @@
         return { done:true };
       }
 
-      // 409 WARNING duplicat
       if (res.status === 409) {
-        const body = await res.json().catch(()=> ({}));
+        // Mostra cos per debug si cal
+        const body = await res.json().catch(async ()=> {
+          const raw = await res.clone().text().catch(()=> '');
+          console.warn('409 RAW body:', raw);
+          return {};
+        });
 
-        // Cas inconsistencia de nom per a EXISTING: ajustem automàticament i reintentem
+        // Inconsistència de nom per EXISTING
         if (body?.error && body?.expectedProductName) {
           const expected = String(body.expectedProductName || '').trim();
           if (expected) {
-            // forcem nom canònic i reintentem amb mateix mode EXISTING + confirm
             return attemptSaveInfo({ mode:'EXISTING', confirmDuplicate:true, forceName: expected });
           }
         }
@@ -540,10 +542,8 @@
         if (body?.warning) {
           dupMsg.textContent = body.message || 'ATENCIÓ: Producte existent en altres calaixos.';
           dupStats.innerHTML = renderDupStats(body);
-          // Obrim modal i deixem que l'usuari decideixi
           try { dupModal.showModal(); } catch { dupModal.setAttribute('open',''); }
 
-          // Un cop obert, configurem els botons una sola vegada per evitar multi-handlers
           dupExistingBtn.onclick = async () => {
             await attemptSaveInfo({ mode:'EXISTING', confirmDuplicate:true });
           };
@@ -553,14 +553,13 @@
           return { done:false, warned:true };
         }
 
-        // Altres 409 sense warning → error normal
         showToast('❌ Conflict updating info', '#b3261e');
+        console.warn('Update info response 409 (no warning):', body);
         return { done:false };
       }
 
-      // Altres errors
       const text = await res.text().catch(()=> 'Error');
-      console.error(text);
+      console.error('Update info response:', res.status, text);
       showToast('❌ Error updating info', '#b3261e');
       return { done:false };
     }
@@ -576,7 +575,7 @@
 
     saveInfoBtn.addEventListener('click', saveInfoBtnHandler);
 
-    // ===== QR (qrcodegen local) =====
+    // ===== QR =====
     const qrBtn = document.getElementById('qrBtn');
     const qrModal = document.getElementById('qrModal');
     const qrClose = document.getElementById('qrClose');
@@ -586,9 +585,7 @@
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     const qrUrlNote = document.getElementById('qrUrlNote');
 
-    const LOGO_CANDIDATES = [
-      "../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"
-    ];
+    const LOGO_CANDIDATES = ["../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"];
 
     let qrLogoPromise;
     function loadQrLogo() {
@@ -607,8 +604,6 @@
       });
       return qrLogoPromise;
     }
-
-    function currentCleanUrl(){ return window.location.href.split('#')[0].split('?')[0]; }
 
     async function drawQR(url){
       const size = 1024;
@@ -670,14 +665,15 @@
       if(!inside) qrModal.close();
     });
 
-    // Copiar enllaç
     copyLinkBtn?.addEventListener('click', async ()=>{
       const url = QR_STATIC_VALUE;
       try{ await navigator.clipboard.writeText(url); showToast('🔗 Enllaç copiat'); }
-      catch{ const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('🔗 Enllaç copiat'); }
+      catch{
+        const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); ta.remove(); showToast('🔗 Enllaç copiat');
+      }
     });
 
-    // Descarregar PNG
     dlPngBtn?.addEventListener('click', ()=>{
       const a = document.createElement('a');
       a.href = qrCanvas.toDataURL('image/png');
@@ -685,7 +681,6 @@
       a.click();
     });
 
-    // Descarregar PDF
     dlPdfBtn?.addEventListener('click', ()=>{
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ unit:'mm', format:'A4' });
