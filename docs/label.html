@@ -9,75 +9,118 @@
 :root{
   --rows:8; --cols:2;
 
-  /* page margins (mm) */
+  /* Page margins (mm) */
   --page-mt:10mm; --page-mr:8mm; --page-mb:10mm; --page-ml:8mm;
 
-  /* labels touch each other */
+  /* Labels touch each other */
   --gap-x:0mm; --gap-y:0mm;
 
+  /* Label internals */
   --label-pad:4mm;
   --code-font:6.5mm;
   --qr-size:32mm;
+
+  /* Fine offset controls (calibration) */
+  --nudge-x:0mm;   /* + moves right, - moves left */
+  --nudge-y:0mm;   /* + moves down, - moves up */
 
   --ink:#0f1b2f; --muted:#667085; --bg:#f5f7f8; --card:#fff;
   --green:#6dbd45; --line:#e6e8eb;
 }
 
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
 
-  *{box-sizing:border-box}
-  body{margin:0;font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+/* Header */
+header{
+  background:#fff;
+  padding:14px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.06)
+}
+header h1{margin:0;font-size:18px}
+.btn{
+  background:linear-gradient(#7ad354,#5aa83a);
+  border:none;color:#0b1f0b;font-weight:700;
+  padding:10px 14px;border-radius:10px;cursor:pointer;
+  box-shadow:0 6px 14px rgba(109,189,69,.24)
+}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
-  header{background:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-  header h1{margin:0;font-size:18px}
-  .btn{background:linear-gradient(#7ad354,#5aa83a);border:none;color:#0b1f0b;font-weight:700;padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:0 6px 14px rgba(109,189,69,.24)}
-  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
-  .btn:disabled{opacity:.5;cursor:not-allowed}
+/* Layout */
+main{
+  max-width:1200px;margin:20px auto;padding:0 20px;
+  display:grid;grid-template-columns:340px 1fr;gap:20px
+}
 
-  main{max-width:1200px;margin:20px auto;padding:0 20px;display:grid;grid-template-columns:340px 1fr;gap:20px}
+/* Left panel */
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,.06)
+}
+.panel h2{margin:0 0 10px;font-size:16px}
+.search{width:100%;padding:10px 12px;border:1px solid #d0d5dd;border-radius:10px;margin-bottom:10px}
+.list{max-height:60vh;overflow:auto;border:1px solid #eef0f3;border-radius:12px;background:#fff}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f2f5;cursor:pointer}
+.item:hover{background:#f7fbf5}
+.code{font-weight:700}
+.name{color:var(--muted);font-size:12px}
+.panel .row{display:flex;gap:8px;margin-top:12px}
 
-  /* Left panel */
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
-  .panel h2{margin:0 0 10px;font-size:16px}
-  .search{width:100%;padding:10px 12px;border:1px solid #d0d5dd;border-radius:10px;margin-bottom:10px}
-  .list{max-height:60vh;overflow:auto;border:1px solid #eef0f3;border-radius:12px;background:#fff}
-  .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f2f5;cursor:pointer}
-  .item:hover{background:#f7fbf5}
-  .code{font-weight:700}
-  .name{color:var(--muted);font-size:12px}
-  .panel .row{display:flex;gap:8px;margin-top:12px}
-
-  /* A4 preview sheet */
+/* A4 preview sheet */
 .sheet{
-  width:210mm; height:297mm; background:#fff; margin:0 auto;
+  width:210mm; height:297mm;
+  background:#fff; margin:0 auto;
   padding:var(--page-mt) var(--page-mr) var(--page-mb) var(--page-ml);
   box-shadow:0 8px 24px rgba(0,0,0,.12);
-  overflow:hidden;           /* no overflow outside A4 */
+  overflow:hidden;
 }
-
 .grid{
-  display:grid; width:100%; height:100%;
-  grid-template-columns: repeat(var(--cols), 1fr);
-  /* EXACT 8 rows — no rounding drift */
-  grid-template-rows: repeat(var(--rows), calc(100% / var(--rows)));
-  gap: var(--gap-y) var(--gap-x);   /* 0 → they touch */
+  display:grid;
+  width:100%; height:100%;
+  grid-template-columns:repeat(var(--cols), calc(100% / var(--cols)));
+  grid-template-rows:repeat(var(--rows), calc(100% / var(--rows)));
+  gap:var(--gap-y) var(--gap-x);
+  transform:translate(var(--nudge-x), var(--nudge-y));
 }
-
 .label{
   outline:0.25mm dashed #d9dde3;
-  outline-offset:-0.25mm;    /* draw guide inside, no clipping */
+  outline-offset:-0.25mm;
   border:none; border-radius:0;
   padding:var(--label-pad);
-  display:flex; align-items:center; justify-content:space-between; gap:6mm;
+  display:flex;align-items:center;justify-content:space-between;gap:6mm;
 }
+.label .codeBig{
+  font-weight:800;
+  font-size:var(--code-font);
+  letter-spacing:.25mm;
+  word-break:break-word
+}
+.label .qrWrap{
+  width:var(--qr-size);height:var(--qr-size);
+  display:flex;align-items:center;justify-content:center
+}
+.label canvas{width:100%;height:100%}
+
+/* Print mode */
 @media print{
   @page{ size:A4; margin:0 }
   header,.panel{ display:none !important }
   body{ background:#fff }
   .sheet{ box-shadow:none; margin:0 }
-  .label{ outline:none }      /* hide guides on paper */
+  .label{ outline:none }
 }
-
-
 </style>
 </head>
 <body>
@@ -92,7 +135,7 @@
 </header>
 
 <main>
-  <!-- Product picker (from stock.csv) -->
+  <!-- Product picker -->
   <section class="panel">
     <h2>1) Add products to the sheet</h2>
     <input class="search" id="search" placeholder="Search by drawer code or product name…" />
@@ -100,9 +143,35 @@
     <div class="row">
       <small class="name">Click a product to place it in the next empty label (row-wise order).</small>
     </div>
+
+    <!-- Calibration panel -->
+    <div class="panel" style="margin-top:12px">
+      <h2 style="margin-bottom:8px">Calibration</h2>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+        <label style="font-size:12px;color:#667085">Top (mm)
+          <input type="number" step="0.5" id="mt" class="search" style="margin:6px 0 0" value="10">
+        </label>
+        <label style="font-size:12px;color:#667085">Bottom (mm)
+          <input type="number" step="0.5" id="mb" class="search" style="margin:6px 0 0" value="10">
+        </label>
+        <label style="font-size:12px;color:#667085">Left (mm)
+          <input type="number" step="0.5" id="ml" class="search" style="margin:6px 0 0" value="8">
+        </label>
+        <label style="font-size:12px;color:#667085">Right (mm)
+          <input type="number" step="0.5" id="mr" class="search" style="margin:6px 0 0" value="8">
+        </label>
+        <label style="font-size:12px;color:#667085">Nudge X (mm)
+          <input type="number" step="0.1" id="nx" class="search" style="margin:6px 0 0" value="0">
+        </label>
+        <label style="font-size:12px;color:#667085">Nudge Y (mm)
+          <input type="number" step="0.1" id="ny" class="search" style="margin:6px 0 0" value="0">
+        </label>
+      </div>
+      <small class="name">Print at A4, Margins: None, Scale: 100%. Use nudges for fine drift correction.</small>
+    </div>
   </section>
 
-  <!-- Sheet -->
+  <!-- A4 Sheet -->
   <section>
     <div class="sheet">
       <div id="grid" class="grid"></div>
@@ -119,7 +188,7 @@
 </script>
 
 <script>
-/* ----- DOM refs ----- */
+/* ======= DOM Refs ======= */
 const grid = document.getElementById('grid');
 const list = document.getElementById('list');
 const search = document.getElementById('search');
@@ -127,10 +196,11 @@ const undoBtn = document.getElementById('undoBtn');
 const clearBtn = document.getElementById('clearBtn');
 const printBtn = document.getElementById('printBtn');
 
-/* ----- Logo (same candidates as product pages) ----- */
+/* ======= Logo ======= */
 const LOGO_CANDIDATES = ["./parcsafe-logo.png","../parcsafe-logo.png","../../parcsafe-logo.png"];
 let logoImg = null;
 
+/* ======= Grid setup ======= */
 function ensureGrid(){
   grid.innerHTML='';
   for(let i=0;i<16;i++){
@@ -151,7 +221,6 @@ function firstEmptyIndex(){
 }
 
 function generateProductUrl(drawerCode){
-  // C2_CP2_11_I → /C2/CP2/fitxes/C2_CP2_11_I.html
   const parts = drawerCode.split('_');
   const rack=parts[0]||''; const section=parts[1]||'';
   const base = 'https://ramonpertinezsola.github.io/C2_CP2_Web';
@@ -173,11 +242,10 @@ function loadLogo(){
 }
 
 async function drawQR(canvas, url){
-  // identical style to product QR
   while(!(window.qrcodegen && window.qrcodegen.QrCode)) {
     await new Promise(r=>setTimeout(r,20));
   }
-  const size = canvas.width; // 640
+  const size = canvas.width;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,size,size);
 
@@ -215,9 +283,12 @@ async function drawQR(canvas, url){
   }
 }
 
+/* ======= Label placement ======= */
+const placedStack = [];
+
 async function placeLabel(drawerCode){
   const idx = firstEmptyIndex();
-  if(idx === -1) return; // full
+  if(idx === -1) return;
   const cell = grid.children[idx];
   cell.querySelector('[data-code]').textContent = drawerCode;
   const url = generateProductUrl(drawerCode);
@@ -235,14 +306,12 @@ function undoLast(){
   ctx.clearRect(0,0,640,640);
 }
 
-/* Actions */
+/* ======= Actions ======= */
 printBtn.onclick = ()=> window.print();
 clearBtn.onclick = clearSheet;
 undoBtn.onclick = undoLast;
 
-const placedStack = [];
-
-/* ----- Load stock.csv and build list ----- */
+/* ======= CSV Load ======= */
 async function loadCSV(){
   const candidates = [
     "./stock.csv","../stock.csv","../../stock.csv",
@@ -301,6 +370,23 @@ search.addEventListener('input', ()=>{
   );
   renderList(f);
 });
+
+/* ======= Calibration Controls ======= */
+const mt=document.getElementById('mt'), mr=document.getElementById('mr'),
+      mb=document.getElementById('mb'), ml=document.getElementById('ml'),
+      nx=document.getElementById('nx'), ny=document.getElementById('ny');
+
+function applyCalib(){
+  const r = document.documentElement.style;
+  if(mt) r.setProperty('--page-mt', `${+mt.value||0}mm`);
+  if(mr) r.setProperty('--page-mr', `${+mr.value||0}mm`);
+  if(mb) r.setProperty('--page-mb', `${+mb.value||0}mm`);
+  if(ml) r.setProperty('--page-ml', `${+ml.value||0}mm`);
+  if(nx) r.setProperty('--nudge-x', `${+nx.value||0}mm`);
+  if(ny) r.setProperty('--nudge-y', `${+ny.value||0}mm`);
+}
+[mt,mr,mb,ml,nx,ny].forEach(el => el && el.addEventListener('input', applyCalib));
+applyCalib();
 </script>
 </body>
 </html>
