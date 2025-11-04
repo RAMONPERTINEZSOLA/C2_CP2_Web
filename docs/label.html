@@ -19,12 +19,10 @@
   --code-font:6.5mm;
   --qr-size:32mm;
 
-  /* NEW: tiny safety to avoid overflow rounding */
-  --fudge:0.8mm;
-
   --ink:#0f1b2f; --muted:#667085; --bg:#f5f7f8; --card:#fff;
   --green:#6dbd45; --line:#e6e8eb;
 }
+
 
   *{box-sizing:border-box}
   body{margin:0;font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
@@ -53,37 +51,32 @@
   width:210mm; height:297mm; background:#fff; margin:0 auto;
   padding:var(--page-mt) var(--page-mr) var(--page-mb) var(--page-ml);
   box-shadow:0 8px 24px rgba(0,0,0,.12);
-  overflow:hidden;              /* NEW: no overflow outside A4 */
+  overflow:hidden;           /* no overflow outside A4 */
 }
 
 .grid{
-  display:grid; width:calc(100% - var(--fudge)); /* NEW: tiny shrink */
-  height:calc(100% - var(--fudge));              /* NEW: tiny shrink */
-  grid-template-columns:repeat(var(--cols),1fr);
-  grid-template-rows:repeat(var(--rows),1fr);
-  gap:var(--gap-y) var(--gap-x); /* 0mm → touching */
+  display:grid; width:100%; height:100%;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  /* EXACT 8 rows — no rounding drift */
+  grid-template-rows: repeat(var(--rows), calc(100% / var(--rows)));
+  gap: var(--gap-y) var(--gap-x);   /* 0 → they touch */
 }
 
 .label{
-  /* switched from border→outline so it doesn't affect sizing */
-  outline:0.25mm dashed #d9dde3;  /* NEW */
-  border:none;                     /* NEW */
-  border-radius:0;
+  outline:0.25mm dashed #d9dde3;
+  outline-offset:-0.25mm;    /* draw guide inside, no clipping */
+  border:none; border-radius:0;
   padding:var(--label-pad);
   display:flex; align-items:center; justify-content:space-between; gap:6mm;
 }
-
-  .label .codeBig{font-weight:800;font-size:var(--code-font);letter-spacing:.25mm;word-break:break-word}
-  .label .qrWrap{width:var(--qr-size);height:var(--qr-size);display:flex;align-items:center;justify-content:center}
-  .label canvas{width:100%;height:100%}
-
- @media print{
+@media print{
   @page{ size:A4; margin:0 }
-  header, .panel{ display:none !important }
+  header,.panel{ display:none !important }
   body{ background:#fff }
   .sheet{ box-shadow:none; margin:0 }
-  .label{ outline:none }    /* NEW: no guides on paper */
+  .label{ outline:none }      /* hide guides on paper */
 }
+
 
 </style>
 </head>
