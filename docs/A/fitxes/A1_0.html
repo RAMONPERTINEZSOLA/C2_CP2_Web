@@ -102,7 +102,7 @@
     #postSaveBanner .counter{font-variant-numeric:tabular-nums; font-weight:700}
     #postSaveBanner button{background:#ffffff; color:#0f1b2f; border:1px solid #cfe4ff66; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer}
 
-    /* Badges: GLOBAL / DRAWER */
+    /* Badges: GLOBAL / DRAWER — ara a la part inferior */
     #stockBadges{display:flex;gap:.5rem;flex-wrap:wrap;margin:.75rem 0 0}
     .badge{
       display:inline-flex;align-items:center;gap:.4rem;
@@ -111,6 +111,14 @@
       font-variant-numeric:tabular-nums;
     }
     .badge.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; }
+
+    /* Clickable distribution pills */
+    .distLink{
+      display:inline-block; padding:.25rem .5rem; border:1px solid var(--line);
+      border-radius:999px; background:#fff; text-decoration:none; color:#1f2937;
+    }
+    .distLink:hover{ box-shadow:0 2px 10px rgba(0,0,0,.06) }
+    .distLink.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; font-weight:600 }
 
     /* Force refresh block */
     .refresh-card{margin-top:16px;padding:12px;border:1px dashed #cdd4d9;border-radius:12px;background:#fff}
@@ -191,7 +199,8 @@
       <div id="description-text" style="line-height:1.6">loading...</div>
     </div>
 
-    <!-- (INFO card eliminada) -->
+    <!-- ⬇️ DISTRIBUTION (just before stock) -->
+    <div id="distributionWrap" style="margin-top:14px"></div>
 
     <!-- Force refresh (data) -->
     <div class="refresh-card">
@@ -218,7 +227,7 @@
       <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
     </div>
 
-    <!-- Badges: GLOBAL (=drawer) / DRAWER -->
+    <!-- ⬇️ GLOBAL/DRAWER badges moved to the bottom -->
     <div id="stockBadges">
       <span id="badgeGlobal" class="badge">GLOBAL: <strong id="globalStockCount">—</strong></span>
       <span id="badgeDrawer" class="badge">DRAWER: <strong id="drawerStockCount">—</strong></span>
@@ -240,7 +249,7 @@
     </div>
   </div>
 
-  <!-- Edit Info Modal (simplificat: només aquest drawer) -->
+  <!-- Edit Info Modal -->
   <dialog class="modal" id="editModal">
     <form method="dialog" id="editForm">
       <div class="hd">
@@ -260,13 +269,59 @@
           <label for="fldDesc">Description</label>
           <textarea id="fldDesc" required></textarea>
         </div>
-        <div class="note">Tip: press <span class="kbd">Esc</span> to close. Changes will apply to <b>this drawer only</b>.</div>
+        <div class="note">Tip: press <span class="kbd">Esc</span> to close.</div>
       </div>
       <div class="ft">
         <button class="btn ghost" value="cancel" type="button">Cancel</button>
         <button class="btn" id="saveInfoBtn" type="button">Save changes</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Process chooser + EXISTING picker -->
+  <dialog class="modal" id="dupModal">
+    <div class="hd">
+      <strong>⚠️ Product process</strong>
+      <button class="close-x" aria-label="Close" id="dupClose" type="button">✕</button>
+    </div>
+
+    <div class="bd" style="grid-template-columns:1fr; gap:14px">
+      <div class="fld fld--wide" id="dupStep1">
+        <label>Message</label>
+        <div id="dupMsg" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;line-height:1.5">
+          You’re about to modify this drawer. Do you want to <b>create a NEW PRODUCT</b> or <b>add an EXISTING PRODUCT</b>?
+        </div>
+        <div class="fld fld--wide" id="dupStatsWrap" style="display:none; margin-top:10px">
+          <label>Stock overview (existing product)</label>
+          <div id="dupStats" style="background:#f7f9fb;border:1px solid #e6edf3;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
+        </div>
+        <div class="note">
+          If the name already exists in other drawers, recommended: <strong>EXISTING PRODUCT</strong>.
+        </div>
+      </div>
+
+      <div class="fld fld--wide" id="dupStep2" style="display:none">
+        <label for="existingSelect">Choose an existing product (by NAME)</label>
+        <select id="existingSelect" style="padding:12px;border:1px solid #d0d5dd;border-radius:12px;font-size:16px"></select>
+        <div class="note">
+          The <b>code</b> and <b>description</b> will be preloaded with canonical values and applied to all rows.
+        </div>
+        <div class="fld fld--wide" id="existingPreview" style="display:none">
+          <label>Canonical preview</label>
+          <div id="existingPreviewBox" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ft" id="dupFt1">
+      <button class="btn ghost" id="dupNew" type="button">Create NEW PRODUCT</button>
+      <button class="btn" id="dupExisting" type="button">Add EXISTING PRODUCT</button>
+    </div>
+
+    <div class="ft" id="dupFt2" style="display:none">
+      <button class="btn ghost" id="dupBack" type="button">← Back</button>
+      <button class="btn" id="dupProceedExisting" type="button">Save now</button>
+    </div>
   </dialog>
 
   <!-- QR MODAL -->
@@ -304,6 +359,12 @@
     const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
     const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
+
+    // Sticky mode
+    let CHOSEN_MODE = null;
+    const MODE_KEY = `mode_${drawerCode}`;
+    function setModeSticky(m){ CHOSEN_MODE = m || null; sessionStorage.setItem(MODE_KEY, CHOSEN_MODE || ''); }
+    function getModeSticky(){ const v = sessionStorage.getItem(MODE_KEY) || ''; CHOSEN_MODE = v ? v : null; return CHOSEN_MODE; }
 
     // Logo loader
     (function loadLogo(){
@@ -379,26 +440,72 @@
       return data;
     }
 
-    // --- Safe normalize
     const normalizeName = s => String(s || '').normalize('NFKC').replace(/\s+/g,' ').trim().toLowerCase();
 
-    // --- Strict aggregation (not rendered, but kept for future)
-    function aggregateStrictForCurrent(row){
-      // Requereix mateix productCode (si no està buit).
-      // Si productCode és buit, empra mateix productName normalitzat.
-      const code = (row.productCode || '').trim().toLowerCase();
-      const name = normalizeName(row.productName || '');
+    function uniqueProductNamesFromData(data){
+      const count = new Map();
+      for (const r of data){
+        const raw = (r.productName || '').trim();
+        if (!raw) continue;
+        const key = normalizeName(raw);
+        const prev = count.get(key) || { display: raw, n: 0 };
+        prev.n += 1;
+        count.set(key, prev);
+      }
+      return [...count.entries()]
+        .sort((a,b)=> b[1].n - a[1].n)
+        .map(([key, v]) => ({ key, display: v.display, n: v.n }));
+    }
+
+    function modeNonEmpty(arr){
+      const m = new Map();
+      for (const v of arr){
+        const s = String(v || '').trim();
+        if (!s) continue;
+        m.set(s, (m.get(s)||0)+1);
+      }
+      let best = '', bestN = 0;
+      for (const [val, n] of m.entries()){
+        if (n > bestN){ best = val; bestN = n; }
+      }
+      return best;
+    }
+
+    function canonicalByProductName(name){
+      const key = normalizeName(name);
+      const rows = ALL_DATA.filter(r => normalizeName(r.productName||'') === key);
+      const codes = rows.map(r => r.productCode || '');
+      const descs = rows.map(r => r.description || '');
+      return {
+        productName: name.trim(),
+        productCode: modeNonEmpty(codes) || '',
+        description: modeNonEmpty(descs) || ''
+      };
+    }
+
+    // ---- STRICT aggregation only for the CURRENT product
+    function aggregateForCurrentProduct(){
+      if (!CURRENT) return { total:0, byDrawer:{}, minByDrawer:{} };
+      const curCode = String(CURRENT.productCode || '').trim().toLowerCase();
+      const curName = normalizeName(CURRENT.productName || '');
+
       const agg = { total:0, byDrawer:{}, minByDrawer:{} };
-      for(const r of ALL_DATA){
-        const rCode = (r.productCode || '').trim().toLowerCase();
+
+      for (const r of ALL_DATA){
+        const rCode = String(r.productCode || '').trim().toLowerCase();
         const rName = normalizeName(r.productName || '');
+
         let match = false;
-        if (code){
-          match = (rCode && rCode === code);
-        }else if (name){
-          match = (rName && rName === name);
+        if (curCode) {
+          // If current has code → match strictly by SAME CODE
+          match = (rCode === curCode);
+        } else if (curName) {
+          // If current has NO code → match by SAME NAME, but ONLY rows WITHOUT code (avoid mixing coded products)
+          match = (rName === curName) && !rCode;
         }
+
         if (!match) continue;
+
         const d = (r.drawerCode||"").trim();
         const q = parseInt(r.stockQty||"0",10) || 0;
         const m = parseInt(r.minStock||"0",10) || 0;
@@ -409,24 +516,49 @@
       return agg;
     }
 
-    function renderBadgesCurrentOnly(currentRow){
+    function renderGlobalAndDrawerBadges_ForCurrent(){
+      const agg = aggregateForCurrentProduct();
       const gEl = document.getElementById('globalStockCount');
       const dEl = document.getElementById('drawerStockCount');
       const badgeDrawer = document.getElementById('badgeDrawer');
+      const distWrap = document.getElementById('distributionWrap');
 
-      const curQty = parseInt(currentRow.stockQty||"0",10) || 0;
-      const min = parseInt(currentRow.minStock||"0",10) || 0;
+      if (gEl) gEl.textContent = String(agg.total);
 
-      if (gEl) gEl.textContent = String(curQty);   // GLOBAL = drawer (per evitar barreges)
-      if (dEl) dEl.textContent = String(curQty);
-
+      const dq = drawerCode ? (agg.byDrawer[drawerCode] || 0) : 0;
+      if (dEl) dEl.textContent = String(dq);
       if (badgeDrawer){
-        badgeDrawer.classList.toggle('low', min>0 && curQty <= min);
+        const min = drawerCode ? (agg.minByDrawer[drawerCode] || 0) : 0;
+        badgeDrawer.classList.toggle('low', min>0 && dq <= min);
         badgeDrawer.title = min ? `Drawer minimum: ${min}` : '';
+      }
+
+      // Distribution panel (only the strictly matching drawers)
+      if (distWrap){
+        const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
+        if (!entries.length){ distWrap.innerHTML = ''; return; }
+        let html = `
+          <div class="card">
+            <div style="font-weight:600;margin-bottom:.4rem">Distribution by drawers (${entries.length})</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.4rem;">
+        `;
+        for (const [d,q] of entries){
+          const min = agg.minByDrawer[d]||0;
+          const lowCls = (min>0 && q<=min) ? 'low' : '';
+          const href = `./${d}.html`;
+          html += `
+            <div>
+              <a class="distLink ${lowCls}" href="${href}" aria-label="Open drawer ${d}">
+                ${d}: <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}
+              </a>
+            </div>`;
+        }
+        html += `</div></div>`;
+        distWrap.innerHTML = html;
       }
     }
 
-    // ---- Full UI reload (for Force refresh)
+    // ---- Full UI reload (for Force refresh) ----
     async function reloadAllUI(){
       try{
         const csv = await loadCSVFromCandidates();
@@ -441,10 +573,8 @@
         document.getElementById("stock-display").innerText = "📦 STOCK: " + (CURRENT.stockQty || "0");
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
 
-        // Badges només d'aquest drawer
-        renderBadgesCurrentOnly(CURRENT);
+        renderGlobalAndDrawerBadges_ForCurrent();
 
-        // Prefill modal
         document.getElementById("fldName").value = CURRENT.productName || "";
         document.getElementById("fldCode").value = CURRENT.productCode || "";
         document.getElementById("fldDesc").value = CURRENT.description || "";
@@ -471,10 +601,9 @@
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
 
-        // Badges només d’aquest drawer
-        renderBadgesCurrentOnly(CURRENT);
+        // NEW strict aggregation:
+        renderGlobalAndDrawerBadges_ForCurrent();
 
-        // Prefill modal
         document.getElementById("fldName").value = CURRENT.productName || "";
         document.getElementById("fldCode").value = CURRENT.productCode || "";
         document.getElementById("fldDesc").value = CURRENT.description || "";
@@ -523,11 +652,10 @@
           });
           if (!r.ok) throw new Error(await r.text());
           cur = newVal; delta = 0; refresh();
-          // update CURRENT in-memory to keep badges consistent
-          if (CURRENT) { CURRENT.stockQty = String(newVal); }
-          renderBadgesCurrentOnly(CURRENT);
           showToast('✔️ Stock successfully updated');
           showPostSaveBanner(60);
+          // Re-render distribution with strict rule
+          renderGlobalAndDrawerBadges_ForCurrent();
         }catch(e){
           console.error(e);
           showToast('❌ Error updating stock', '#b3261e');
@@ -559,7 +687,7 @@
     }
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') setDrawerImg(false); });
 
-    // Upload (JPEG/PNG)
+    // Upload (JPEG)
     const uploadBtn     = document.getElementById('uploadPhotoBtn');
     const refreshImgBtn = document.getElementById('refreshImgBtn');
     const fileInput     = document.getElementById('fileInput');
@@ -571,9 +699,7 @@
     fileInput.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0];
       if(!file) return;
-      const isJpeg = /image\/jpe?g/i.test(file.type);
-      const isPng  = /image\/png/i.test(file.type);
-      if(!isJpeg && !isPng) return showToast('Only JPEG or PNG', '#b3261e');
+      if(!/image\/jpe?g/i.test(file.type)) return showToast('JPEG only (.jpg/.jpeg)', '#b3261e');
       if(file.size > 8*1024*1024) return showToast('Max 8MB image', '#b3261e');
 
       const fd = new FormData();
@@ -591,7 +717,7 @@
       }finally{ fileInput.value = ''; }
     });
 
-    // --- Edit info modal (SENSE “create/existing” i SENSE propagació)
+    // --- Edit info modal / process chooser ---
     const editBtn = document.getElementById('editInfoBtn');
     const editDescBtn = document.getElementById('editDescBtn');
     const modal = document.getElementById('editModal');
@@ -600,13 +726,151 @@
     const fldCode = document.getElementById('fldCode');
     const fldDesc = document.getElementById('fldDesc');
 
-    function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
+    function setEditLocked(mode){
+      if (mode === 'existing'){
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = true;
+      } else if (mode === 'desc-only'){
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = false;
+      } else if (mode === 'all'){
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = true;
+      } else {
+        fldName.disabled = false; fldCode.disabled = false; fldDesc.disabled = false;
+      }
+    }
+    function applyCanonToFields(canon){
+      fldName.value = canon.productName || '';
+      fldCode.value = canon.productCode || '';
+      fldDesc.value = canon.description || '';
+    }
 
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
-    document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{ modal.close(); });
-    document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{ modal.close(); });
-    editBtn.addEventListener('click', ()=> safeOpenDialog(modal));
-    editDescBtn.addEventListener('click', ()=> safeOpenDialog(modal));
+    document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{ setModeSticky(null); modal.close(); setEditLocked('none'); });
+    document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{ setModeSticky(null); modal.close(); setEditLocked('none'); });
+
+    const dupModal = document.getElementById('dupModal');
+    const dupMsg   = document.getElementById('dupMsg');
+    const dupStats = document.getElementById('dupStats');
+    const dupStatsWrap = document.getElementById('dupStatsWrap');
+    const dupClose = document.getElementById('dupClose');
+    const dupExistingBtn = document.getElementById('dupExisting');
+    const dupNewBtn      = document.getElementById('dupNew');
+
+    dupClose.addEventListener('click', ()=>{ setModeSticky(null); dupModal.close(); });
+    dupModal.addEventListener('click', (e)=>{
+      const r = dupModal.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if(!inside){ setModeSticky(null); dupModal.close(); }
+    });
+
+    function renderDupStats(agg, productName){
+      const lines = (agg.perLine || [])
+        .map(x => `- ${x.drawerCode} → qty: ${x.qty}${x.productCode ? ' | code: ' + x.productCode : ''}`)
+        .join('<br>');
+      return `
+        <div><strong>productName:</strong> ${productName || ''}</div>
+        <div><strong>Lines:</strong> ${agg.countLines ?? 0}</div>
+        <div><strong>TOTAL STOCK:</strong> ${agg.totalQty ?? 0}</div>
+        <hr>
+        <div style="font-weight:600; margin:4px 0">Per-line detail</div>
+        <div>${lines || '(none)'}</div>
+      `;
+    }
+
+    const dupStep1 = document.getElementById('dupStep1');
+    const dupStep2 = document.getElementById('dupStep2');
+    const dupFt1   = document.getElementById('dupFt1');
+    const dupFt2   = document.getElementById('dupFt2');
+    const existingSelect = document.getElementById('existingSelect');
+    const dupBackBtn     = document.getElementById('dupBack');
+    const dupProceedExistingBtn = document.getElementById('dupProceedExisting');
+    const existingPreview = document.getElementById('existingPreview');
+    const existingPreviewBox = document.getElementById('existingPreviewBox');
+
+    function openExistingPicker(){
+      const items = uniqueProductNamesFromData(ALL_DATA);
+      existingSelect.innerHTML = '';
+      const opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = '— Select a product —';
+      existingSelect.appendChild(opt0);
+
+      for (const it of items){
+        const o = document.createElement('option');
+        o.value = it.display;
+        o.textContent = `${it.display} (${it.n})`;
+        existingSelect.appendChild(o);
+      }
+
+      const curName = (CURRENT?.productName || '').trim();
+      if (curName){
+        for (const o of existingSelect.options){
+          if (normalizeName(o.value) === normalizeName(curName)) { existingSelect.value = o.value; break; }
+        }
+      }
+
+      const renderPreview = ()=>{
+        const val = existingSelect.value.trim();
+        if (!val){
+          existingPreview.style.display = 'none';
+          existingPreviewBox.innerHTML = '';
+          return;
+        }
+        const canon = canonicalByProductName(val);
+        existingPreviewBox.innerHTML =
+          `name: ${canon.productName || ''}<br>` +
+          `code: ${canon.productCode || ''}<br>` +
+          `desc: ${canon.description || ''}`;
+        existingPreview.style.display = '';
+      };
+      existingSelect.onchange = renderPreview;
+      renderPreview();
+
+      dupStep1.style.display = 'none';
+      dupFt1.style.display   = 'none';
+      dupStep2.style.display = '';
+      dupFt2.style.display   = '';
+    }
+
+    dupBackBtn.addEventListener('click', ()=>{
+      dupStep2.style.display = 'none';
+      dupFt2.style.display   = 'none';
+      dupStep1.style.display = '';
+      dupFt1.style.display   = '';
+    });
+
+    dupExistingBtn.onclick = () => { openExistingPicker(); };
+    dupNewBtn.onclick      = () => { setModeSticky("NEW"); setEditLocked('none'); dupModal.close(); modal.showModal(); };
+
+    document.getElementById('editInfoBtn').addEventListener("click", async () => {
+      const name = (CURRENT?.productName || "").trim();
+      if (!name) { setModeSticky("NEW"); setEditLocked('none'); return modal.showModal(); }
+
+      try {
+        const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
+        const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(await r.text());
+        const body = await r.json();
+
+        if (body.exists) {
+          const agg = body.aggregate || {};
+          dupStatsWrap.style.display = "";
+          dupStats.innerHTML = renderDupStats(agg, name);
+          dupMsg.textContent = "⚠️ This product (same NAME) already exists in other drawers. Choose the process:";
+        } else {
+          dupStatsWrap.style.display = "none";
+          dupStats.innerHTML = "";
+          dupMsg.textContent = "You’re about to modify this drawer. Do you want to create a NEW PRODUCT or add an EXISTING PRODUCT?";
+        }
+
+        try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
+      } catch (err) {
+        console.error("Error checking duplicates:", err);
+        showToast("❌ Error loading duplicates", "#b3261e");
+        setEditLocked('none');
+        modal.showModal(); // fallback
+      }
+    });
 
     async function postUpdateInfo(payload){
       const r = await fetch(UPDATE_INFO_ENDPOINT, {
@@ -617,27 +881,20 @@
       return r;
     }
 
-    saveInfoBtn.addEventListener('click', async (ev)=>{
-      ev.preventDefault();
-      const name = (fldName.value || '').trim();
-      const code = (fldCode.value || '').trim();
-      const desc = (fldDesc.value || '').trim();
-      if(!name || !code || !desc){
-        showToast('Please fill all fields', '#b3261e');
-        return;
-      }
-      try{
-        const payload = {
-          drawerCode,
-          productName: name,
-          productCode: code,
-          description: desc,
-          propagateAll: false,          // ⬅️ IMPORTANT: només aquest drawer
-          mode: 'CURRENT_ONLY'          // ⬅️ pista per al Worker (opcional, segur)
-        };
-        const res = await postUpdateInfo(payload);
-        if (!res.ok) throw new Error(await res.text());
+    // attemptSaveInfo — NO propagation on NEW
+    async function attemptSaveInfo({ forceName = null, forceMode = null, _tried409Once = false } = {}){
+      const name = (forceName ?? fldName.value).trim();
+      const code = fldCode.value.trim();
+      const desc = fldDesc.value.trim();
 
+      const payload = { drawerCode, productName: name, productCode: code, description: desc };
+      const effectiveMode = (forceMode || getModeSticky() || '').toUpperCase();
+      if (effectiveMode) payload.mode = effectiveMode;
+      payload.propagateAll = (effectiveMode !== 'NEW');
+
+      const res = await postUpdateInfo(payload);
+
+      if (res.ok) {
         const body = await res.json().catch(()=> ({}));
         const updated = body?.drawerUpdated || {};
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${updated.productName || name}`;
@@ -650,13 +907,101 @@
           CURRENT.description = updated.description || desc;
         }
 
-        showToast('✔️ Product info updated (this drawer only)');
+        showToast('✔️ Product info updated');
         showPostSaveBanner(60);
-        modal.close();
-      }catch(e){
-        console.error(e);
-        showToast('❌ Error updating info', '#b3261e');
+
+        // Recompute strict aggregation immediately so que només surti el drawer aplicat si és NEW
+        renderGlobalAndDrawerBadges_ForCurrent();
+
+        return { done:true };
       }
+
+      if (res.status === 409) {
+        let body = {};
+        try { body = await res.json(); } catch {}
+
+        if ((effectiveMode === 'EXISTING') && !_tried409Once) {
+          const expected = (body && body.expectedProductName) ? String(body.expectedProductName).trim() : null;
+          return attemptSaveInfo({ forceName: expected || name, forceMode: 'EXISTING', _tried409Once: true });
+        }
+
+        if (effectiveMode === 'EXISTING'){
+          showToast('⚠️ Could not save in EXISTING mode (conflict). Check CSV name duplicates.', '#b3261e');
+          return { done:false };
+        }
+
+        if (body?.warning) {
+          setModeSticky(null);
+          dupStatsWrap.style.display = "none";
+          dupStats.innerHTML = "";
+          dupMsg.textContent = "You’re about to modify this drawer. Do you want to create a NEW PRODUCT or add an EXISTING PRODUCT?";
+          try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
+          return { done:false, warned:true };
+        }
+
+        showToast('❌ Conflict updating info', '#b3261e');
+        return { done:false };
+      }
+
+      const text = await res.text().catch(()=> 'Error');
+      console.error('Update info response:', res.status, text);
+      showToast('❌ Error updating info', '#b3261e');
+      return { done:false };
+    }
+
+    document.getElementById('saveInfoBtn').addEventListener('click', async (ev)=>{
+      ev.preventDefault();
+      const mode = (getModeSticky() || '').toUpperCase();
+
+      const name = (fldName.value || '').trim();
+      const code = (fldCode.value || '').trim();
+      const desc = (fldDesc.value || '').trim();
+
+      if (mode === 'DESC_ONLY'){
+        if (!desc){ showToast('Description cannot be empty', '#b3261e'); return; }
+        setEditLocked('all');
+        const res = await attemptSaveInfo({ forceMode: 'DESC_ONLY' });
+        setEditLocked('none');
+        if (res.done){ setModeSticky(null); }
+        return;
+      }
+
+      if (mode === 'EXISTING'){ return; }
+
+      if(!name || !code || !desc){
+        showToast('Please fill all fields', '#b3261e');
+        return;
+      }
+
+      try {
+        const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
+        const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
+        const r = await fetch(url);
+        if (r.ok) {
+          const body = await r.json();
+          if (body.exists) {
+            const agg = body.aggregate || {};
+            dupStatsWrap.style.display = "";
+            dupStats.innerHTML = renderDupStats(agg, name);
+            dupMsg.textContent = "⚠️ You’re creating a NEW PRODUCT with a NAME that already exists. Switch to EXISTING PRODUCT?";
+
+            dupExistingBtn.onclick = () => { openExistingPicker(); };
+            dupNewBtn.onclick      = async () => {
+              setModeSticky("NEW");
+              dupModal.close();
+              setEditLocked('all');
+              await attemptSaveInfo({ forceMode: 'NEW' });
+              setEditLocked('none');
+            };
+            try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
+            return;
+          }
+        }
+      } catch(e){ console.warn("Duplicate check on save (NEW) failed:", e); }
+
+      setEditLocked('all');
+      await attemptSaveInfo({ forceMode: 'NEW' });
+      setEditLocked('none');
     });
 
     // --- QR ---
@@ -725,12 +1070,12 @@
       }
     }
 
-    function safeOpenDialog2(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
+    function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function openQrModal(){
       const url = QR_STATIC_VALUE;
       document.getElementById('qrUrlNote').textContent = url;
-      safeOpenDialog2(qrModal);
+      safeOpenDialog(qrModal);
       await new Promise(r=>requestAnimationFrame(r));
       await ensureQrLib();
       await drawQR(url);
