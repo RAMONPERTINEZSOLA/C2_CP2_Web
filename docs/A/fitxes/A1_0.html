@@ -100,7 +100,7 @@
     #postSaveBanner .counter{font-variant-numeric:tabular-nums; font-weight:700}
     #postSaveBanner button{background:#ffffff; color:#0f1b2f; border:1px solid #cfe4ff66; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer}
 
-    /* ===== Badges GLOBAL / DRAWER ===== */
+    /* Badges: GLOBAL / DRAWER */
     #stockBadges{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
     .badge{
       display:inline-flex;align-items:center;gap:.4rem;
@@ -148,7 +148,7 @@
       </div>
     </div>
 
-    <!-- ===== BADGES GLOBAL / DRAWER ===== -->
+    <!-- GLOBAL / DRAWER badges -->
     <div id="stockBadges">
       <span id="badgeGlobal" class="badge">GLOBAL: <strong id="globalStockCount">—</strong></span>
       <span id="badgeDrawer" class="badge">DRAWER: <strong id="drawerStockCount">—</strong></span>
@@ -212,7 +212,7 @@
     <div id="toast"></div>
   </div>
 
-  <!-- Banner post-save (countdown) -->
+  <!-- Post-save banner (countdown) -->
   <div id="postSaveBanner" role="status" aria-live="polite">
     <div class="row">
       <div>
@@ -254,7 +254,7 @@
     </form>
   </dialog>
 
-  <!-- PROCESS CHOOSER + EXISTING PICKER -->
+  <!-- Process chooser + EXISTING picker -->
   <dialog class="modal" id="dupModal">
     <div class="hd">
       <strong>⚠️ Product process</strong>
@@ -322,7 +322,7 @@
   </dialog>
 
   <script>
-    // ======= Setup QR lib wait =======
+    // --- QR lib wait ---
     async function ensureQrLib(timeoutMs = 1000) {
       const t0 = performance.now();
       while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
@@ -331,15 +331,14 @@
       }
     }
 
-    // ======= Constants =======
+    // --- Constants ---
     const drawerCode = "A1_0";
     const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
     const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
 
-    // --- Sticky mode helpers ---
-    // 'NEW' | 'EXISTING' | 'DESC_ONLY' | null
+    // Sticky mode
     let CHOSEN_MODE = null;
     const MODE_KEY = `mode_${drawerCode}`;
     function setModeSticky(m){ CHOSEN_MODE = m || null; sessionStorage.setItem(MODE_KEY, CHOSEN_MODE || ''); }
@@ -371,12 +370,11 @@
       setTimeout(()=> toast.style.display="none", 2600);
     }
 
-    // ======= Post-save banner with countdown =======
+    // Post-save banner with countdown
     const psb = document.getElementById('postSaveBanner');
     const psbCounter = document.getElementById('psbCounter');
     const psbRefreshBtn = document.getElementById('psbRefreshBtn');
     psbRefreshBtn.addEventListener('click', ()=> location.reload());
-
     let psbTimer = null;
     function showPostSaveBanner(seconds = 60){
       clearInterval(psbTimer);
@@ -390,9 +388,9 @@
       }, 1000);
     }
 
-    // ======= CSV load & globals =======
+    // CSV globals
     let ALL_DATA = [];
-    let CURRENT  = null; // current drawer row
+    let CURRENT  = null;
 
     async function loadCSVFromCandidates() {
       const candidates = [
@@ -420,13 +418,7 @@
       return data;
     }
 
-    function normalizeName(s){
-      return String(s || '')
-        .normalize('NFKC')
-        .replace(/\s+/g,' ')
-        .trim()
-        .toLowerCase();
-    }
+    const normalizeName = s => String(s || '').normalize('NFKC').replace(/\s+/g,' ').trim().toLowerCase();
 
     function uniqueProductNamesFromData(data){
       const count = new Map();
@@ -469,24 +461,12 @@
       };
     }
 
-    function aggregateForCode(code){
-      const same = ALL_DATA.filter(r => (r.productCode||"").trim() === code.trim());
-      const perLine = same.map(r => ({
-        drawerCode: r.drawerCode,
-        qty: parseInt(r.stockQty||"0",10) || 0,
-        productName: r.productName||""
-      }));
-      const totalQty = perLine.reduce((a,b)=>a+b.qty,0);
-      return { countLines: perLine.length, totalQty, perLine };
-    }
-
-    // ======= NEW: GLOBAL & DRAWER aggregation by product key =======
+    // --- Aggregation by product key (prefer code, fallback name) ---
     function getProductKeyFromRow(row){
       const code = (row.productCode || "").trim();
       if (code) return { key: code.toLowerCase(), type: "code" };
       return { key: normalizeName(row.productName || ""), type: "name" };
     }
-
     function aggregateForProductKey(productKey, useCodePrefer=true){
       const agg = { total:0, byDrawer:{}, minByDrawer:{} };
       for(const r of ALL_DATA){
@@ -505,7 +485,6 @@
       }
       return agg;
     }
-
     function renderGlobalAndDrawerBadges(agg, currentDrawer){
       const gEl = document.getElementById('globalStockCount');
       const dEl = document.getElementById('drawerStockCount');
@@ -519,16 +498,16 @@
       if (badgeDrawer){
         const min = currentDrawer ? (agg.minByDrawer[currentDrawer] || 0) : 0;
         badgeDrawer.classList.toggle('low', min>0 && dq <= min);
-        badgeDrawer.title = min ? `Min drawer: ${min}` : '';
+        badgeDrawer.title = min ? `Drawer minimum: ${min}` : '';
       }
 
-      // Distribució per drawers (opcional)
+      // Optional distribution panel
       if (distWrap){
         const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
         if (!entries.length){ distWrap.innerHTML = ''; return; }
         let html = `
           <div style="border:1px solid var(--line);border-radius:12px;padding:.75rem;background:#fff">
-            <div style="font-weight:600;margin-bottom:.4rem">Distribució per drawers (${entries.length})</div>
+            <div style="font-weight:600;margin-bottom:.4rem">Distribution by drawers (${entries.length})</div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.4rem;">
         `;
         for (const [d,q] of entries){
@@ -541,7 +520,7 @@
       }
     }
 
-    // ====== UI boot ======
+    // --- Boot ---
     loadCSVFromCandidates()
       .then(csv => {
         ALL_DATA = parseCSV(csv);
@@ -557,8 +536,8 @@
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
 
-        // ===== NEW: calcula i pinta GLOBAL + DRAWER =====
-        const { key } = getProductKeyFromRow(CURRENT); // preferim code si existeix
+        // NEW: Global + Drawer counters
+        const { key } = getProductKeyFromRow(CURRENT);
         const agg = aggregateForProductKey(key, true);
         renderGlobalAndDrawerBadges(agg, drawerCode);
 
@@ -569,7 +548,7 @@
       })
       .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
 
-    // ======= Stock UI =======
+    // --- Stock UI ---
     function initStockUI(initialQty, MIN_STOCK = 10) {
       const curEl = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
@@ -619,10 +598,10 @@
       refresh();
     }
 
-    // ====================== Drawer image (JPEG only) ======================
+    // --- Drawer image (JPEG only) ---
     const IMG_VER_KEY = `imgVer_${drawerCode}`;
-    function getImgVersion(){ const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10); return isNaN(v) ? 1 : v; }
-    function bumpImgVersion(){ const v = getImgVersion() + 1; localStorage.setItem(IMG_VER_KEY, String(v)); return v; }
+    const getImgVersion = () => { const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10); return isNaN(v) ? 1 : v; };
+    const bumpImgVersion = () => { const v = getImgVersion() + 1; localStorage.setItem(IMG_VER_KEY, String(v)); return v; };
     function imageCandidatesWithVersion(version){
       const ts = `?v=${version}`;
       return [
@@ -672,7 +651,7 @@
       }finally{ fileInput.value = ''; }
     });
 
-    // === Edit info modal ===
+    // --- Edit info modal ---
     const editBtn = document.getElementById('editInfoBtn');
     const editDescBtn = document.getElementById('editDescBtn');
     const modal = document.getElementById('editModal');
@@ -692,17 +671,14 @@
         fldName.disabled = false; fldCode.disabled = false; fldDesc.disabled = false;
       }
     }
-
     function applyCanonToFields(canon){
       fldName.value = canon.productName || '';
       fldCode.value = canon.productCode || '';
       fldDesc.value = canon.description || '';
     }
 
-    // avoid form submit
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
 
-    // close buttons
     document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{
       setModeSticky(null); modal.close(); setEditLocked('none');
     });
@@ -710,7 +686,7 @@
       setModeSticky(null); modal.close(); setEditLocked('none');
     });
 
-    // ===== Process chooser / existing picker =====
+    // Process chooser / existing picker
     const dupModal = document.getElementById('dupModal');
     const dupMsg   = document.getElementById('dupMsg');
     const dupStats = document.getElementById('dupStats');
@@ -802,7 +778,7 @@
       dupFt1.style.display   = '';
     });
 
-    // EXISTING → Save NOW
+    // EXISTING → Save now
     dupProceedExistingBtn.addEventListener('click', async ()=>{
       const val = (existingSelect.value || '').trim();
       if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
@@ -857,7 +833,7 @@
     }
     editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
 
-    // Botó: Edit Description (DESC_ONLY)
+    // Edit Description only
     editDescBtn.addEventListener('click', () => {
       setModeSticky('DESC_ONLY');
       fldName.value = CURRENT?.productName || '';
@@ -876,7 +852,7 @@
       return r;
     }
 
-    // ===== attemptSaveInfo amb propagateAll =====
+    // attemptSaveInfo with propagateAll
     async function attemptSaveInfo({ forceName = null, forceMode = null, _tried409Once = false } = {}){
       const name = (forceName ?? fldName.value).trim();
       const code = fldCode.value.trim();
@@ -941,7 +917,6 @@
       return { done:false };
     }
 
-    // ===== Save handler =====
     const saveInfoBtnHandler = async (ev)=>{
       ev.preventDefault();
       const mode = (getModeSticky() || '').toUpperCase();
@@ -999,7 +974,7 @@
 
     document.getElementById('saveInfoBtn').addEventListener('click', saveInfoBtnHandler);
 
-    // ===== QR =====
+    // --- QR ---
     const qrBtn = document.getElementById('qrBtn');
     const qrModal = document.getElementById('qrModal');
     const qrClose = document.getElementById('qrClose');
