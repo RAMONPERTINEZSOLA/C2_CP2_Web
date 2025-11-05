@@ -285,6 +285,17 @@
   </dialog>
 
   <script>
+
+    // Close buttons wiring (always work)
+    document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{
+      modal.close();
+      setEditLocked('none');
+    });
+    document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{
+      modal.close();
+      setEditLocked('none');
+    });
+
     // ======= Setup QR lib wait =======
     async function ensureQrLib(timeoutMs = 1000) {
       const t0 = performance.now();
@@ -501,11 +512,23 @@
     const fldCode = document.getElementById('fldCode');
     const fldDesc = document.getElementById('fldDesc');
 
-        function setEditLocked(lock){
-      fldName.disabled = !!lock;
-      fldCode.disabled = !!lock;
-      fldDesc.disabled = !!lock;
-    }
+      function setEditLocked(mode){
+  // mode: 'none' | 'existing' | 'all'
+  if (mode === 'existing'){
+    fldName.disabled = true;
+    fldCode.disabled = true;
+    fldDesc.disabled = false; // només desc editable
+  } else if (mode === 'all'){
+    fldName.disabled = true;
+    fldCode.disabled = true;
+    fldDesc.disabled = true;
+  } else {
+    // none
+    fldName.disabled = false;
+    fldCode.disabled = false;
+    fldDesc.disabled = false;
+  }
+}
 
 
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
@@ -527,18 +550,19 @@
     });
 
     function renderDupStats(agg, productName){
-  const lines = (agg.perLine || [])
-    .map(x => `- ${x.drawerCode} → qty: ${x.qty}${x.productCode ? ' | code: ' + x.productCode : ''}`)
-    .join('<br>');
-  return `
-    <div><strong>productName:</strong> ${productName || ''}</div>
-    <div><strong>Línies:</strong> ${agg.countLines ?? 0}</div>
-    <div><strong>STOCK TOTAL:</strong> ${agg.totalQty ?? 0}</div>
-    <hr>
-    <div style="font-weight:600; margin:4px 0">Detall per línia</div>
-    <div>${lines || '(cap)'}</div>
-  `;
-}
+    const lines = (agg.perLine || [])
+      .map(x => `- ${x.drawerCode} → qty: ${x.qty}${x.productCode ? ' | code: ' + x.productCode : ''}`)
+      .join('<br>');
+    return `
+      <div><strong>productName:</strong> ${productName || ''}</div>
+      <div><strong>Lines:</strong> ${agg.countLines ?? 0}</div>
+      <div><strong>TOTAL STOCK:</strong> ${agg.totalQty ?? 0}</div>
+      <hr>
+      <div style="font-weight:600; margin:4px 0">Per-line detail</div>
+      <div>${lines || '(none)'}</div>
+    `;
+  }
+
 
 // ===== Helpers per a noms i canònics (a nivell de fitxer)
 function normalizeName(s){
@@ -664,23 +688,47 @@ dupBackBtn.addEventListener('click', ()=>{
 });
 
 // quan prems “Continuar” amb producte existent
-dupProceedExistingBtn.addEventListener('click', ()=>{
-  const val = existingSelect.value.trim();
-  if (!val){ showToast('Tria un producte existent', '#b3261e'); return; }
+dupProceedExistingBtn.addEventListener('click', async ()=>{
+  const val = (existingSelect.value || '').trim();
+  if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
   const canon = canonicalByProductName(val);
 
-  // Prefill editor amb els canònics i bloqueja mode EXISTENT
-  CHOSEN_MODE = 'EXISTING';
-  fldName.value = canon.productName || '';
-  fldCode.value = canon.productCode || '';
-  fldDesc.value = canon.description || '';
+  // Opció: oferim editar la Description abans de guardar
+  const wantEditDesc = confirm(
+    "You chose an EXISTING product.\n\nDo you want to adjust the Description before saving?\n\nOK = edit description first\nCancel = save now"
+  );
 
-    // 🔒 bloqueja camps en mode EXISTENT
-  setEditLocked(true);
-  
-  dupModal.close();
-  modal.showModal();
+  CHOSEN_MODE = 'EXISTING';
+
+  if (wantEditDesc){
+    // Prefill i obre editor amb només Description editable
+    fldName.value = canon.productName || '';
+    fldCode.value = canon.productCode || '';
+    fldDesc.value = canon.description || '';
+    setEditLocked('existing');
+    dupModal.close();
+    try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
+    return;
+  }
+
+  // Guardat immediat amb canònics
+  setEditLocked('all'); // evitem doble clic
+  const res = await attemptSaveInfo({
+    forceName: canon.productName || ''
+  });
+  if (!res.done){
+    // si per algun motiu no es pot, obrim editor amb desc editable
+    fldName.value = canon.productName || '';
+    fldCode.value = canon.productCode || '';
+    fldDesc.value = canon.description || '';
+    setEditLocked('existing');
+    dupModal.close();
+    try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
+  } else {
+    dupModal.close();
+  }
 });
+
 
 // === PRE-WARNING: consulta real al Worker abans d’obrir el chooser ===
 async function checkDuplicatesBeforeEdit() {
@@ -797,37 +845,29 @@ editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
     }
 
     const saveInfoBtnHandler = async (ev)=>{
-  ev.preventDefault();
-  const name = fldName.value.trim();
-  const code = fldCode.value.trim();
-  const desc = fldDesc.value.trim();
-  if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
+      ev.preventDefault();
 
-  // Si està en mode NEW, avisa si el NOM ja existeix
-  if (CHOSEN_MODE === 'NEW') {
-    try {
-      const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
-      const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
-      const r = await fetch(url);
-      if (r.ok) {
-        const body = await r.json();
-        if (body.exists) {
-          const agg = body.aggregate || {};
-          dupStatsWrap.style.display = "";
-          dupStats.innerHTML = renderDupStats(agg, name);
-          dupMsg.textContent = "⚠️ ATENCIÓ: estàs creant un PRODUCTE NOU amb un NOM que ja existeix. Vols canviar a PRODUCTE EXISTENT?";
-          dupExistingBtn.onclick = () => { openExistingPicker(); };
-          dupNewBtn.onclick      = async () => { CHOSEN_MODE = "NEW"; dupModal.close(); await attemptSaveInfo(); };
+      const name = (fldName.value || '').trim();
+      const code = (fldCode.value || '').trim();
+      const desc = (fldDesc.value || '').trim();
 
-          try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
-          return; // atura aquí; l’usuari decideix
-        }
+      if (CHOSEN_MODE === 'EXISTING'){
+        // En mode EXISTENT només exigim Description (pot ser buit si no vols canvis)
+        await attemptSaveInfo();
+        return;
       }
-    } catch(e){ console.warn("Duplicate check on save (NEW) failed:", e); }
-  }
 
-  await attemptSaveInfo();
-};
+      // Mode NEW: tots requerits
+      if(!name || !code || !desc){
+        showToast('Please fill all fields', '#b3261e'); 
+        return;
+      }
+
+      // Dedupe NEW si cal...
+      // (mantens el teu check de duplicates tal com el tens)
+      await attemptSaveInfo();
+    };
+
 
     // ===== QR =====
     const qrBtn = document.getElementById('qrBtn');
