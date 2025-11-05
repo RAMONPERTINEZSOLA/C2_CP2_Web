@@ -63,7 +63,6 @@
       100%{opacity:0;transform:translate(-50%,10px)}
     }
 
-    /* ===== Improved Modal Style ===== */
     dialog.modal{border:none;border-radius:22px;padding:0;max-width:760px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
     dialog.modal::backdrop{background:rgba(10,12,14,.45);backdrop-filter:blur(3px)}
     .modal .hd{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#f0f7ec}
@@ -91,15 +90,12 @@
     }
   </style>
 
-  <!-- Keep dialog on top -->
   <style>
     dialog.modal{ z-index: 10010 !important; }
     dialog.modal::backdrop{ z-index: 10000 !important; }
   </style>
   
-  <!-- PDF (CDN) + QR (LOCAL) -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <!-- QR UMD -->
   <script type="module">
     import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
     const lib = (m && m.QrCode) ? m : (m && m.default && m.default.QrCode) ? m.default : m;
@@ -550,40 +546,31 @@
     const fldCode = document.getElementById('fldCode');
     const fldDesc = document.getElementById('fldDesc');
 
-    // 'none' | 'existing' | 'all'
     function setEditLocked(mode){
-      if (mode === 'existing'){         // EXISTENT: només descr. editable
-        fldName.disabled = true;
-        fldCode.disabled = true;
-        fldDesc.disabled = false;
-      } else if (mode === 'all'){       // Bloqueig complet (mentre guardem)
-        fldName.disabled = true;
-        fldCode.disabled = true;
-        fldDesc.disabled = true;
-      } else {                          // NEW o sense mode: tot editable
-        fldName.disabled = false;
-        fldCode.disabled = false;
-        fldDesc.disabled = false;
+      if (mode === 'existing'){
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = false;
+      } else if (mode === 'all'){
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = true;
+      } else {
+        fldName.disabled = false; fldCode.disabled = false; fldDesc.disabled = false;
       }
     }
 
-    
     function applyCanonToFields(canon){
-        fldName.value = canon.productName || '';
-        fldCode.value = canon.productCode || '';
-        fldDesc.value = canon.description || '';
-      }
+      fldName.value = canon.productName || '';
+      fldCode.value = canon.productCode || '';
+      fldDesc.value = canon.description || '';
+    }
 
-
-    // Ensure form doesn't auto-submit
+    // avoid form submit
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
 
-    // Close buttons wiring
+    // close buttons
     document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{
-      modal.close(); setEditLocked('none');
+      CHOSEN_MODE = null; modal.close(); setEditLocked('none');
     });
     document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{
-      modal.close(); setEditLocked('none');
+      CHOSEN_MODE = null; modal.close(); setEditLocked('none');
     });
 
     // ===== Process chooser / existing picker =====
@@ -595,11 +582,11 @@
     const dupExistingBtn = document.getElementById('dupExisting');
     const dupNewBtn      = document.getElementById('dupNew');
 
-    dupClose.addEventListener('click', ()=> dupModal.close());
+    dupClose.addEventListener('click', ()=>{ CHOSEN_MODE = null; dupModal.close(); });
     dupModal.addEventListener('click', (e)=>{
       const r = dupModal.getBoundingClientRect();
       const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-      if(!inside) dupModal.close();
+      if(!inside){ CHOSEN_MODE = null; dupModal.close(); }
     });
 
     function renderDupStats(agg, productName){
@@ -616,7 +603,6 @@
       `;
     }
 
-    // Step 2 UI
     const dupStep1 = document.getElementById('dupStep1');
     const dupStep2 = document.getElementById('dupStep2');
     const dupFt1   = document.getElementById('dupFt1');
@@ -679,37 +665,30 @@
       dupFt1.style.display   = '';
     });
 
-    // EXISTING → Continue: save now (or edit desc first)
-      dupProceedExistingBtn.addEventListener('click', async ()=>{
+    // EXISTING → Continue
+    dupProceedExistingBtn.addEventListener('click', async ()=>{
       const val = (existingSelect.value || '').trim();
       if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
 
-      // Canonicals i “fallbacks” segurs
       const canon = canonicalByProductName(val);
-      const safeCanon = {
-        productName: canon.productName || (CURRENT?.productName || ''),
-        productCode: canon.productCode || (CURRENT?.productCode || 'N/A'),
-        description: canon.description || (CURRENT?.description || '')
-      };
-
-      CHOSEN_MODE = 'EXISTENT';
+      CHOSEN_MODE = 'EXISTING';
 
       const wantEditDesc = confirm(
         "You chose an EXISTING product.\n\nDo you want to adjust the Description before saving?\n\nOK = edit description first\nCancel = save now"
       );
 
       if (wantEditDesc){
-        applyCanonToFields(safeCanon);
+        applyCanonToFields(canon);
         setEditLocked('existing');
         dupModal.close();
         try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
         return;
       }
 
-      // Guarda ara mateix amb canònics segurs (sense editor)
-      applyCanonToFields(safeCanon);
+      // Save now with canonical values
+      applyCanonToFields(canon);
       setEditLocked('all');
-      const res = await attemptSaveInfo({ forceName: safeCanon.productName });
+      const res = await attemptSaveInfo({ forceName: canon.productName || '' });
 
       if (res.done){
         CHOSEN_MODE = null;
@@ -718,13 +697,11 @@
         return;
       }
 
-      // Fallback: si hi hagués un 409 inesperat, obre editor només amb desc.
+      // Fallback
       setEditLocked('existing');
       dupModal.close();
       try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
     });
-
-
 
     // Pre-warning: check name duplicates before open
     async function checkDuplicatesBeforeEdit() {
@@ -808,9 +785,7 @@
 
         if (body?.error && body?.expectedProductName) {
           const expected = String(body.expectedProductName || '').trim();
-          if (expected) {
-            return attemptSaveInfo({ forceName: expected });
-          }
+          if (expected) return attemptSaveInfo({ forceName: expected });
         }
 
         if (body?.warning) {
@@ -840,9 +815,7 @@
       const code = (fldCode.value || '').trim();
       const desc = (fldDesc.value || '').trim();
 
-      if (CHOSEN_MODE === 'EXISTENT'){
-        // En mode EXISTENT només validem que hi hagi descripció (si la vols afegir)
-        // i guardem directament amb els valors actuals del formulari.
+      if (CHOSEN_MODE === 'EXISTING'){
         setEditLocked('all');
         const res = await attemptSaveInfo();
         setEditLocked('none');
@@ -850,13 +823,12 @@
         return;
       }
 
-      // Mode NEW: requerim tots els camps
+      // NEW
       if(!name || !code || !desc){
         showToast('Please fill all fields', '#b3261e');
         return;
       }
 
-      // Check duplicats per NEW
       try {
         const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
         const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
@@ -887,7 +859,6 @@
       await attemptSaveInfo();
       setEditLocked('none');
     };
-
 
     document.getElementById('saveInfoBtn').addEventListener('click', saveInfoBtnHandler);
 
