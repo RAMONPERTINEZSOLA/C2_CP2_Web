@@ -296,6 +296,12 @@
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
     const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
 
+    // --- Sticky mode helpers (ENGANXÓS) ---
+    let CHOSEN_MODE = null; // 'NEW' | 'EXISTING' | null
+    const MODE_KEY = `mode_${drawerCode}`;
+    function setModeSticky(m){ CHOSEN_MODE = m || null; sessionStorage.setItem(MODE_KEY, CHOSEN_MODE || ''); }
+    function getModeSticky(){ const v = sessionStorage.getItem(MODE_KEY) || ''; CHOSEN_MODE = v ? v : null; return CHOSEN_MODE; }
+
     // Logo loader
     (function loadLogo(){
       const logo = document.getElementById('logo');
@@ -325,7 +331,6 @@
     // ======= CSV load & globals =======
     let ALL_DATA = [];
     let CURRENT  = null; // current drawer row
-    let CHOSEN_MODE = null; // 'NEW' | 'EXISTING' | null
 
     async function loadCSVFromCandidates() {
       const candidates = [
@@ -453,6 +458,7 @@
       function refresh(){
         curEl.textContent = cur;
         deltaEl.textContent = delta > 0 ? '+' + delta : delta;
+        
         const nv = cur + delta;
         newEl.textContent = nv;
         exact.value = nv;
@@ -565,12 +571,12 @@
     // avoid form submit
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
 
-    // close buttons
+    // close buttons (netejar mode sticky)
     document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{
-      CHOSEN_MODE = null; modal.close(); setEditLocked('none');
+      setModeSticky(null); modal.close(); setEditLocked('none');
     });
     document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{
-      CHOSEN_MODE = null; modal.close(); setEditLocked('none');
+      setModeSticky(null); modal.close(); setEditLocked('none');
     });
 
     // ===== Process chooser / existing picker =====
@@ -582,11 +588,11 @@
     const dupExistingBtn = document.getElementById('dupExisting');
     const dupNewBtn      = document.getElementById('dupNew');
 
-    dupClose.addEventListener('click', ()=>{ CHOSEN_MODE = null; dupModal.close(); });
+    dupClose.addEventListener('click', ()=>{ setModeSticky(null); dupModal.close(); });
     dupModal.addEventListener('click', (e)=>{
       const r = dupModal.getBoundingClientRect();
       const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-      if(!inside){ CHOSEN_MODE = null; dupModal.close(); }
+      if(!inside){ setModeSticky(null); dupModal.close(); }
     });
 
     function renderDupStats(agg, productName){
@@ -665,13 +671,13 @@
       dupFt1.style.display   = '';
     });
 
-    // EXISTING → Continue
+    // EXISTING → Continue (mode sticky + flux segur)
     dupProceedExistingBtn.addEventListener('click', async ()=>{
       const val = (existingSelect.value || '').trim();
       if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
 
       const canon = canonicalByProductName(val);
-      CHOSEN_MODE = 'EXISTING';
+      setModeSticky('EXISTING');
 
       const wantEditDesc = confirm(
         "You chose an EXISTING product.\n\nDo you want to adjust the Description before saving?\n\nOK = edit description first\nCancel = save now"
@@ -680,7 +686,6 @@
       if (wantEditDesc){
         applyCanonToFields(canon);
         setEditLocked('existing');
-        CHOSEN_MODE = 'EXISTING';       // reafirma mode
         dupModal.close();
         try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
         return;
@@ -692,13 +697,13 @@
       const res = await attemptSaveInfo({ forceName: canon.productName || '', forceMode: 'EXISTING' });
 
       if (res.done){
-        CHOSEN_MODE = null;
+        setModeSticky(null);
         setEditLocked('none');
         dupModal.close();
         return;
       }
 
-      // Fallback
+      // Fallback a editar descripció
       setEditLocked('existing');
       dupModal.close();
       try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
@@ -707,7 +712,7 @@
     // Pre-warning: check name duplicates before open
     async function checkDuplicatesBeforeEdit() {
       const name = (CURRENT?.productName || "").trim();
-      if (!name) { CHOSEN_MODE = "NEW"; setEditLocked('none'); return modal.showModal(); }
+      if (!name) { setModeSticky("NEW"); setEditLocked('none'); return modal.showModal(); }
 
       try {
         const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
@@ -728,7 +733,7 @@
         }
 
         dupExistingBtn.onclick = () => { openExistingPicker(); };
-        dupNewBtn.onclick      = () => { CHOSEN_MODE = "NEW"; setEditLocked('none'); dupModal.close(); modal.showModal(); };
+        dupNewBtn.onclick      = () => { setModeSticky("NEW"); setEditLocked('none'); dupModal.close(); modal.showModal(); };
 
         try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
       } catch (err) {
@@ -749,14 +754,14 @@
       return r;
     }
 
-    // ===== PATCH: attemptSaveInfo amb forceMode i reintent 409 en EXISTING =====
+    // ===== attemptSaveInfo amb forceMode i reintent 409 en EXISTING =====
     async function attemptSaveInfo({ forceName = null, forceMode = null, _tried409Once = false } = {}){
       const name = (forceName ?? fldName.value).trim();
       const code = fldCode.value.trim();
       const desc = fldDesc.value.trim();
 
       const payload = { drawerCode, productName: name, productCode: code, description: desc };
-      const effectiveMode = (forceMode || CHOSEN_MODE || '').toUpperCase();
+      const effectiveMode = (forceMode || getModeSticky() || '').toUpperCase();
       if (effectiveMode) payload.mode = effectiveMode;
 
       const res = await postUpdateInfo(payload);
@@ -783,7 +788,7 @@
         let body = {};
         try { body = await res.json(); } catch {}
 
-        // ⛔ EXISTING: mai reobrir dupModal. Reintenta 1 cop amb expectedProductName si existeix.
+        // EXISTING: mai reobrir dupModal. Reintenta 1 cop amb expectedProductName si existeix.
         if (effectiveMode === 'EXISTING') {
           if (!_tried409Once) {
             const expected = (body && body.expectedProductName) ? String(body.expectedProductName).trim() : null;
@@ -793,9 +798,9 @@
           return { done:false };
         }
 
-        // NEW: sí que pot obrir el dupModal (com abans)
+        // NEW: pot obrir el dupModal
         if (body?.warning) {
-          CHOSEN_MODE = null;
+          setModeSticky(null);
           dupStatsWrap.style.display = "none";
           dupStats.innerHTML = "";
           dupMsg.textContent = "You’re about to modify this drawer. Do you want to create a NEW PRODUCT or add an EXISTING PRODUCT?";
@@ -813,20 +818,21 @@
       return { done:false };
     }
 
-
-    // ===== PATCH: Save handler reforçat =====
+    // ===== Save handler reforçat (consulta sticky & salta pre-check en EXISTING) =====
     const saveInfoBtnHandler = async (ev)=>{
       ev.preventDefault();
+      const mode = (getModeSticky() || '').toUpperCase();
 
       const name = (fldName.value || '').trim();
       const code = (fldCode.value || '').trim();
       const desc = (fldDesc.value || '').trim();
 
-      if (CHOSEN_MODE === 'EXISTING'){
+      // EXISTING → no fem pre-check de duplicats
+      if (mode === 'EXISTING'){
         setEditLocked('all');
-        const res = await attemptSaveInfo({ forceMode: 'EXISTING' }); // ← important
+        const res = await attemptSaveInfo({ forceMode: 'EXISTING' });
         setEditLocked('none');
-        if (res.done){ CHOSEN_MODE = null; }
+        if (res.done){ setModeSticky(null); }
         return;
       }
 
@@ -850,7 +856,7 @@
 
             dupExistingBtn.onclick = () => { openExistingPicker(); };
             dupNewBtn.onclick      = async () => {
-              CHOSEN_MODE = "NEW";
+              setModeSticky("NEW");
               dupModal.close();
               setEditLocked('all');
               await attemptSaveInfo({ forceMode: 'NEW' });
