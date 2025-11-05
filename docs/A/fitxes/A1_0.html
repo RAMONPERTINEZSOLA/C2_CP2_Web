@@ -215,30 +215,53 @@
     </form>
   </dialog>
 
-  <!-- ✅ DUPLICATE / PROCESS CHOOSER MODAL -->
+  <!-- ✅ DUPLICATE / PROCESS CHOOSER + EXISTING PICKER -->
   <dialog class="modal" id="dupModal">
     <div class="hd">
       <strong>⚠️ Product process</strong>
       <button class="close-x" aria-label="Close" id="dupClose" type="button">✕</button>
     </div>
+
     <div class="bd" style="grid-template-columns:1fr; gap:14px">
-      <div class="fld fld--wide">
+      <!-- Pas 1: chooser / missatge + stats -->
+      <div class="fld fld--wide" id="dupStep1">
         <label>Message</label>
         <div id="dupMsg" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;line-height:1.5">
           Estàs a punt de modificar aquest calaix. Vols <b>crear un PRODUCTE NOU</b> o <b>afegir un PRODUCTE EXISTENT</b>?
         </div>
+        <div class="fld fld--wide" id="dupStatsWrap" style="display:none; margin-top:10px">
+          <label>Stock overview (producte existent)</label>
+          <div id="dupStats" style="background:#f7f9fb;border:1px solid #e6edf3;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
+        </div>
+        <div class="note">
+          Si el nom ja existeix en altres calaixos, recomanat: <strong>PRODUCTE EXISTENT</strong> (manté nom canònic i agrega stock).
+        </div>
       </div>
-      <div class="fld fld--wide" id="dupStatsWrap" style="display:none">
-        <label>Stock overview (producte existent)</label>
-        <div id="dupStats" style="background:#f7f9fb;border:1px solid #e6edf3;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
-      </div>
-      <div class="note">
-        Si el codi ja existeix en altres calaixos, recomanat: <strong>PRODUCTE EXISTENT</strong> (manté nom canònic i agrega stock).
+
+      <!-- Pas 2: selector de producte existent -->
+      <div class="fld fld--wide" id="dupStep2" style="display:none">
+        <label for="existingSelect">Tria un producte existent (pel NOM)</label>
+        <select id="existingSelect" style="padding:12px;border:1px solid #d0d5dd;border-radius:12px;font-size:16px">
+          <!-- s’omple per JS -->
+        </select>
+        <div class="note">
+          Es pre-carregaran el <b>codi</b> i la <b>descripció</b> canònics (valors més freqüents) per aquest nom.
+        </div>
+        <div class="fld fld--wide" id="existingPreview" style="display:none">
+          <label>Vista prèvia canònica</label>
+          <div id="existingPreviewBox" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
+        </div>
       </div>
     </div>
-    <div class="ft">
+
+    <div class="ft" id="dupFt1">
       <button class="btn ghost" id="dupNew" type="button">Crear PRODUCTE NOU</button>
       <button class="btn" id="dupExisting" type="button">Afegir PRODUCTE EXISTENT</button>
+    </div>
+
+    <div class="ft" id="dupFt2" style="display:none">
+      <button class="btn ghost" id="dupBack" type="button">← Enrere</button>
+      <button class="btn" id="dupProceedExisting" type="button">Continuar</button>
     </div>
   </dialog>
 
@@ -478,6 +501,13 @@
     const fldCode = document.getElementById('fldCode');
     const fldDesc = document.getElementById('fldDesc');
 
+        function setEditLocked(lock){
+      fldName.disabled = !!lock;
+      fldCode.disabled = !!lock;
+      fldDesc.disabled = !!lock;
+    }
+
+
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
 
     // Duplicate / chooser modal refs
@@ -496,19 +526,161 @@
       if(!inside) dupModal.close();
     });
 
-    function renderDupStats(agg, productCode){
-      const lines = (agg.perLine || [])
-        .map(x => `- ${x.drawerCode} → qty: ${x.qty}${x.productName ? ' | ' + x.productName : ''}`)
-        .join('<br>');
-      return `
-        <div><strong>productCode:</strong> ${productCode || ''}</div>
-        <div><strong>Línies:</strong> ${agg.countLines ?? 0}</div>
-        <div><strong>STOCK TOTAL:</strong> ${agg.totalQty ?? 0}</div>
-        <hr>
-        <div style="font-weight:600; margin:4px 0">Detall per línia</div>
-        <div>${lines || '(cap)'}</div>
-      `;
+    function renderDupStats(agg, productName){
+  const lines = (agg.perLine || [])
+    .map(x => `- ${x.drawerCode} → qty: ${x.qty}${x.productCode ? ' | code: ' + x.productCode : ''}`)
+    .join('<br>');
+  return `
+    <div><strong>productName:</strong> ${productName || ''}</div>
+    <div><strong>Línies:</strong> ${agg.countLines ?? 0}</div>
+    <div><strong>STOCK TOTAL:</strong> ${agg.totalQty ?? 0}</div>
+    <hr>
+    <div style="font-weight:600; margin:4px 0">Detall per línia</div>
+    <div>${lines || '(cap)'}</div>
+  `;
+}
+
+// ===== Helpers per a noms i canònics (a nivell de fitxer)
+function normalizeName(s){
+  return String(s || '')
+    .normalize('NFKC')
+    .replace(/\s+/g,' ')
+    .trim()
+    .toLowerCase();
+}
+
+// retorna llistat de noms únics (ordenats per freqüència desc)
+function uniqueProductNamesFromData(data){
+  const count = new Map();
+  for (const r of data){
+    const raw = (r.productName || '').trim();
+    if (!raw) continue;
+    const key = normalizeName(raw);
+    const prev = count.get(key) || { display: raw, n: 0 };
+    // manté el primer “display” trobat (majúscules, accents…)
+    prev.n += 1;
+    count.set(key, prev);
+  }
+  return [...count.entries()]
+    .sort((a,b)=> b[1].n - a[1].n)
+    .map(([key, v]) => ({ key, display: v.display, n: v.n }));
+}
+
+// mode (valor més freqüent) d’un array, ignorant buits
+function modeNonEmpty(arr){
+  const m = new Map();
+  for (const v of arr){
+    const s = String(v || '').trim();
+    if (!s) continue;
+    m.set(s, (m.get(s)||0)+1);
+  }
+  let best = '', bestN = 0;
+  for (const [val, n] of m.entries()){
+    if (n > bestN){ best = val; bestN = n; }
+  }
+  return best;
+}
+
+// a partir d’un NOM, troba codi i descripció canònics (més freqüents)
+function canonicalByProductName(name){
+  const key = normalizeName(name);
+  const rows = ALL_DATA.filter(r => normalizeName(r.productName||'') === key);
+  const codes = rows.map(r => r.productCode || '');
+  const descs = rows.map(r => r.description || '');
+  return {
+    productName: name.trim(),
+    productCode: modeNonEmpty(codes) || '',
+    description: modeNonEmpty(descs) || ''
+  };
+}
+
+// ====== Elements del “pas 2” (selector existent)
+const dupStep1 = document.getElementById('dupStep1');
+const dupStep2 = document.getElementById('dupStep2');
+const dupFt1   = document.getElementById('dupFt1');
+const dupFt2   = document.getElementById('dupFt2');
+const existingSelect = document.getElementById('existingSelect');
+const dupBackBtn     = document.getElementById('dupBack');
+const dupProceedExistingBtn = document.getElementById('dupProceedExisting');
+const existingPreview = document.getElementById('existingPreview');
+const existingPreviewBox = document.getElementById('existingPreviewBox');
+
+// passa a “pas 2” i omple el <select>
+function openExistingPicker(){
+  // omple la llista
+  const items = uniqueProductNamesFromData(ALL_DATA);
+  existingSelect.innerHTML = '';
+  const opt0 = document.createElement('option');
+  opt0.value = '';
+  opt0.textContent = '— Selecciona un producte —';
+  existingSelect.appendChild(opt0);
+
+  for (const it of items){
+    const o = document.createElement('option');
+    o.value = it.display;
+    o.textContent = `${it.display} (${it.n})`;
+    existingSelect.appendChild(o);
+  }
+
+  // preselecciona l’actual si existeix
+  const curName = (CURRENT?.productName || '').trim();
+  if (curName){
+    for (const o of existingSelect.options){
+      if (normalizeName(o.value) === normalizeName(curName)) { existingSelect.value = o.value; break; }
     }
+  }
+
+  // mostra vista prèvia si hi ha selecció
+  const renderPreview = ()=>{
+    const val = existingSelect.value.trim();
+    if (!val){
+      existingPreview.style.display = 'none';
+      existingPreviewBox.innerHTML = '';
+      return;
+    }
+    const canon = canonicalByProductName(val);
+    existingPreviewBox.innerHTML =
+      `name: ${canon.productName || ''}<br>` +
+      `code: ${canon.productCode || ''}<br>` +
+      `desc: ${canon.description || ''}`;
+    existingPreview.style.display = '';
+  };
+  existingSelect.onchange = renderPreview;
+  renderPreview();
+
+  // mostra pas 2
+  dupStep1.style.display = 'none';
+  dupFt1.style.display   = 'none';
+  dupStep2.style.display = '';
+  dupFt2.style.display   = '';
+}
+
+// torna al pas 1
+dupBackBtn.addEventListener('click', ()=>{
+  dupStep2.style.display = 'none';
+  dupFt2.style.display   = 'none';
+  dupStep1.style.display = '';
+  dupFt1.style.display   = '';
+});
+
+// quan prems “Continuar” amb producte existent
+dupProceedExistingBtn.addEventListener('click', ()=>{
+  const val = existingSelect.value.trim();
+  if (!val){ showToast('Tria un producte existent', '#b3261e'); return; }
+  const canon = canonicalByProductName(val);
+
+  // Prefill editor amb els canònics i bloqueja mode EXISTENT
+  CHOSEN_MODE = 'EXISTING';
+  fldName.value = canon.productName || '';
+  fldCode.value = canon.productCode || '';
+  fldDesc.value = canon.description || '';
+
+    // 🔒 bloqueja camps en mode EXISTENT
+  setEditLocked(true);
+  
+  dupModal.close();
+  modal.showModal();
+});
 
 // === PRE-WARNING: consulta real al Worker abans d’obrir el chooser ===
 async function checkDuplicatesBeforeEdit() {
@@ -535,8 +707,8 @@ async function checkDuplicatesBeforeEdit() {
       dupMsg.textContent = "Estàs a punt de modificar aquest calaix. Vols crear un PRODUCTE NOU o afegir un PRODUCTE EXISTENT?";
     }
 
-    dupExistingBtn.onclick = () => { CHOSEN_MODE = "EXISTING"; dupModal.close(); modal.showModal(); };
-    dupNewBtn.onclick      = () => { CHOSEN_MODE = "NEW";      dupModal.close(); modal.showModal(); };
+    dupExistingBtn.onclick = () => { openExistingPicker(); };
+    dupNewBtn.onclick      = () => { CHOSEN_MODE = "NEW"; dupModal.close(); modal.showModal(); };
 
     try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
   } catch (err) {
@@ -603,10 +775,15 @@ editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
 
         // Si el Worker retorna warning (per si s’arriba al Save sense haver triat)
         if (body?.warning) {
-          CHOSEN_MODE = null; // força que torni a preguntar el procés
-          openProcessChooser();
+          CHOSEN_MODE = null;
+          // tornem a mostrar el chooser bàsic
+          dupStatsWrap.style.display = "none";
+          dupStats.innerHTML = "";
+          dupMsg.textContent = "Estàs a punt de modificar aquest calaix. Vols crear un PRODUCTE NOU o afegir un PRODUCTE EXISTENT?";
+          try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
           return { done:false, warned:true };
         }
+
 
         showToast('❌ Conflict updating info', '#b3261e');
         console.warn('Update info response 409 (no warning):', body);
@@ -639,8 +816,9 @@ editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
           dupStatsWrap.style.display = "";
           dupStats.innerHTML = renderDupStats(agg, name);
           dupMsg.textContent = "⚠️ ATENCIÓ: estàs creant un PRODUCTE NOU amb un NOM que ja existeix. Vols canviar a PRODUCTE EXISTENT?";
-          dupExistingBtn.onclick = async () => { CHOSEN_MODE = "EXISTING"; dupModal.close(); await attemptSaveInfo(); };
-          dupNewBtn.onclick      = async () => { CHOSEN_MODE = "NEW";      dupModal.close(); await attemptSaveInfo(); };
+          dupExistingBtn.onclick = () => { openExistingPicker(); };
+          dupNewBtn.onclick      = async () => { CHOSEN_MODE = "NEW"; dupModal.close(); await attemptSaveInfo(); };
+
           try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
           return; // atura aquí; l’usuari decideix
         }
