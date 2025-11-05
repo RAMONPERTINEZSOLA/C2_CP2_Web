@@ -510,39 +510,62 @@
       `;
     }
 
-    function openProcessChooser(){
-      const code = (CURRENT?.productCode || '').trim();
-      const hasCode = !!code;
-      let message = 'Estàs a punt de modificar aquest calaix. Vols crear un PRODUCTE NOU o afegir un PRODUCTE EXISTENT?';
+// === PRE-WARNING: consulta real al Worker abans d’obrir el chooser ===
+async function checkDuplicatesBeforeEdit() {
+  const name = (CURRENT?.productName || "").trim();
+  const code = (CURRENT?.productCode || "").trim();
+  if (!name && !code) {
+    // No hi ha dades, simplement obre el modal normal
+    CHOSEN_MODE = "NEW";
+    modal.showModal();
+    return;
+  }
 
-      // Si tenim codi, calculem agregats
-      if (hasCode){
-        const agg = aggregateForCode(code);
-        const others = agg.perLine.filter(x => x.drawerCode !== drawerCode);
-        if (others.length > 0){
-          message = 'ATENCIÓ: aquest producte ja existeix en altres calaixos. Tria el procés:';
-          dupStatsWrap.style.display = '';
-          dupStats.innerHTML = renderDupStats(agg, code);
-        } else {
-          dupStatsWrap.style.display = 'none';
-          dupStats.innerHTML = '';
-        }
-      } else {
-        dupStatsWrap.style.display = 'none';
-        dupStats.innerHTML = '';
-      }
+  try {
+    const qs = new URLSearchParams({
+      productCode: code,
+      productName: name,
+      exclude: drawerCode
+    });
+    const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs.toString()}`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(await r.text());
+    const body = await r.json();
 
-      dupMsg.textContent = message;
-
-      // Configura decisions (un sol cop per clic)
-      dupExistingBtn.onclick = () => { CHOSEN_MODE = 'EXISTING'; dupModal.close(); modal.showModal(); };
-      dupNewBtn.onclick      = () => { CHOSEN_MODE = 'NEW';      dupModal.close(); modal.showModal(); };
-
-      try { dupModal.showModal(); } catch { dupModal.setAttribute('open',''); }
+    // Si existeixen duplicats → obre el modal de procés
+    if (body.exists) {
+      const agg = body.aggregate || {};
+      dupStatsWrap.style.display = "";
+      dupStats.innerHTML = renderDupStats(agg, code);
+      dupMsg.textContent = "⚠️ ATENCIÓ: aquest producte ja existeix en altres calaixos. Tria el procés:";
+    } else {
+      dupStatsWrap.style.display = "none";
+      dupStats.innerHTML = "";
+      dupMsg.textContent = "Estàs a punt de modificar aquest calaix. Vols crear un PRODUCTE NOU o afegir un PRODUCTE EXISTENT?";
     }
 
-    // 👉 Ara, el botó d'editar primer obre el chooser
-    editBtn.addEventListener('click', openProcessChooser);
+    dupExistingBtn.onclick = () => {
+      CHOSEN_MODE = "EXISTING";
+      dupModal.close();
+      modal.showModal();
+    };
+    dupNewBtn.onclick = () => {
+      CHOSEN_MODE = "NEW";
+      dupModal.close();
+      modal.showModal();
+    };
+
+    try { dupModal.showModal(); } catch { dupModal.setAttribute("open", ""); }
+  } catch (err) {
+    console.error("Error checking duplicates:", err);
+    showToast("❌ Error loading duplicates", "#b3261e");
+    modal.showModal(); // fallback
+  }
+}
+
+// 👉 El botó d’editar ara primer fa la consulta remota
+editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
+
 
     async function postUpdateInfo(payload){
       const r = await fetch(UPDATE_INFO_ENDPOINT, {
