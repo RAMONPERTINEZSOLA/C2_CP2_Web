@@ -88,6 +88,17 @@
     @media (max-width: 900px){
       .imggrid.two-cols{ grid-template-columns: 1fr; }
     }
+
+    /* Banner post-save */
+    #postSaveBanner{
+      position:fixed; inset:auto 20px 20px 20px;
+      background:#0f1b2f; color:#e8f3ff; border:1px solid #cfe4ff33;
+      border-radius:14px; padding:12px 14px; box-shadow:0 12px 40px rgba(0,0,0,.35);
+      display:none; z-index:2000;
+    }
+    #postSaveBanner .row{justify-content:space-between}
+    #postSaveBanner .counter{font-variant-numeric:tabular-nums; font-weight:700}
+    #postSaveBanner button{background:#ffffff; color:#0f1b2f; border:1px solid #cfe4ff66; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer}
   </style>
 
   <style>
@@ -184,6 +195,19 @@
     <div id="toast"></div>
   </div>
 
+  <!-- Banner post-save (countdown) -->
+  <div id="postSaveBanner" role="status" aria-live="polite">
+    <div class="row">
+      <div>
+        <strong>Change saved.</strong>
+        Please wait about <span class="counter" id="psbCounter">60</span>s and then refresh the page to see it everywhere.
+      </div>
+      <div class="row">
+        <button id="psbRefreshBtn" type="button">Refresh now</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Edit Info Modal -->
   <dialog class="modal" id="editModal">
     <form method="dialog" id="editForm">
@@ -241,7 +265,7 @@
         <label for="existingSelect">Choose an existing product (by NAME)</label>
         <select id="existingSelect" style="padding:12px;border:1px solid #d0d5dd;border-radius:12px;font-size:16px"></select>
         <div class="note">
-          The <b>code</b> and <b>description</b> will be preloaded with canonical values (most frequent) for this name.
+          The <b>code</b> and <b>description</b> will be preloaded with canonical values (most frequent) for this name and applied to all rows.
         </div>
         <div class="fld fld--wide" id="existingPreview" style="display:none">
           <label>Canonical preview</label>
@@ -257,7 +281,7 @@
 
     <div class="ft" id="dupFt2" style="display:none">
       <button class="btn ghost" id="dupBack" type="button">← Back</button>
-      <button class="btn" id="dupProceedExisting" type="button">Continue</button>
+      <button class="btn" id="dupProceedExisting" type="button">Save now</button>
     </div>
   </dialog>
 
@@ -297,8 +321,8 @@
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
     const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
 
-    // --- Sticky mode helpers (ENGANXÓS) ---
-    // Valors possibles: 'NEW' | 'EXISTING' | 'DESC_ONLY' | null
+    // --- Sticky mode helpers ---
+    // 'NEW' | 'EXISTING' | 'DESC_ONLY' | null
     let CHOSEN_MODE = null;
     const MODE_KEY = `mode_${drawerCode}`;
     function setModeSticky(m){ CHOSEN_MODE = m || null; sessionStorage.setItem(MODE_KEY, CHOSEN_MODE || ''); }
@@ -328,6 +352,25 @@
       toast.style.backgroundColor = color;
       toast.style.display = "block";
       setTimeout(()=> toast.style.display="none", 2600);
+    }
+
+    // ======= Post-save banner with countdown =======
+    const psb = document.getElementById('postSaveBanner');
+    const psbCounter = document.getElementById('psbCounter');
+    const psbRefreshBtn = document.getElementById('psbRefreshBtn');
+    psbRefreshBtn.addEventListener('click', ()=> location.reload());
+
+    let psbTimer = null;
+    function showPostSaveBanner(seconds = 60){
+      clearInterval(psbTimer);
+      psbCounter.textContent = String(seconds);
+      psb.style.display = 'block';
+      psbTimer = setInterval(() => {
+        let v = parseInt(psbCounter.textContent || '0', 10);
+        v = Math.max(0, v - 1);
+        psbCounter.textContent = String(v);
+        if (v <= 0){ clearInterval(psbTimer); }
+      }, 1000);
     }
 
     // ======= CSV load & globals =======
@@ -360,18 +403,6 @@
       return data;
     }
 
-    function aggregateForCode(code){
-      const same = ALL_DATA.filter(r => (r.productCode||"").trim() === code.trim());
-      const perLine = same.map(r => ({
-        drawerCode: r.drawerCode,
-        qty: parseInt(r.stockQty||"0",10) || 0,
-        productName: r.productName||""
-      }));
-      const totalQty = perLine.reduce((a,b)=>a+b.qty,0);
-      return { countLines: perLine.length, totalQty, perLine };
-    }
-
-    // ===== Helpers: names & canonicals =====
     function normalizeName(s){
       return String(s || '')
         .normalize('NFKC')
@@ -419,6 +450,17 @@
         productCode: modeNonEmpty(codes) || '',
         description: modeNonEmpty(descs) || ''
       };
+    }
+
+    function aggregateForCode(code){
+      const same = ALL_DATA.filter(r => (r.productCode||"").trim() === code.trim());
+      const perLine = same.map(r => ({
+        drawerCode: r.drawerCode,
+        qty: parseInt(r.stockQty||"0",10) || 0,
+        productName: r.productName||""
+      }));
+      const totalQty = perLine.reduce((a,b)=>a+b.qty,0);
+      return { countLines: perLine.length, totalQty, perLine };
     }
 
     // ====== UI boot ======
@@ -485,6 +527,7 @@
           if (!r.ok) throw new Error(await r.text());
           cur = newVal; delta = 0; refresh();
           showToast('✔️ Stock successfully updated');
+          showPostSaveBanner(60);
         }catch(e){
           console.error(e);
           showToast('❌ Error updating stock', '#b3261e');
@@ -539,6 +582,7 @@
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
         setDrawerImg(true);
+        showPostSaveBanner(60);
       }catch(err){
         console.error(err);
         showToast('❌ Error uploading image', '#b3261e');
@@ -556,7 +600,7 @@
 
     function setEditLocked(mode){
       if (mode === 'existing'){
-        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = false;
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = true; // cap edició prèvia
       } else if (mode === 'desc-only'){
         fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = false;
       } else if (mode === 'all'){
@@ -575,7 +619,7 @@
     // avoid form submit
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
 
-    // close buttons (netejar mode sticky)
+    // close buttons
     document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{
       setModeSticky(null); modal.close(); setEditLocked('none');
     });
@@ -675,42 +719,24 @@
       dupFt1.style.display   = '';
     });
 
-    // EXISTING → Continue (mode sticky + flux segur)
+    // EXISTING → Save NOW (sense editar abans)
     dupProceedExistingBtn.addEventListener('click', async ()=>{
       const val = (existingSelect.value || '').trim();
       if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
-
       const canon = canonicalByProductName(val);
+
       setModeSticky('EXISTING');
-
-      const wantEditDesc = confirm(
-        "You chose an EXISTING product.\n\nDo you want to adjust the Description before saving?\n\nOK = edit description first\nCancel = save now"
-      );
-
-      if (wantEditDesc){
-        applyCanonToFields(canon);
-        setEditLocked('existing');
-        dupModal.close();
-        try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
-        return;
-      }
-
-      // Save now with canonical values
       applyCanonToFields(canon);
-      setEditLocked('all');
+      setEditLocked('existing'); // bloquejat (no es pot editar abans de guardar)
+      dupModal.close();
+
       const res = await attemptSaveInfo({ forceName: canon.productName || '', forceMode: 'EXISTING' });
+      setEditLocked('none');
 
       if (res.done){
         setModeSticky(null);
-        setEditLocked('none');
-        dupModal.close();
-        return;
+        showPostSaveBanner(60);
       }
-
-      // Fallback a editar descripció
-      setEditLocked('existing');
-      dupModal.close();
-      try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
     });
 
     // Pre-warning: check name duplicates before open (per Edit Product Info)
@@ -749,10 +775,9 @@
     }
     editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
 
-    // --- Nou botó: Edit Description (DESC_ONLY) ---
+    // Botó: Edit Description (DESC_ONLY) — propaga a totes les files del mateix producte
     editDescBtn.addEventListener('click', () => {
       setModeSticky('DESC_ONLY');
-      // Precarrega i bloqueja nom/codi
       fldName.value = CURRENT?.productName || '';
       fldCode.value = CURRENT?.productCode || '';
       fldDesc.value = CURRENT?.description || '';
@@ -769,7 +794,7 @@
       return r;
     }
 
-    // ===== attemptSaveInfo amb forceMode i reintent 409 en EXISTING =====
+    // ===== attemptSaveInfo amb propagateAll =====
     async function attemptSaveInfo({ forceName = null, forceMode = null, _tried409Once = false } = {}){
       const name = (forceName ?? fldName.value).trim();
       const code = fldCode.value.trim();
@@ -778,6 +803,10 @@
       const payload = { drawerCode, productName: name, productCode: code, description: desc };
       const effectiveMode = (forceMode || getModeSticky() || '').toUpperCase();
       if (effectiveMode) payload.mode = effectiveMode;
+
+      // IMPORTANT: propagar canònics a TOTES les files del mateix producte
+      // (El Worker pot ignorar-ho si no cal; és retrocompatible)
+      payload.propagateAll = true;
 
       const res = await postUpdateInfo(payload);
 
@@ -796,6 +825,7 @@
 
         modal.close(); setEditLocked('none');
         showToast('✔️ Product info updated');
+        showPostSaveBanner(60);
         return { done:true };
       }
 
@@ -803,7 +833,6 @@
         let body = {};
         try { body = await res.json(); } catch {}
 
-        // EXISTING: reintenta 1 cop amb expectedProductName
         if ((effectiveMode === 'EXISTING') && !_tried409Once) {
           const expected = (body && body.expectedProductName) ? String(body.expectedProductName).trim() : null;
           return attemptSaveInfo({ forceName: expected || name, forceMode: 'EXISTING', _tried409Once: true });
@@ -814,8 +843,8 @@
           return { done:false };
         }
 
-        // NEW: pot obrir dupModal
         if (body?.warning) {
+          // NEW amb warning → reobre el selector
           setModeSticky(null);
           dupStatsWrap.style.display = "none";
           dupStats.innerHTML = "";
@@ -834,7 +863,7 @@
       return { done:false };
     }
 
-    // ===== Save handler reforçat =====
+    // ===== Save handler =====
     const saveInfoBtnHandler = async (ev)=>{
       ev.preventDefault();
       const mode = (getModeSticky() || '').toUpperCase();
@@ -843,7 +872,7 @@
       const code = (fldCode.value || '').trim();
       const desc = (fldDesc.value || '').trim();
 
-      // DESC_ONLY → només descripció, sense pre-checks
+      // DESC_ONLY → només descripció, però propagant a totes les files
       if (mode === 'DESC_ONLY'){
         if (!desc){ showToast('Description cannot be empty', '#b3261e'); return; }
         setEditLocked('all');
@@ -853,16 +882,13 @@
         return;
       }
 
-      // EXISTING → sense pre-check de duplicats
+      // EXISTING → no hi ha pre-checks ni edició prèvia; això ho fem al botó "Save now"
       if (mode === 'EXISTING'){
-        setEditLocked('all');
-        const res = await attemptSaveInfo({ forceMode: 'EXISTING' });
-        setEditLocked('none');
-        if (res.done){ setModeSticky(null); }
+        // no hauria d'arribar aquí perquè guardem directament a dupProceedExistingBtn
         return;
       }
 
-      // NEW (amb validacions bàsiques)
+      // NEW (validacions bàsiques + pre-check duplicats)
       if(!name || !code || !desc){
         showToast('Please fill all fields', '#b3261e');
         return;
