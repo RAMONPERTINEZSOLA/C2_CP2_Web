@@ -109,6 +109,14 @@
       font-variant-numeric:tabular-nums;
     }
     .badge.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; }
+
+    /* Clickable distribution pills */
+    .distLink{
+      display:inline-block; padding:.25rem .5rem; border:1px solid var(--line);
+      border-radius:999px; background:#fff; text-decoration:none; color:var(--ink);
+    }
+    .distLink:hover{ box-shadow:0 2px 10px rgba(0,0,0,.06) }
+    .distLink.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; font-weight:600 }
   </style>
 
   <style>
@@ -501,7 +509,7 @@
         badgeDrawer.title = min ? `Drawer minimum: ${min}` : '';
       }
 
-      // Optional distribution panel
+      // Distribution panel with quick links
       if (distWrap){
         const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
         if (!entries.length){ distWrap.innerHTML = ''; return; }
@@ -512,8 +520,14 @@
         `;
         for (const [d,q] of entries){
           const min = agg.minByDrawer[d]||0;
-          const low = (min>0 && q<=min) ? 'style="color:#b3261e;font-weight:600"' : '';
-          html += `<div ${low}>${d}: <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}</div>`;
+          const lowCls = (min>0 && q<=min) ? 'low' : '';
+          const href = `./${d}.html`;
+          html += `
+            <div>
+              <a class="distLink ${lowCls}" href="${href}" aria-label="Open drawer ${d}">
+                ${d}: <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}
+              </a>
+            </div>`;
         }
         html += `</div></div>`;
         distWrap.innerHTML = html;
@@ -536,7 +550,7 @@
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
 
-        // NEW: Global + Drawer counters
+        // Global + Drawer counters
         const { key } = getProductKeyFromRow(CURRENT);
         const agg = aggregateForProductKey(key, true);
         renderGlobalAndDrawerBadges(agg, drawerCode);
