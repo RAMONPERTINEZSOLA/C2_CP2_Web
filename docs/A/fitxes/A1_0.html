@@ -99,6 +99,16 @@
     #postSaveBanner .row{justify-content:space-between}
     #postSaveBanner .counter{font-variant-numeric:tabular-nums; font-weight:700}
     #postSaveBanner button{background:#ffffff; color:#0f1b2f; border:1px solid #cfe4ff66; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer}
+
+    /* ===== Badges GLOBAL / DRAWER ===== */
+    #stockBadges{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+    .badge{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.35rem .6rem;border:1px solid var(--line);border-radius:999px;
+      background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.04); font-size:.9rem;
+      font-variant-numeric:tabular-nums;
+    }
+    .badge.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; }
   </style>
 
   <style>
@@ -137,6 +147,13 @@
         <button class="btn ghost" id="qrBtn" type="button">📎 QR</button>
       </div>
     </div>
+
+    <!-- ===== BADGES GLOBAL / DRAWER ===== -->
+    <div id="stockBadges">
+      <span id="badgeGlobal" class="badge">GLOBAL: <strong id="globalStockCount">—</strong></span>
+      <span id="badgeDrawer" class="badge">DRAWER: <strong id="drawerStockCount">—</strong></span>
+    </div>
+    <div id="distributionWrap" style="margin-top:.25rem"></div>
 
     <div class="cards">
       <div class="card">
@@ -463,6 +480,67 @@
       return { countLines: perLine.length, totalQty, perLine };
     }
 
+    // ======= NEW: GLOBAL & DRAWER aggregation by product key =======
+    function getProductKeyFromRow(row){
+      const code = (row.productCode || "").trim();
+      if (code) return { key: code.toLowerCase(), type: "code" };
+      return { key: normalizeName(row.productName || ""), type: "name" };
+    }
+
+    function aggregateForProductKey(productKey, useCodePrefer=true){
+      const agg = { total:0, byDrawer:{}, minByDrawer:{} };
+      for(const r of ALL_DATA){
+        const code = (r.productCode||"").trim().toLowerCase();
+        const name = normalizeName(r.productName||"");
+        const match = useCodePrefer
+          ? (code ? code===productKey : name===productKey)
+          : (name===productKey);
+        if (!match) continue;
+        const d = (r.drawerCode||"").trim();
+        const q = parseInt(r.stockQty||"0",10) || 0;
+        const m = parseInt(r.minStock||"0",10) || 0;
+        agg.total += q;
+        agg.byDrawer[d] = (agg.byDrawer[d]||0)+q;
+        agg.minByDrawer[d] = m;
+      }
+      return agg;
+    }
+
+    function renderGlobalAndDrawerBadges(agg, currentDrawer){
+      const gEl = document.getElementById('globalStockCount');
+      const dEl = document.getElementById('drawerStockCount');
+      const badgeDrawer = document.getElementById('badgeDrawer');
+      const distWrap = document.getElementById('distributionWrap');
+
+      if (gEl) gEl.textContent = String(agg.total);
+
+      const dq = currentDrawer ? (agg.byDrawer[currentDrawer] || 0) : 0;
+      if (dEl) dEl.textContent = String(dq);
+      if (badgeDrawer){
+        const min = currentDrawer ? (agg.minByDrawer[currentDrawer] || 0) : 0;
+        badgeDrawer.classList.toggle('low', min>0 && dq <= min);
+        badgeDrawer.title = min ? `Min drawer: ${min}` : '';
+      }
+
+      // Distribució per drawers (opcional)
+      if (distWrap){
+        const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
+        if (!entries.length){ distWrap.innerHTML = ''; return; }
+        let html = `
+          <div style="border:1px solid var(--line);border-radius:12px;padding:.75rem;background:#fff">
+            <div style="font-weight:600;margin-bottom:.4rem">Distribució per drawers (${entries.length})</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.4rem;">
+        `;
+        for (const [d,q] of entries){
+          const min = agg.minByDrawer[d]||0;
+          const low = (min>0 && q<=min) ? 'style="color:#b3261e;font-weight:600"' : '';
+          html += `<div ${low}>${d}: <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}</div>`;
+        }
+        html += `</div></div>`;
+        distWrap.innerHTML = html;
+      }
+    }
+
     // ====== UI boot ======
     loadCSVFromCandidates()
       .then(csv => {
@@ -478,6 +556,11 @@
         document.getElementById("stock-display").innerText = "📦 STOCK: " + (CURRENT.stockQty || "0");
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
+
+        // ===== NEW: calcula i pinta GLOBAL + DRAWER =====
+        const { key } = getProductKeyFromRow(CURRENT); // preferim code si existeix
+        const agg = aggregateForProductKey(key, true);
+        renderGlobalAndDrawerBadges(agg, drawerCode);
 
         // Prefill modal
         document.getElementById("fldName").value = CURRENT.productName || "";
@@ -600,7 +683,7 @@
 
     function setEditLocked(mode){
       if (mode === 'existing'){
-        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = true; // cap edició prèvia
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = true;
       } else if (mode === 'desc-only'){
         fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = false;
       } else if (mode === 'all'){
@@ -719,7 +802,7 @@
       dupFt1.style.display   = '';
     });
 
-    // EXISTING → Save NOW (sense editar abans)
+    // EXISTING → Save NOW
     dupProceedExistingBtn.addEventListener('click', async ()=>{
       const val = (existingSelect.value || '').trim();
       if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
@@ -727,7 +810,7 @@
 
       setModeSticky('EXISTING');
       applyCanonToFields(canon);
-      setEditLocked('existing'); // bloquejat (no es pot editar abans de guardar)
+      setEditLocked('existing');
       dupModal.close();
 
       const res = await attemptSaveInfo({ forceName: canon.productName || '', forceMode: 'EXISTING' });
@@ -739,7 +822,6 @@
       }
     });
 
-    // Pre-warning: check name duplicates before open (per Edit Product Info)
     async function checkDuplicatesBeforeEdit() {
       const name = (CURRENT?.productName || "").trim();
       if (!name) { setModeSticky("NEW"); setEditLocked('none'); return modal.showModal(); }
@@ -775,7 +857,7 @@
     }
     editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
 
-    // Botó: Edit Description (DESC_ONLY) — propaga a totes les files del mateix producte
+    // Botó: Edit Description (DESC_ONLY)
     editDescBtn.addEventListener('click', () => {
       setModeSticky('DESC_ONLY');
       fldName.value = CURRENT?.productName || '';
@@ -804,8 +886,6 @@
       const effectiveMode = (forceMode || getModeSticky() || '').toUpperCase();
       if (effectiveMode) payload.mode = effectiveMode;
 
-      // IMPORTANT: propagar canònics a TOTES les files del mateix producte
-      // (El Worker pot ignorar-ho si no cal; és retrocompatible)
       payload.propagateAll = true;
 
       const res = await postUpdateInfo(payload);
@@ -823,7 +903,6 @@
           CURRENT.description = updated.description || desc;
         }
 
-        modal.close(); setEditLocked('none');
         showToast('✔️ Product info updated');
         showPostSaveBanner(60);
         return { done:true };
@@ -844,7 +923,6 @@
         }
 
         if (body?.warning) {
-          // NEW amb warning → reobre el selector
           setModeSticky(null);
           dupStatsWrap.style.display = "none";
           dupStats.innerHTML = "";
@@ -872,7 +950,6 @@
       const code = (fldCode.value || '').trim();
       const desc = (fldDesc.value || '').trim();
 
-      // DESC_ONLY → només descripció, però propagant a totes les files
       if (mode === 'DESC_ONLY'){
         if (!desc){ showToast('Description cannot be empty', '#b3261e'); return; }
         setEditLocked('all');
@@ -882,13 +959,8 @@
         return;
       }
 
-      // EXISTING → no hi ha pre-checks ni edició prèvia; això ho fem al botó "Save now"
-      if (mode === 'EXISTING'){
-        // no hauria d'arribar aquí perquè guardem directament a dupProceedExistingBtn
-        return;
-      }
+      if (mode === 'EXISTING'){ return; }
 
-      // NEW (validacions bàsiques + pre-check duplicats)
       if(!name || !code || !desc){
         showToast('Please fill all fields', '#b3261e');
         return;
