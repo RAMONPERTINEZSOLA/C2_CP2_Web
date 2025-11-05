@@ -550,22 +550,30 @@
     const fldCode = document.getElementById('fldCode');
     const fldDesc = document.getElementById('fldDesc');
 
-    // Lock helper: 'none' | 'existing' | 'all'
+    // 'none' | 'existing' | 'all'
     function setEditLocked(mode){
-      if (mode === 'existing'){
+      if (mode === 'existing'){         // EXISTENT: només descr. editable
         fldName.disabled = true;
         fldCode.disabled = true;
         fldDesc.disabled = false;
-      } else if (mode === 'all'){
+      } else if (mode === 'all'){       // Bloqueig complet (mentre guardem)
         fldName.disabled = true;
         fldCode.disabled = true;
         fldDesc.disabled = true;
-      } else {
+      } else {                          // NEW o sense mode: tot editable
         fldName.disabled = false;
         fldCode.disabled = false;
         fldDesc.disabled = false;
       }
     }
+
+    
+    function applyCanonToFields(canon){
+        fldName.value = canon.productName || '';
+        fldCode.value = canon.productCode || '';
+        fldDesc.value = canon.description || '';
+      }
+
 
     // Ensure form doesn't auto-submit
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
@@ -673,40 +681,43 @@
 
     // EXISTING → Continue: save now (or edit desc first)
     dupProceedExistingBtn.addEventListener('click', async ()=>{
-      const val = (existingSelect.value || '').trim();
-      if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
-      const canon = canonicalByProductName(val);
+  const val = (existingSelect.value || '').trim();
+  if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
 
+  const canon = canonicalByProductName(val);
+  CHOSEN_MODE = 'EXISTING';
+
+  // Preguntem si vol ajustar la descripció abans de guardar
       const wantEditDesc = confirm(
         "You chose an EXISTING product.\n\nDo you want to adjust the Description before saving?\n\nOK = edit description first\nCancel = save now"
       );
 
-      CHOSEN_MODE = 'EXISTING';
-
       if (wantEditDesc){
-        fldName.value = canon.productName || '';
-        fldCode.value = canon.productCode || '';
-        fldDesc.value = canon.description || '';
+        applyCanonToFields(canon);
         setEditLocked('existing');
         dupModal.close();
         try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
         return;
       }
 
-      setEditLocked('all'); // prevent double submit
+      // Guardar ara mateix amb els valors canònics (sense passar per l’editor)
+      applyCanonToFields(canon);      // <<< important: carreguem canònics als inputs
+      setEditLocked('all');           // evitem doble clic
       const res = await attemptSaveInfo({ forceName: canon.productName || '' });
-      if (!res.done){
-        // fallback to editor
-        fldName.value = canon.productName || '';
-        fldCode.value = canon.productCode || '';
-        fldDesc.value = canon.description || '';
-        setEditLocked('existing');
-        dupModal.close();
-        try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
-      } else {
-        dupModal.close();
+
+      if (res.done){
+        CHOSEN_MODE = null;           // netegem estat
+        setEditLocked('none');
+        dupModal.close();             // tanquem i ja està
+        return;
       }
+
+      // Fallback: si no s'ha pogut guardar, obrim editor amb només desc. editable
+      setEditLocked('existing');
+      dupModal.close();
+      try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
     });
+
 
     // Pre-warning: check name duplicates before open
     async function checkDuplicatesBeforeEdit() {
@@ -823,17 +834,22 @@
       const desc = (fldDesc.value || '').trim();
 
       if (CHOSEN_MODE === 'EXISTING'){
-        await attemptSaveInfo(); // only desc may change
+        // En mode EXISTENT només validem que hi hagi descripció (si la vols afegir)
+        // i guardem directament amb els valors actuals del formulari.
+        setEditLocked('all');
+        const res = await attemptSaveInfo();
+        setEditLocked('none');
+        if (res.done){ CHOSEN_MODE = null; }
         return;
       }
 
-      // NEW mode: require all
+      // Mode NEW: requerim tots els camps
       if(!name || !code || !desc){
-        showToast('Please fill all fields', '#b3261e'); 
+        showToast('Please fill all fields', '#b3261e');
         return;
       }
 
-      // Duplicate check for NEW
+      // Check duplicats per NEW
       try {
         const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
         const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
@@ -845,16 +861,26 @@
             dupStatsWrap.style.display = "";
             dupStats.innerHTML = renderDupStats(agg, name);
             dupMsg.textContent = "⚠️ You’re creating a NEW PRODUCT with a NAME that already exists. Switch to EXISTING PRODUCT?";
+
             dupExistingBtn.onclick = () => { openExistingPicker(); };
-            dupNewBtn.onclick      = async () => { CHOSEN_MODE = "NEW"; dupModal.close(); await attemptSaveInfo(); };
+            dupNewBtn.onclick      = async () => {
+              CHOSEN_MODE = "NEW";
+              dupModal.close();
+              setEditLocked('all');
+              await attemptSaveInfo();
+              setEditLocked('none');
+            };
             try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
             return;
           }
         }
       } catch(e){ console.warn("Duplicate check on save (NEW) failed:", e); }
 
+      setEditLocked('all');
       await attemptSaveInfo();
+      setEditLocked('none');
     };
+
 
     document.getElementById('saveInfoBtn').addEventListener('click', saveInfoBtnHandler);
 
