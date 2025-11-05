@@ -113,10 +113,14 @@
     /* Clickable distribution pills */
     .distLink{
       display:inline-block; padding:.25rem .5rem; border:1px solid var(--line);
-      border-radius:999px; background:#fff; text-decoration:none; color:var(--ink);
+      border-radius:999px; background:#fff; text-decoration:none; color:#1f2937;
     }
     .distLink:hover{ box-shadow:0 2px 10px rgba(0,0,0,.06) }
     .distLink.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; font-weight:600 }
+
+    /* Force refresh block */
+    .refresh-card{margin-top:16px;padding:12px;border:1px dashed #cdd4d9;border-radius:12px;background:#fff}
+    .refresh-card small{color:#667085;display:block;margin-top:6px}
   </style>
 
   <style>
@@ -197,6 +201,21 @@
     <div class="card" style="margin-top:20px">
       <h3>Description</h3>
       <div id="description-text" style="line-height:1.6">loading...</div>
+    </div>
+
+    <!-- INFO/HELP IMAGE just after description -->
+    <div class="card" id="info-image-card" style="margin-top:14px">
+      <h3>Info</h3>
+      <div class="imgwrap" style="min-height:auto">
+        <!-- ⬇️ Canvia el src per la teva imatge -->
+        <img id="infoImage" src="../images/distribution_hint.png" alt="Distribution hint" style="max-width:100%;height:auto">
+      </div>
+    </div>
+
+    <!-- In-page Force Refresh -->
+    <div class="refresh-card">
+      <button id="hardRefreshBtn" class="btn ghost" type="button">↻ Force refresh data</button>
+      <small>Use this button if needed ~1 minute after applying a change.</small>
     </div>
 
     <div class="stock-display" id="stock-display">Loading stock...</div>
@@ -534,6 +553,35 @@
       }
     }
 
+    // ---- Full UI reload (for in-page Force refresh) ----
+    async function reloadAllUI(){
+      try{
+        const csv = await loadCSVFromCandidates();
+        ALL_DATA = parseCSV(csv);
+        CURRENT  = ALL_DATA.find(r => (r.drawerCode || "").trim() === drawerCode);
+        if (!CURRENT) throw new Error("Drawer not found");
+        // Update visible fields
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${CURRENT.productName || ""}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${CURRENT.productCode || ""}`;
+        document.getElementById("description-text").textContent = CURRENT.description || "";
+        const MIN_STOCK = parseInt(CURRENT.minStock || "10", 10);
+        document.getElementById("stock-display").innerText = "📦 STOCK: " + (CURRENT.stockQty || "0");
+        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
+        // Global dist
+        const { key } = getProductKeyFromRow(CURRENT);
+        const agg = aggregateForProductKey(key, true);
+        renderGlobalAndDrawerBadges(agg, drawerCode);
+        // Refill edit modal fields
+        document.getElementById("fldName").value = CURRENT.productName || "";
+        document.getElementById("fldCode").value = CURRENT.productCode || "";
+        document.getElementById("fldDesc").value = CURRENT.description || "";
+        showToast('↻ Data refreshed');
+      }catch(e){
+        console.error(e);
+        showToast('❌ Error refreshing', '#b3261e');
+      }
+    }
+
     // --- Boot ---
     loadCSVFromCandidates()
       .then(csv => {
@@ -559,6 +607,9 @@
         document.getElementById("fldName").value = CURRENT.productName || "";
         document.getElementById("fldCode").value = CURRENT.productCode || "";
         document.getElementById("fldDesc").value = CURRENT.description || "";
+
+        // wire hard refresh
+        document.getElementById('hardRefreshBtn')?.addEventListener('click', reloadAllUI);
       })
       .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
 
@@ -866,7 +917,7 @@
       return r;
     }
 
-    // attemptSaveInfo with propagateAll
+    // attemptSaveInfo — FIX: do NOT propagate on NEW
     async function attemptSaveInfo({ forceName = null, forceMode = null, _tried409Once = false } = {}){
       const name = (forceName ?? fldName.value).trim();
       const code = fldCode.value.trim();
@@ -876,7 +927,9 @@
       const effectiveMode = (forceMode || getModeSticky() || '').toUpperCase();
       if (effectiveMode) payload.mode = effectiveMode;
 
-      payload.propagateAll = true;
+      // 🔧 KEY FIX:
+      // Only propagate when NOT NEW (i.e., EXISTING updates or general updates).
+      payload.propagateAll = (effectiveMode !== 'NEW');
 
       const res = await postUpdateInfo(payload);
 
