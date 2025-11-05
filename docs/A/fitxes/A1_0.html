@@ -680,6 +680,7 @@
       if (wantEditDesc){
         applyCanonToFields(canon);
         setEditLocked('existing');
+        CHOSEN_MODE = 'EXISTING';       // reafirma mode
         dupModal.close();
         try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
         return;
@@ -688,7 +689,7 @@
       // Save now with canonical values
       applyCanonToFields(canon);
       setEditLocked('all');
-      const res = await attemptSaveInfo({ forceName: canon.productName || '' });
+      const res = await attemptSaveInfo({ forceName: canon.productName || '', forceMode: 'EXISTING' });
 
       if (res.done){
         CHOSEN_MODE = null;
@@ -748,13 +749,15 @@
       return r;
     }
 
-    async function attemptSaveInfo({ forceName = null } = {}){
+    // ===== PATCH: attemptSaveInfo amb forceMode i reintent 409 en EXISTING =====
+    async function attemptSaveInfo({ forceName = null, forceMode = null, _tried409Once = false } = {}){
       const name = (forceName ?? fldName.value).trim();
       const code = fldCode.value.trim();
       const desc = fldDesc.value.trim();
 
-      const payload = { drawerCode, productName:name, productCode:code, description:desc };
-      if (CHOSEN_MODE) payload.mode = CHOSEN_MODE;
+      const payload = { drawerCode, productName: name, productCode: code, description: desc };
+      const effectiveMode = (forceMode || CHOSEN_MODE || '').toUpperCase();
+      if (effectiveMode) payload.mode = effectiveMode;
 
       const res = await postUpdateInfo(payload);
 
@@ -777,28 +780,26 @@
       }
 
       if (res.status === 409) {
-        const body = await res.json().catch(async ()=> {
-          const raw = await res.clone().text().catch(()=> '');
-          console.warn('409 RAW body:', raw);
-          return {};
-        });
+        let body = {};
+        try { body = await res.json(); } catch {}
 
-        if (body?.error && body?.expectedProductName) {
-          const expected = String(body.expectedProductName || '').trim();
-          if (expected) return attemptSaveInfo({ forceName: expected });
+        if ((effectiveMode === 'EXISTING') && !_tried409Once) {
+          const expected = (body && body.expectedProductName) ? String(body.expectedProductName).trim() : null;
+          return attemptSaveInfo({ forceName: expected || name, forceMode: 'EXISTING', _tried409Once: true });
         }
 
         if (body?.warning) {
-          CHOSEN_MODE = null;
-          dupStatsWrap.style.display = "none";
-          dupStats.innerHTML = "";
-          dupMsg.textContent = "You’re about to modify this drawer. Do you want to create a NEW PRODUCT or add an EXISTING PRODUCT?";
-          try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
+          if (effectiveMode !== 'EXISTING') {
+            CHOSEN_MODE = null;
+            dupStatsWrap.style.display = "none";
+            dupStats.innerHTML = "";
+            dupMsg.textContent = "You’re about to modify this drawer. Do you want to create a NEW PRODUCT or add an EXISTING PRODUCT?";
+            try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
+          }
           return { done:false, warned:true };
         }
 
         showToast('❌ Conflict updating info', '#b3261e');
-        console.warn('Update info response 409 (no warning):', body);
         return { done:false };
       }
 
@@ -808,6 +809,7 @@
       return { done:false };
     }
 
+    // ===== PATCH: Save handler reforçat =====
     const saveInfoBtnHandler = async (ev)=>{
       ev.preventDefault();
 
@@ -817,7 +819,7 @@
 
       if (CHOSEN_MODE === 'EXISTING'){
         setEditLocked('all');
-        const res = await attemptSaveInfo();
+        const res = await attemptSaveInfo({ forceMode: 'EXISTING' });
         setEditLocked('none');
         if (res.done){ CHOSEN_MODE = null; }
         return;
@@ -846,7 +848,7 @@
               CHOSEN_MODE = "NEW";
               dupModal.close();
               setEditLocked('all');
-              await attemptSaveInfo();
+              await attemptSaveInfo({ forceMode: 'NEW' });
               setEditLocked('none');
             };
             try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
@@ -856,7 +858,7 @@
       } catch(e){ console.warn("Duplicate check on save (NEW) failed:", e); }
 
       setEditLocked('all');
-      await attemptSaveInfo();
+      await attemptSaveInfo({ forceMode: 'NEW' });
       setEditLocked('none');
     };
 
