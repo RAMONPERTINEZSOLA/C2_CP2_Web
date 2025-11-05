@@ -513,57 +513,38 @@
 // === PRE-WARNING: consulta real al Worker abans d’obrir el chooser ===
 async function checkDuplicatesBeforeEdit() {
   const name = (CURRENT?.productName || "").trim();
-  const code = (CURRENT?.productCode || "").trim();
-  if (!name && !code) {
-    // No hi ha dades, simplement obre el modal normal
-    CHOSEN_MODE = "NEW";
-    modal.showModal();
-    return;
-  }
+  // Si no hi ha nom encara, obre directament el modal i proposa mode NEW
+  if (!name) { CHOSEN_MODE = "NEW"; return modal.showModal(); }
 
   try {
-    const qs = new URLSearchParams({
-      productCode: code,
-      productName: name,
-      exclude: drawerCode
-    });
-    const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs.toString()}`;
+    const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
+    const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
     const r = await fetch(url);
     if (!r.ok) throw new Error(await r.text());
     const body = await r.json();
 
-    // Si existeixen duplicats → obre el modal de procés
     if (body.exists) {
+      // Mostra stats per NOM
       const agg = body.aggregate || {};
       dupStatsWrap.style.display = "";
-      dupStats.innerHTML = renderDupStats(agg, code);
-      dupMsg.textContent = "⚠️ ATENCIÓ: aquest producte ja existeix en altres calaixos. Tria el procés:";
+      dupStats.innerHTML = renderDupStats(agg, name);
+      dupMsg.textContent = "⚠️ ATENCIÓ: aquest producte (mateix NOM) ja existeix en altres calaixos. Tria el procés:";
     } else {
       dupStatsWrap.style.display = "none";
       dupStats.innerHTML = "";
       dupMsg.textContent = "Estàs a punt de modificar aquest calaix. Vols crear un PRODUCTE NOU o afegir un PRODUCTE EXISTENT?";
     }
 
-    dupExistingBtn.onclick = () => {
-      CHOSEN_MODE = "EXISTING";
-      dupModal.close();
-      modal.showModal();
-    };
-    dupNewBtn.onclick = () => {
-      CHOSEN_MODE = "NEW";
-      dupModal.close();
-      modal.showModal();
-    };
+    dupExistingBtn.onclick = () => { CHOSEN_MODE = "EXISTING"; dupModal.close(); modal.showModal(); };
+    dupNewBtn.onclick      = () => { CHOSEN_MODE = "NEW";      dupModal.close(); modal.showModal(); };
 
-    try { dupModal.showModal(); } catch { dupModal.setAttribute("open", ""); }
+    try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
   } catch (err) {
     console.error("Error checking duplicates:", err);
     showToast("❌ Error loading duplicates", "#b3261e");
     modal.showModal(); // fallback
   }
 }
-
-// 👉 El botó d’editar ara primer fa la consulta remota
 editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
 
 
@@ -639,15 +620,36 @@ editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
     }
 
     const saveInfoBtnHandler = async (ev)=>{
-      ev.preventDefault();
-      const name = fldName.value.trim();
-      const code = fldCode.value.trim();
-      const desc = fldDesc.value.trim();
-      if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
-      await attemptSaveInfo();
-    };
-    document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
-    saveInfoBtn.addEventListener('click', saveInfoBtnHandler);
+  ev.preventDefault();
+  const name = fldName.value.trim();
+  const code = fldCode.value.trim();
+  const desc = fldDesc.value.trim();
+  if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
+
+  // Si està en mode NEW, avisa si el NOM ja existeix
+  if (CHOSEN_MODE === 'NEW') {
+    try {
+      const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
+      const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
+      const r = await fetch(url);
+      if (r.ok) {
+        const body = await r.json();
+        if (body.exists) {
+          const agg = body.aggregate || {};
+          dupStatsWrap.style.display = "";
+          dupStats.innerHTML = renderDupStats(agg, name);
+          dupMsg.textContent = "⚠️ ATENCIÓ: estàs creant un PRODUCTE NOU amb un NOM que ja existeix. Vols canviar a PRODUCTE EXISTENT?";
+          dupExistingBtn.onclick = async () => { CHOSEN_MODE = "EXISTING"; dupModal.close(); await attemptSaveInfo(); };
+          dupNewBtn.onclick      = async () => { CHOSEN_MODE = "NEW";      dupModal.close(); await attemptSaveInfo(); };
+          try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
+          return; // atura aquí; l’usuari decideix
+        }
+      }
+    } catch(e){ console.warn("Duplicate check on save (NEW) failed:", e); }
+  }
+
+  await attemptSaveInfo();
+};
 
     // ===== QR =====
     const qrBtn = document.getElementById('qrBtn');
