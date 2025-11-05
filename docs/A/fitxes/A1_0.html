@@ -98,7 +98,7 @@
   
   <!-- PDF (CDN) + QR (LOCAL COMPILAT) -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <!-- ✅ QR UMD per navegador (substitueix l'script local) -->
+  <!-- ✅ QR UMD per navegador -->
   <script type="module">
     import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
     const lib = (m && m.QrCode) ? m : (m && m.default && m.default.QrCode) ? m.default : m;
@@ -215,25 +215,25 @@
     </form>
   </dialog>
 
-  <!-- ✅ DUPLICATE WARNING MODAL -->
+  <!-- ✅ DUPLICATE / PROCESS CHOOSER MODAL -->
   <dialog class="modal" id="dupModal">
     <div class="hd">
-      <strong>⚠️ Product warning</strong>
+      <strong>⚠️ Product process</strong>
       <button class="close-x" aria-label="Close" id="dupClose" type="button">✕</button>
     </div>
     <div class="bd" style="grid-template-columns:1fr; gap:14px">
       <div class="fld fld--wide">
         <label>Message</label>
         <div id="dupMsg" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;line-height:1.5">
-          ATENCIÓ: Aquest producte ja existeix en altres calaixos.
+          Estàs a punt de modificar aquest calaix. Vols <b>crear un PRODUCTE NOU</b> o <b>afegir un PRODUCTE EXISTENT</b>?
         </div>
       </div>
-      <div class="fld fld--wide">
-        <label>Stock overview</label>
+      <div class="fld fld--wide" id="dupStatsWrap" style="display:none">
+        <label>Stock overview (producte existent)</label>
         <div id="dupStats" style="background:#f7f9fb;border:1px solid #e6edf3;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
       </div>
       <div class="note">
-        Tria el procés: <strong>PRODUCTE EXISTENT</strong> per vincular a l’existent (manté nom canònic), o <strong>PRODUCTE NOU</strong> per crear-ne un de nou al calaix actual.
+        Si el codi ja existeix en altres calaixos, recomanat: <strong>PRODUCTE EXISTENT</strong> (manté nom canònic i agrega stock).
       </div>
     </div>
     <div class="ft">
@@ -262,6 +262,7 @@
   </dialog>
 
   <script>
+    // ======= Setup QR lib wait =======
     async function ensureQrLib(timeoutMs = 1000) {
       const t0 = performance.now();
       while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
@@ -270,14 +271,14 @@
       }
     }
 
+    // ======= Constants =======
     const drawerCode = "A1_0";
-    // 🔧 Unifica domini del Worker
     const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
     const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
 
-    // ===== Logo loader =====
+    // ======= Logo loader =======
     (function loadLogo(){
       const logo = document.getElementById('logo');
       const candidates = [
@@ -294,6 +295,7 @@
       tryNext();
     })();
 
+    // ======= Toast =======
     const toast = document.getElementById("toast");
     function showToast(msg, color="#198754"){
       toast.textContent = msg;
@@ -301,6 +303,11 @@
       toast.style.display = "block";
       setTimeout(()=> toast.style.display="none", 2600);
     }
+
+    // ======= CSV load & globals =======
+    let ALL_DATA = [];
+    let CURRENT  = null; // fila del drawer actual
+    let CHOSEN_MODE = null; // 'NEW' | 'EXISTING' | null
 
     async function loadCSVFromCandidates() {
       const candidates = [
@@ -318,32 +325,51 @@
       throw new Error("stock.csv not found via any path");
     }
 
+    function parseCSV(txt){
+      const rows = txt.trim().split(/\r?\n/);
+      const headers = rows[0].split(",").map(h => h.trim());
+      const data = rows.slice(1).map(r => {
+        const vals = r.split(",");
+        return headers.reduce((o, h, i) => { o[h] = vals[i] ? vals[i].trim() : ""; return o; }, {});
+      });
+      return data;
+    }
+
+    function aggregateForCode(code){
+      const same = ALL_DATA.filter(r => (r.productCode||"").trim() === code.trim());
+      const perLine = same.map(r => ({
+        drawerCode: r.drawerCode,
+        qty: parseInt(r.stockQty||"0",10) || 0,
+        productName: r.productName||""
+      }));
+      const totalQty = perLine.reduce((a,b)=>a+b.qty,0);
+      return { countLines: perLine.length, totalQty, perLine };
+    }
+
+    // Inicialitza dades UI
     loadCSVFromCandidates()
       .then(csv => {
-        const rows = csv.trim().split("\n");
-        const headers = rows[0].split(",");
-        const data = rows.slice(1).map(r => {
-          const vals = r.split(",");
-          return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
-        });
-        const match = data.find(r => (r.drawerCode || "").trim() === drawerCode);
-        if (!match) throw new Error("Drawer not found");
+        ALL_DATA = parseCSV(csv);
+        CURRENT  = ALL_DATA.find(r => (r.drawerCode || "").trim() === drawerCode);
+        if (!CURRENT) throw new Error("Drawer not found");
 
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ""}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ""}`;
-        document.getElementById("description-text").textContent = match.description || "";
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${CURRENT.productName || ""}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${CURRENT.productCode || ""}`;
+        document.getElementById("description-text").textContent = CURRENT.description || "";
 
-        const MIN_STOCK = parseInt(match.minStock || "10", 10);
-        document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
+        const MIN_STOCK = parseInt(CURRENT.minStock || "10", 10);
+        document.getElementById("stock-display").innerText = "📦 STOCK: " + (CURRENT.stockQty || "0");
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
-        initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
+        initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
 
-        document.getElementById("fldName").value = match.productName || "";
-        document.getElementById("fldCode").value = match.productCode || "";
-        document.getElementById("fldDesc").value = match.description || "";
+        // Prefill modal
+        document.getElementById("fldName").value = CURRENT.productName || "";
+        document.getElementById("fldCode").value = CURRENT.productCode || "";
+        document.getElementById("fldDesc").value = CURRENT.description || "";
       })
       .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
 
+    // ======= Stock UI =======
     function initStockUI(initialQty, MIN_STOCK = 10) {
       const curEl = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
@@ -444,7 +470,7 @@
       }finally{ fileInput.value = ''; }
     });
 
-    // === Edit info modal + DUP WARNING flux ===
+    // === Edit info modal + PROCESS CHOOSER BEFORE OPEN ===
     const editBtn = document.getElementById('editInfoBtn');
     const modal = document.getElementById('editModal');
     const saveInfoBtn = document.getElementById('saveInfoBtn');
@@ -452,23 +478,16 @@
     const fldCode = document.getElementById('fldCode');
     const fldDesc = document.getElementById('fldDesc');
 
-    // Evita submit implícit del form dialog
-    document.getElementById('editForm')?.addEventListener('submit', (e) => e.preventDefault());
+    document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
 
-    // Duplicate modal refs
+    // Duplicate / chooser modal refs
     const dupModal = document.getElementById('dupModal');
     const dupMsg   = document.getElementById('dupMsg');
     const dupStats = document.getElementById('dupStats');
+    const dupStatsWrap = document.getElementById('dupStatsWrap');
     const dupClose = document.getElementById('dupClose');
     const dupExistingBtn = document.getElementById('dupExisting');
     const dupNewBtn      = document.getElementById('dupNew');
-
-    editBtn.addEventListener('click', ()=> modal.showModal());
-    modal.addEventListener('click', (e)=>{
-      const rect = modal.getBoundingClientRect();
-      const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-      if(!inside) modal.close();
-    });
 
     dupClose.addEventListener('click', ()=> dupModal.close());
     dupModal.addEventListener('click', (e)=>{
@@ -477,19 +496,53 @@
       if(!inside) dupModal.close();
     });
 
-    function renderDupStats(body){
-      const lines = (body?.aggregate?.perLine || [])
+    function renderDupStats(agg, productCode){
+      const lines = (agg.perLine || [])
         .map(x => `- ${x.drawerCode} → qty: ${x.qty}${x.productName ? ' | ' + x.productName : ''}`)
         .join('<br>');
       return `
-        <div><strong>productCode:</strong> ${body?.productCode || ''}</div>
-        <div><strong>Línies:</strong> ${body?.aggregate?.countLines ?? 0}</div>
-        <div><strong>STOCK TOTAL:</strong> ${body?.aggregate?.totalQty ?? 0}</div>
+        <div><strong>productCode:</strong> ${productCode || ''}</div>
+        <div><strong>Línies:</strong> ${agg.countLines ?? 0}</div>
+        <div><strong>STOCK TOTAL:</strong> ${agg.totalQty ?? 0}</div>
         <hr>
         <div style="font-weight:600; margin:4px 0">Detall per línia</div>
         <div>${lines || '(cap)'}</div>
       `;
     }
+
+    function openProcessChooser(){
+      const code = (CURRENT?.productCode || '').trim();
+      const hasCode = !!code;
+      let message = 'Estàs a punt de modificar aquest calaix. Vols crear un PRODUCTE NOU o afegir un PRODUCTE EXISTENT?';
+
+      // Si tenim codi, calculem agregats
+      if (hasCode){
+        const agg = aggregateForCode(code);
+        const others = agg.perLine.filter(x => x.drawerCode !== drawerCode);
+        if (others.length > 0){
+          message = 'ATENCIÓ: aquest producte ja existeix en altres calaixos. Tria el procés:';
+          dupStatsWrap.style.display = '';
+          dupStats.innerHTML = renderDupStats(agg, code);
+        } else {
+          dupStatsWrap.style.display = 'none';
+          dupStats.innerHTML = '';
+        }
+      } else {
+        dupStatsWrap.style.display = 'none';
+        dupStats.innerHTML = '';
+      }
+
+      dupMsg.textContent = message;
+
+      // Configura decisions (un sol cop per clic)
+      dupExistingBtn.onclick = () => { CHOSEN_MODE = 'EXISTING'; dupModal.close(); modal.showModal(); };
+      dupNewBtn.onclick      = () => { CHOSEN_MODE = 'NEW';      dupModal.close(); modal.showModal(); };
+
+      try { dupModal.showModal(); } catch { dupModal.setAttribute('open',''); }
+    }
+
+    // 👉 Ara, el botó d'editar primer obre el chooser
+    editBtn.addEventListener('click', openProcessChooser);
 
     async function postUpdateInfo(payload){
       const r = await fetch(UPDATE_INFO_ENDPOINT, {
@@ -500,14 +553,13 @@
       return r;
     }
 
-    async function attemptSaveInfo({ mode = null, confirmDuplicate = false, forceName = null } = {}){
+    async function attemptSaveInfo({ forceName = null } = {}){
       const name = (forceName ?? fldName.value).trim();
       const code = fldCode.value.trim();
       const desc = fldDesc.value.trim();
 
       const payload = { drawerCode, productName:name, productCode:code, description:desc };
-      if (mode) payload.mode = mode;
-      if (confirmDuplicate) payload.confirmDuplicate = true;
+      if (CHOSEN_MODE) payload.mode = CHOSEN_MODE;
 
       const res = await postUpdateInfo(payload);
 
@@ -517,39 +569,38 @@
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${updated.productName || name}`;
         document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${updated.productCode || code}`;
         document.getElementById("description-text").textContent = updated.description || desc;
+
+        // Actualitza globals per a properes edicions
+        if (CURRENT){
+          CURRENT.productName = updated.productName || name;
+          CURRENT.productCode = updated.productCode || code;
+          CURRENT.description = updated.description || desc;
+        }
+
         modal.close();
-        dupModal.close();
         showToast('✔️ Product info updated');
         return { done:true };
       }
 
       if (res.status === 409) {
-        // Mostra cos per debug si cal
         const body = await res.json().catch(async ()=> {
           const raw = await res.clone().text().catch(()=> '');
           console.warn('409 RAW body:', raw);
           return {};
         });
 
-        // Inconsistència de nom per EXISTING
+        // Si el Worker ens diu quin nom canònic cal, ho apliquem i reintentem
         if (body?.error && body?.expectedProductName) {
           const expected = String(body.expectedProductName || '').trim();
           if (expected) {
-            return attemptSaveInfo({ mode:'EXISTING', confirmDuplicate:true, forceName: expected });
+            return attemptSaveInfo({ forceName: expected });
           }
         }
 
+        // Si el Worker retorna warning (per si s’arriba al Save sense haver triat)
         if (body?.warning) {
-          dupMsg.textContent = body.message || 'ATENCIÓ: Producte existent en altres calaixos.';
-          dupStats.innerHTML = renderDupStats(body);
-          try { dupModal.showModal(); } catch { dupModal.setAttribute('open',''); }
-
-          dupExistingBtn.onclick = async () => {
-            await attemptSaveInfo({ mode:'EXISTING', confirmDuplicate:true });
-          };
-          dupNewBtn.onclick = async () => {
-            await attemptSaveInfo({ mode:'NEW', confirmDuplicate:true });
-          };
+          CHOSEN_MODE = null; // força que torni a preguntar el procés
+          openProcessChooser();
           return { done:false, warned:true };
         }
 
@@ -570,9 +621,9 @@
       const code = fldCode.value.trim();
       const desc = fldDesc.value.trim();
       if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
-      await attemptSaveInfo(); // primer intent sense flags; gestionarà 409 si cal
+      await attemptSaveInfo();
     };
-
+    document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
     saveInfoBtn.addEventListener('click', saveInfoBtnHandler);
 
     // ===== QR =====
@@ -583,10 +634,8 @@
     const dlPngBtn = document.getElementById('dlPngBtn');
     const dlPdfBtn = document.getElementById('dlPdfBtn');
     const copyLinkBtn = document.getElementById('copyLinkBtn');
-    const qrUrlNote = document.getElementById('qrUrlNote');
 
     const LOGO_CANDIDATES = ["../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"];
-
     let qrLogoPromise;
     function loadQrLogo() {
       if (qrLogoPromise) return qrLogoPromise;
@@ -665,7 +714,7 @@
       if(!inside) qrModal.close();
     });
 
-    copyLinkBtn?.addEventListener('click', async ()=>{
+    document.getElementById('copyLinkBtn')?.addEventListener('click', async ()=>{
       const url = QR_STATIC_VALUE;
       try{ await navigator.clipboard.writeText(url); showToast('🔗 Enllaç copiat'); }
       catch{
@@ -674,14 +723,14 @@
       }
     });
 
-    dlPngBtn?.addEventListener('click', ()=>{
+    document.getElementById('dlPngBtn')?.addEventListener('click', ()=>{
       const a = document.createElement('a');
       a.href = qrCanvas.toDataURL('image/png');
       a.download = `${drawerCode}_QR.png`;
       a.click();
     });
 
-    dlPdfBtn?.addEventListener('click', ()=>{
+    document.getElementById('dlPdfBtn')?.addEventListener('click', ()=>{
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ unit:'mm', format:'A4' });
       const png = qrCanvas.toDataURL('image/png');
