@@ -28,7 +28,7 @@
     .drawer-code{font-size:12px;color:#475467;background:#eef4ff;border:1px solid #d6e4ff;padding:4px 8px;border-radius:999px;font-weight:700;letter-spacing:.3px}
 
     .meta{display:grid;grid-template-columns:1fr auto;gap:6px 18px;margin-bottom:6px;align-items:center}
-    .meta .codeWrap{display:flex;align-items:center;gap:10px}
+    .meta .codeWrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     .meta strong{color:var(--ink)}
     .btn{border:none;border-radius:12px;padding:8px 12px;font-weight:600;cursor:pointer;background:var(--green);color:#fff;box-shadow:var(--brand-shadow);transition:transform .04s ease, background .2s ease}
     .btn:hover{background:var(--green-2)} .btn:active{transform:translateY(1px)}
@@ -122,6 +122,7 @@
       <div class="codeWrap">
         <div id="product-code"><strong>Product Code:</strong> loading...</div>
         <button class="btn secondary" id="editInfoBtn" type="button">✏️ Edit Product Info</button>
+        <button class="btn ghost" id="editDescBtn" type="button">📝 Edit Description</button>
         <button class="btn ghost" id="qrBtn" type="button">📎 QR</button>
       </div>
     </div>
@@ -297,7 +298,8 @@
     const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
 
     // --- Sticky mode helpers (ENGANXÓS) ---
-    let CHOSEN_MODE = null; // 'NEW' | 'EXISTING' | null
+    // Valors possibles: 'NEW' | 'EXISTING' | 'DESC_ONLY' | null
+    let CHOSEN_MODE = null;
     const MODE_KEY = `mode_${drawerCode}`;
     function setModeSticky(m){ CHOSEN_MODE = m || null; sessionStorage.setItem(MODE_KEY, CHOSEN_MODE || ''); }
     function getModeSticky(){ const v = sessionStorage.getItem(MODE_KEY) || ''; CHOSEN_MODE = v ? v : null; return CHOSEN_MODE; }
@@ -458,7 +460,6 @@
       function refresh(){
         curEl.textContent = cur;
         deltaEl.textContent = delta > 0 ? '+' + delta : delta;
-        
         const nv = cur + delta;
         newEl.textContent = nv;
         exact.value = nv;
@@ -546,6 +547,7 @@
 
     // === Edit info modal ===
     const editBtn = document.getElementById('editInfoBtn');
+    const editDescBtn = document.getElementById('editDescBtn');
     const modal = document.getElementById('editModal');
     const saveInfoBtn = document.getElementById('saveInfoBtn');
     const fldName = document.getElementById('fldName');
@@ -554,6 +556,8 @@
 
     function setEditLocked(mode){
       if (mode === 'existing'){
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = false;
+      } else if (mode === 'desc-only'){
         fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = false;
       } else if (mode === 'all'){
         fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = true;
@@ -709,7 +713,7 @@
       try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
     });
 
-    // Pre-warning: check name duplicates before open
+    // Pre-warning: check name duplicates before open (per Edit Product Info)
     async function checkDuplicatesBeforeEdit() {
       const name = (CURRENT?.productName || "").trim();
       if (!name) { setModeSticky("NEW"); setEditLocked('none'); return modal.showModal(); }
@@ -744,6 +748,17 @@
       }
     }
     editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
+
+    // --- Nou botó: Edit Description (DESC_ONLY) ---
+    editDescBtn.addEventListener('click', () => {
+      setModeSticky('DESC_ONLY');
+      // Precarrega i bloqueja nom/codi
+      fldName.value = CURRENT?.productName || '';
+      fldCode.value = CURRENT?.productCode || '';
+      fldDesc.value = CURRENT?.description || '';
+      setEditLocked('desc-only');
+      try { modal.showModal(); } catch { modal.setAttribute('open',''); }
+    });
 
     async function postUpdateInfo(payload){
       const r = await fetch(UPDATE_INFO_ENDPOINT, {
@@ -788,17 +803,18 @@
         let body = {};
         try { body = await res.json(); } catch {}
 
-        // EXISTING: mai reobrir dupModal. Reintenta 1 cop amb expectedProductName si existeix.
-        if (effectiveMode === 'EXISTING') {
-          if (!_tried409Once) {
-            const expected = (body && body.expectedProductName) ? String(body.expectedProductName).trim() : null;
-            return attemptSaveInfo({ forceName: expected || name, forceMode: 'EXISTING', _tried409Once: true });
-          }
+        // EXISTING: reintenta 1 cop amb expectedProductName
+        if ((effectiveMode === 'EXISTING') && !_tried409Once) {
+          const expected = (body && body.expectedProductName) ? String(body.expectedProductName).trim() : null;
+          return attemptSaveInfo({ forceName: expected || name, forceMode: 'EXISTING', _tried409Once: true });
+        }
+
+        if (effectiveMode === 'EXISTING'){
           showToast('⚠️ Could not save in EXISTING mode (conflict). Check CSV name duplicates.', '#b3261e');
           return { done:false };
         }
 
-        // NEW: pot obrir el dupModal
+        // NEW: pot obrir dupModal
         if (body?.warning) {
           setModeSticky(null);
           dupStatsWrap.style.display = "none";
@@ -818,7 +834,7 @@
       return { done:false };
     }
 
-    // ===== Save handler reforçat (consulta sticky & salta pre-check en EXISTING) =====
+    // ===== Save handler reforçat =====
     const saveInfoBtnHandler = async (ev)=>{
       ev.preventDefault();
       const mode = (getModeSticky() || '').toUpperCase();
@@ -827,7 +843,17 @@
       const code = (fldCode.value || '').trim();
       const desc = (fldDesc.value || '').trim();
 
-      // EXISTING → no fem pre-check de duplicats
+      // DESC_ONLY → només descripció, sense pre-checks
+      if (mode === 'DESC_ONLY'){
+        if (!desc){ showToast('Description cannot be empty', '#b3261e'); return; }
+        setEditLocked('all');
+        const res = await attemptSaveInfo({ forceMode: 'DESC_ONLY' });
+        setEditLocked('none');
+        if (res.done){ setModeSticky(null); }
+        return;
+      }
+
+      // EXISTING → sense pre-check de duplicats
       if (mode === 'EXISTING'){
         setEditLocked('all');
         const res = await attemptSaveInfo({ forceMode: 'EXISTING' });
@@ -836,7 +862,7 @@
         return;
       }
 
-      // NEW
+      // NEW (amb validacions bàsiques)
       if(!name || !code || !desc){
         showToast('Please fill all fields', '#b3261e');
         return;
