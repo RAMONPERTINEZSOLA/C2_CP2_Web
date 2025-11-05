@@ -53,7 +53,9 @@
     .stock-ui .warn.pulse{display:block;animation:pulse 1s infinite}
     .stock-ui .warn.pulse::before{content:"❗❗"; margin-right:8px; display:inline-block; animation:wiggle .8s infinite;}
     @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,53,69,.35)}70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}}
-    @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
+    @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}
+
+    }
 
     #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background-color:#198754;color:white;padding:10px 20px;border-radius:10px;font-weight:700;display:none;animation:fade 3s ease forwards;z-index:1000}
     @keyframes fade{
@@ -100,8 +102,8 @@
     #postSaveBanner .counter{font-variant-numeric:tabular-nums; font-weight:700}
     #postSaveBanner button{background:#ffffff; color:#0f1b2f; border:1px solid #cfe4ff66; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer}
 
-    /* Badges: GLOBAL / DRAWER */
-    #stockBadges{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+    /* Badges: GLOBAL / DRAWER — ara a la part inferior */
+    #stockBadges{display:flex;gap:.5rem;flex-wrap:wrap;margin:.75rem 0 0}
     .badge{
       display:inline-flex;align-items:center;gap:.4rem;
       padding:.35rem .6rem;border:1px solid var(--line);border-radius:999px;
@@ -160,13 +162,6 @@
       </div>
     </div>
 
-    <!-- GLOBAL / DRAWER badges -->
-    <div id="stockBadges">
-      <span id="badgeGlobal" class="badge">GLOBAL: <strong id="globalStockCount">—</strong></span>
-      <span id="badgeDrawer" class="badge">DRAWER: <strong id="drawerStockCount">—</strong></span>
-    </div>
-    <div id="distributionWrap" style="margin-top:.25rem"></div>
-
     <div class="cards">
       <div class="card">
         <h3>Drawer Photo</h3>
@@ -198,26 +193,31 @@
       </div>
     </div>
 
+    <!-- Description -->
     <div class="card" style="margin-top:20px">
       <h3>Description</h3>
       <div id="description-text" style="line-height:1.6">loading...</div>
     </div>
 
-    <!-- INFO/HELP IMAGE just after description -->
+    <!-- Info image just after Description -->
     <div class="card" id="info-image-card" style="margin-top:14px">
       <h3>Info</h3>
       <div class="imgwrap" style="min-height:auto">
-        <!-- ⬇️ Canvia el src per la teva imatge -->
+        <!-- Canvia el src per la teva imatge -->
         <img id="infoImage" src="../images/distribution_hint.png" alt="Distribution hint" style="max-width:100%;height:auto">
       </div>
     </div>
 
-    <!-- In-page Force Refresh -->
+    <!-- ⬇️ DISTRIBUTION NOW HERE (just before stock) -->
+    <div id="distributionWrap" style="margin-top:14px"></div>
+
+    <!-- Force refresh (data) -->
     <div class="refresh-card">
       <button id="hardRefreshBtn" class="btn ghost" type="button">↻ Force refresh data</button>
       <small>Use this button if needed ~1 minute after applying a change.</small>
     </div>
 
+    <!-- Stock area -->
     <div class="stock-display" id="stock-display">Loading stock...</div>
 
     <div class="stock-ui" id="stockUI">
@@ -234,6 +234,12 @@
         <button class="save" id="saveBtn" type="button">Save</button>
       </div>
       <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
+    </div>
+
+    <!-- ⬇️ GLOBAL/DRAWER badges moved to the bottom -->
+    <div id="stockBadges">
+      <span id="badgeGlobal" class="badge">GLOBAL: <strong id="globalStockCount">—</strong></span>
+      <span id="badgeDrawer" class="badge">DRAWER: <strong id="drawerStockCount">—</strong></span>
     </div>
 
     <div id="toast"></div>
@@ -289,7 +295,6 @@
     </div>
 
     <div class="bd" style="grid-template-columns:1fr; gap:14px">
-      <!-- Step 1 -->
       <div class="fld fld--wide" id="dupStep1">
         <label>Message</label>
         <div id="dupMsg" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;line-height:1.5">
@@ -300,16 +305,15 @@
           <div id="dupStats" style="background:#f7f9fb;border:1px solid #e6edf3;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
         </div>
         <div class="note">
-          If the name already exists in other drawers, recommended: <strong>EXISTING PRODUCT</strong> (keeps canonical name and aggregates stock).
+          If the name already exists in other drawers, recommended: <strong>EXISTING PRODUCT</strong>.
         </div>
       </div>
 
-      <!-- Step 2: existing picker -->
       <div class="fld fld--wide" id="dupStep2" style="display:none">
         <label for="existingSelect">Choose an existing product (by NAME)</label>
         <select id="existingSelect" style="padding:12px;border:1px solid #d0d5dd;border-radius:12px;font-size:16px"></select>
         <div class="note">
-          The <b>code</b> and <b>description</b> will be preloaded with canonical values (most frequent) for this name and applied to all rows.
+          The <b>code</b> and <b>description</b> will be preloaded with canonical values and applied to all rows.
         </div>
         <div class="fld fld--wide" id="existingPreview" style="display:none">
           <label>Canonical preview</label>
@@ -528,12 +532,12 @@
         badgeDrawer.title = min ? `Drawer minimum: ${min}` : '';
       }
 
-      // Distribution panel with quick links
+      // Distribution panel WITH quick links — now placed before stock
       if (distWrap){
         const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
         if (!entries.length){ distWrap.innerHTML = ''; return; }
         let html = `
-          <div style="border:1px solid var(--line);border-radius:12px;padding:.75rem;background:#fff">
+          <div class="card">
             <div style="font-weight:600;margin-bottom:.4rem">Distribution by drawers (${entries.length})</div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.4rem;">
         `;
@@ -553,25 +557,25 @@
       }
     }
 
-    // ---- Full UI reload (for in-page Force refresh) ----
+    // ---- Full UI reload (for Force refresh) ----
     async function reloadAllUI(){
       try{
         const csv = await loadCSVFromCandidates();
         ALL_DATA = parseCSV(csv);
         CURRENT  = ALL_DATA.find(r => (r.drawerCode || "").trim() === drawerCode);
         if (!CURRENT) throw new Error("Drawer not found");
-        // Update visible fields
+
         document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${CURRENT.productName || ""}`;
         document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${CURRENT.productCode || ""}`;
         document.getElementById("description-text").textContent = CURRENT.description || "";
         const MIN_STOCK = parseInt(CURRENT.minStock || "10", 10);
         document.getElementById("stock-display").innerText = "📦 STOCK: " + (CURRENT.stockQty || "0");
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
-        // Global dist
+
         const { key } = getProductKeyFromRow(CURRENT);
         const agg = aggregateForProductKey(key, true);
         renderGlobalAndDrawerBadges(agg, drawerCode);
-        // Refill edit modal fields
+
         document.getElementById("fldName").value = CURRENT.productName || "";
         document.getElementById("fldCode").value = CURRENT.productCode || "";
         document.getElementById("fldDesc").value = CURRENT.description || "";
@@ -598,17 +602,14 @@
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
 
-        // Global + Drawer counters
         const { key } = getProductKeyFromRow(CURRENT);
         const agg = aggregateForProductKey(key, true);
         renderGlobalAndDrawerBadges(agg, drawerCode);
 
-        // Prefill modal
         document.getElementById("fldName").value = CURRENT.productName || "";
         document.getElementById("fldCode").value = CURRENT.productCode || "";
         document.getElementById("fldDesc").value = CURRENT.description || "";
 
-        // wire hard refresh
         document.getElementById('hardRefreshBtn')?.addEventListener('click', reloadAllUI);
       })
       .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
@@ -716,7 +717,7 @@
       }finally{ fileInput.value = ''; }
     });
 
-    // --- Edit info modal ---
+    // --- Edit info modal / process chooser (dup) — sense canvis funcionals rellevants ---
     const editBtn = document.getElementById('editInfoBtn');
     const editDescBtn = document.getElementById('editDescBtn');
     const modal = document.getElementById('editModal');
@@ -743,15 +744,9 @@
     }
 
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
+    document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{ setModeSticky(null); modal.close(); setEditLocked('none'); });
+    document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{ setModeSticky(null); modal.close(); setEditLocked('none'); });
 
-    document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{
-      setModeSticky(null); modal.close(); setEditLocked('none');
-    });
-    document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{
-      setModeSticky(null); modal.close(); setEditLocked('none');
-    });
-
-    // Process chooser / existing picker
     const dupModal = document.getElementById('dupModal');
     const dupMsg   = document.getElementById('dupMsg');
     const dupStats = document.getElementById('dupStats');
@@ -843,27 +838,10 @@
       dupFt1.style.display   = '';
     });
 
-    // EXISTING → Save now
-    dupProceedExistingBtn.addEventListener('click', async ()=>{
-      const val = (existingSelect.value || '').trim();
-      if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
-      const canon = canonicalByProductName(val);
+    dupExistingBtn.onclick = () => { openExistingPicker(); };
+    dupNewBtn.onclick      = () => { setModeSticky("NEW"); setEditLocked('none'); dupModal.close(); modal.showModal(); };
 
-      setModeSticky('EXISTING');
-      applyCanonToFields(canon);
-      setEditLocked('existing');
-      dupModal.close();
-
-      const res = await attemptSaveInfo({ forceName: canon.productName || '', forceMode: 'EXISTING' });
-      setEditLocked('none');
-
-      if (res.done){
-        setModeSticky(null);
-        showPostSaveBanner(60);
-      }
-    });
-
-    async function checkDuplicatesBeforeEdit() {
+    document.getElementById('editInfoBtn').addEventListener("click", async () => {
       const name = (CURRENT?.productName || "").trim();
       if (!name) { setModeSticky("NEW"); setEditLocked('none'); return modal.showModal(); }
 
@@ -885,9 +863,6 @@
           dupMsg.textContent = "You’re about to modify this drawer. Do you want to create a NEW PRODUCT or add an EXISTING PRODUCT?";
         }
 
-        dupExistingBtn.onclick = () => { openExistingPicker(); };
-        dupNewBtn.onclick      = () => { setModeSticky("NEW"); setEditLocked('none'); dupModal.close(); modal.showModal(); };
-
         try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
       } catch (err) {
         console.error("Error checking duplicates:", err);
@@ -895,17 +870,6 @@
         setEditLocked('none');
         modal.showModal(); // fallback
       }
-    }
-    editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
-
-    // Edit Description only
-    editDescBtn.addEventListener('click', () => {
-      setModeSticky('DESC_ONLY');
-      fldName.value = CURRENT?.productName || '';
-      fldCode.value = CURRENT?.productCode || '';
-      fldDesc.value = CURRENT?.description || '';
-      setEditLocked('desc-only');
-      try { modal.showModal(); } catch { modal.setAttribute('open',''); }
     });
 
     async function postUpdateInfo(payload){
@@ -917,7 +881,7 @@
       return r;
     }
 
-    // attemptSaveInfo — FIX: do NOT propagate on NEW
+    // attemptSaveInfo — NO propagation on NEW
     async function attemptSaveInfo({ forceName = null, forceMode = null, _tried409Once = false } = {}){
       const name = (forceName ?? fldName.value).trim();
       const code = fldCode.value.trim();
@@ -926,9 +890,6 @@
       const payload = { drawerCode, productName: name, productCode: code, description: desc };
       const effectiveMode = (forceMode || getModeSticky() || '').toUpperCase();
       if (effectiveMode) payload.mode = effectiveMode;
-
-      // 🔧 KEY FIX:
-      // Only propagate when NOT NEW (i.e., EXISTING updates or general updates).
       payload.propagateAll = (effectiveMode !== 'NEW');
 
       const res = await postUpdateInfo(payload);
@@ -984,7 +945,7 @@
       return { done:false };
     }
 
-    const saveInfoBtnHandler = async (ev)=>{
+    document.getElementById('saveInfoBtn').addEventListener('click', async (ev)=>{
       ev.preventDefault();
       const mode = (getModeSticky() || '').toUpperCase();
 
@@ -1037,9 +998,7 @@
       setEditLocked('all');
       await attemptSaveInfo({ forceMode: 'NEW' });
       setEditLocked('none');
-    };
-
-    document.getElementById('saveInfoBtn').addEventListener('click', saveInfoBtnHandler);
+    });
 
     // --- QR ---
     const qrBtn = document.getElementById('qrBtn');
