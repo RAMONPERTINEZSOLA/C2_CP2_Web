@@ -680,43 +680,50 @@
     });
 
     // EXISTING → Continue: save now (or edit desc first)
-    dupProceedExistingBtn.addEventListener('click', async ()=>{
-  const val = (existingSelect.value || '').trim();
-  if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
+      dupProceedExistingBtn.addEventListener('click', async ()=>{
+      const val = (existingSelect.value || '').trim();
+      if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
 
-  const canon = canonicalByProductName(val);
-  CHOSEN_MODE = 'EXISTING';
+      // Canonicals i “fallbacks” segurs
+      const canon = canonicalByProductName(val);
+      const safeCanon = {
+        productName: canon.productName || (CURRENT?.productName || ''),
+        productCode: canon.productCode || (CURRENT?.productCode || 'N/A'),
+        description: canon.description || (CURRENT?.description || '')
+      };
 
-  // Preguntem si vol ajustar la descripció abans de guardar
+      CHOSEN_MODE = 'EXISTENT';
+
       const wantEditDesc = confirm(
         "You chose an EXISTING product.\n\nDo you want to adjust the Description before saving?\n\nOK = edit description first\nCancel = save now"
       );
 
       if (wantEditDesc){
-        applyCanonToFields(canon);
+        applyCanonToFields(safeCanon);
         setEditLocked('existing');
         dupModal.close();
         try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
         return;
       }
 
-      // Guardar ara mateix amb els valors canònics (sense passar per l’editor)
-      applyCanonToFields(canon);      // <<< important: carreguem canònics als inputs
-      setEditLocked('all');           // evitem doble clic
-      const res = await attemptSaveInfo({ forceName: canon.productName || '' });
+      // Guarda ara mateix amb canònics segurs (sense editor)
+      applyCanonToFields(safeCanon);
+      setEditLocked('all');
+      const res = await attemptSaveInfo({ forceName: safeCanon.productName });
 
       if (res.done){
-        CHOSEN_MODE = null;           // netegem estat
+        CHOSEN_MODE = null;
         setEditLocked('none');
-        dupModal.close();             // tanquem i ja està
+        dupModal.close();
         return;
       }
 
-      // Fallback: si no s'ha pogut guardar, obrim editor amb només desc. editable
+      // Fallback: si hi hagués un 409 inesperat, obre editor només amb desc.
       setEditLocked('existing');
       dupModal.close();
       try{ modal.showModal(); }catch{ modal.setAttribute('open',''); }
     });
+
 
 
     // Pre-warning: check name duplicates before open
@@ -833,7 +840,7 @@
       const code = (fldCode.value || '').trim();
       const desc = (fldDesc.value || '').trim();
 
-      if (CHOSEN_MODE === 'EXISTING'){
+      if (CHOSEN_MODE === 'EXISTENT'){
         // En mode EXISTENT només validem que hi hagi descripció (si la vols afegir)
         // i guardem directament amb els valors actuals del formulari.
         setEditLocked('all');
