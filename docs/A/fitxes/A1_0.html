@@ -100,8 +100,8 @@
     #postSaveBanner .counter{font-variant-numeric:tabular-nums; font-weight:700}
     #postSaveBanner button{background:#ffffff; color:#0f1b2f; border:1px solid #cfe4ff66; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer}
 
-    /* Badges: GLOBAL / DRAWER — a baix */
-    #stockBadges{display:flex;gap:.5rem;flex-wrap:wrap;margin:.75rem 0 0}
+    /* Badges: GLOBAL / DRAWER */
+    #stockBadges{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
     .badge{
       display:inline-flex;align-items:center;gap:.4rem;
       padding:.35rem .6rem;border:1px solid var(--line);border-radius:999px;
@@ -110,18 +110,13 @@
     }
     .badge.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; }
 
-    /* Distribution pills */
+    /* Clickable distribution pills */
     .distLink{
       display:inline-block; padding:.25rem .5rem; border:1px solid var(--line);
-      border-radius:999px; background:#fff; text-decoration:none; color:#1f2937;
-      margin:.2rem;
+      border-radius:999px; background:#fff; text-decoration:none; color:var(--ink);
     }
     .distLink:hover{ box-shadow:0 2px 10px rgba(0,0,0,.06) }
     .distLink.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; font-weight:600 }
-
-    /* Force refresh block */
-    .refresh-card{margin-top:16px;padding:12px;border:1px dashed #cdd4d9;border-radius:12px;background:#fff}
-    .refresh-card small{color:#667085;display:block;margin-top:6px}
   </style>
 
   <style>
@@ -161,6 +156,13 @@
       </div>
     </div>
 
+    <!-- GLOBAL / DRAWER badges -->
+    <div id="stockBadges">
+      <span id="badgeGlobal" class="badge">GLOBAL: <strong id="globalStockCount">—</strong></span>
+      <span id="badgeDrawer" class="badge">DRAWER: <strong id="drawerStockCount">—</strong></span>
+    </div>
+    <div id="distributionWrap" style="margin-top:.25rem"></div>
+
     <div class="cards">
       <div class="card">
         <h3>Drawer Photo</h3>
@@ -192,22 +194,11 @@
       </div>
     </div>
 
-    <!-- Description -->
     <div class="card" style="margin-top:20px">
       <h3>Description</h3>
       <div id="description-text" style="line-height:1.6">loading...</div>
     </div>
 
-    <!-- ⬇️ DISTRIBUTION (just after description) -->
-    <div id="distributionWrap" style="margin-top:14px"></div>
-
-    <!-- Force refresh (data) -->
-    <div class="refresh-card">
-      <button id="hardRefreshBtn" class="btn ghost" type="button">↻ Force refresh data</button>
-      <small>Use this button if needed ~1 minute after applying a change.</small>
-    </div>
-
-    <!-- Stock area -->
     <div class="stock-display" id="stock-display">Loading stock...</div>
 
     <div class="stock-ui" id="stockUI">
@@ -224,12 +215,6 @@
         <button class="save" id="saveBtn" type="button">Save</button>
       </div>
       <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
-    </div>
-
-    <!-- badges -->
-    <div id="stockBadges">
-      <span id="badgeGlobal" class="badge">GLOBAL: <strong id="globalStockCount">—</strong></span>
-      <span id="badgeDrawer" class="badge">DRAWER: <strong id="drawerStockCount">—</strong></span>
     </div>
 
     <div id="toast"></div>
@@ -285,6 +270,7 @@
     </div>
 
     <div class="bd" style="grid-template-columns:1fr; gap:14px">
+      <!-- Step 1 -->
       <div class="fld fld--wide" id="dupStep1">
         <label>Message</label>
         <div id="dupMsg" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;line-height:1.5">
@@ -295,15 +281,16 @@
           <div id="dupStats" style="background:#f7f9fb;border:1px solid #e6edf3;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
         </div>
         <div class="note">
-          If the name already exists in other drawers, recommended: <strong>EXISTING PRODUCT</strong>.
+          If the name already exists in other drawers, recommended: <strong>EXISTING PRODUCT</strong> (keeps canonical name and aggregates stock).
         </div>
       </div>
 
+      <!-- Step 2: existing picker -->
       <div class="fld fld--wide" id="dupStep2" style="display:none">
         <label for="existingSelect">Choose an existing product (by NAME)</label>
         <select id="existingSelect" style="padding:12px;border:1px solid #d0d5dd;border-radius:12px;font-size:16px"></select>
         <div class="note">
-          The <b>code</b> and <b>description</b> will be preloaded with canonical values and applied to all rows.
+          The <b>code</b> and <b>description</b> will be preloaded with canonical values (most frequent) for this name and applied to all rows.
         </div>
         <div class="fld fld--wide" id="existingPreview" style="display:none">
           <label>Canonical preview</label>
@@ -441,25 +428,62 @@
 
     const normalizeName = s => String(s || '').normalize('NFKC').replace(/\s+/g,' ').trim().toLowerCase();
 
-    // STRICT product filter: if current has code -> match by code ONLY.
-    // If current has NO code -> match only rows WITHOUT code AND same normalized name.
-    function filterRowsSameProduct(all, current){
-      const curCode = (current.productCode || '').trim().toLowerCase();
-      const curName = normalizeName(current.productName || '');
-      if (curCode){
-        return all.filter(r => (r.productCode || '').trim().toLowerCase() === curCode);
-      } else {
-        return all.filter(r => {
-          const code = (r.productCode || '').trim();
-          if (code) return false; // exclude coded rows
-          return normalizeName(r.productName || '') === curName;
-        });
+    function uniqueProductNamesFromData(data){
+      const count = new Map();
+      for (const r of data){
+        const raw = (r.productName || '').trim();
+        if (!raw) continue;
+        const key = normalizeName(raw);
+        const prev = count.get(key) || { display: raw, n: 0 };
+        prev.n += 1;
+        count.set(key, prev);
       }
+      return [...count.entries()]
+        .sort((a,b)=> b[1].n - a[1].n)
+        .map(([key, v]) => ({ key, display: v.display, n: v.n }));
     }
 
-    function aggregateFromRows(rows){
+    function modeNonEmpty(arr){
+      const m = new Map();
+      for (const v of arr){
+        const s = String(v || '').trim();
+        if (!s) continue;
+        m.set(s, (m.get(s)||0)+1);
+      }
+      let best = '', bestN = 0;
+      for (const [val, n] of m.entries()){
+        if (n > bestN){ best = val; bestN = n; }
+      }
+      return best;
+    }
+
+    function canonicalByProductName(name){
+      const key = normalizeName(name);
+      const rows = ALL_DATA.filter(r => normalizeName(r.productName||'') === key);
+      const codes = rows.map(r => r.productCode || '');
+      const descs = rows.map(r => r.description || '');
+      return {
+        productName: name.trim(),
+        productCode: modeNonEmpty(codes) || '',
+        description: modeNonEmpty(descs) || ''
+      };
+    }
+
+    // --- Aggregation by product key (prefer code, fallback name) ---
+    function getProductKeyFromRow(row){
+      const code = (row.productCode || "").trim();
+      if (code) return { key: code.toLowerCase(), type: "code" };
+      return { key: normalizeName(row.productName || ""), type: "name" };
+    }
+    function aggregateForProductKey(productKey, useCodePrefer=true){
       const agg = { total:0, byDrawer:{}, minByDrawer:{} };
-      for(const r of rows){
+      for(const r of ALL_DATA){
+        const code = (r.productCode||"").trim().toLowerCase();
+        const name = normalizeName(r.productName||"");
+        const match = useCodePrefer
+          ? (code ? code===productKey : name===productKey)
+          : (name===productKey);
+        if (!match) continue;
         const d = (r.drawerCode||"").trim();
         const q = parseInt(r.stockQty||"0",10) || 0;
         const m = parseInt(r.minStock||"0",10) || 0;
@@ -469,16 +493,14 @@
       }
       return agg;
     }
-
-    function renderDistributionFromRows(rows, currentDrawer){
-      const distWrap = document.getElementById('distributionWrap');
+    function renderGlobalAndDrawerBadges(agg, currentDrawer){
       const gEl = document.getElementById('globalStockCount');
       const dEl = document.getElementById('drawerStockCount');
       const badgeDrawer = document.getElementById('badgeDrawer');
-
-      const agg = aggregateFromRows(rows);
+      const distWrap = document.getElementById('distributionWrap');
 
       if (gEl) gEl.textContent = String(agg.total);
+
       const dq = currentDrawer ? (agg.byDrawer[currentDrawer] || 0) : 0;
       if (dEl) dEl.textContent = String(dq);
       if (badgeDrawer){
@@ -487,54 +509,28 @@
         badgeDrawer.title = min ? `Drawer minimum: ${min}` : '';
       }
 
-      const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
-      if (!entries.length){ distWrap.innerHTML = ''; return; }
-
-      let html = `
-        <div class="card">
-          <div style="font-weight:600;margin-bottom:.4rem">Distribution by drawers (${entries.length})</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.4rem;">
-      `;
-      for (const [d,q] of entries){
-        const min = agg.minByDrawer[d]||0;
-        const lowCls = (min>0 && q<=min) ? 'low' : '';
-        const href = `./${d}.html`;
-        html += `
-          <div>
-            <a class="distLink ${lowCls}" href="${href}" aria-label="Open drawer ${d}">
-              ${d}: <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}
-            </a>
-          </div>`;
-      }
-      html += `</div></div>`;
-      distWrap.innerHTML = html;
-    }
-
-    // ---- Full UI reload (for Force refresh) ----
-    async function reloadAllUI(){
-      try{
-        const csv = await loadCSVFromCandidates();
-        ALL_DATA = parseCSV(csv);
-        CURRENT  = ALL_DATA.find(r => (r.drawerCode || "").trim() === drawerCode);
-        if (!CURRENT) throw new Error("Drawer not found");
-
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${CURRENT.productName || ""}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${CURRENT.productCode || ""}`;
-        document.getElementById("description-text").textContent = CURRENT.description || "";
-        const MIN_STOCK = parseInt(CURRENT.minStock || "10", 10);
-        document.getElementById("stock-display").innerText = "📦 STOCK: " + (CURRENT.stockQty || "0");
-        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
-
-        const sameRows = filterRowsSameProduct(ALL_DATA, CURRENT);
-        renderDistributionFromRows(sameRows, drawerCode);
-
-        document.getElementById("fldName").value = CURRENT.productName || "";
-        document.getElementById("fldCode").value = CURRENT.productCode || "";
-        document.getElementById("fldDesc").value = CURRENT.description || "";
-        showToast('↻ Data refreshed');
-      }catch(e){
-        console.error(e);
-        showToast('❌ Error refreshing', '#b3261e');
+      // Distribution panel with quick links
+      if (distWrap){
+        const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
+        if (!entries.length){ distWrap.innerHTML = ''; return; }
+        let html = `
+          <div style="border:1px solid var(--line);border-radius:12px;padding:.75rem;background:#fff">
+            <div style="font-weight:600;margin-bottom:.4rem">Distribution by drawers (${entries.length})</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.4rem;">
+        `;
+        for (const [d,q] of entries){
+          const min = agg.minByDrawer[d]||0;
+          const lowCls = (min>0 && q<=min) ? 'low' : '';
+          const href = `./${d}.html`;
+          html += `
+            <div>
+              <a class="distLink ${lowCls}" href="${href}" aria-label="Open drawer ${d}">
+                ${d}: <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}
+              </a>
+            </div>`;
+        }
+        html += `</div></div>`;
+        distWrap.innerHTML = html;
       }
     }
 
@@ -554,15 +550,15 @@
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
 
-        // DISTRIBUTION (filtered strictly)
-        const sameRows = filterRowsSameProduct(ALL_DATA, CURRENT);
-        renderDistributionFromRows(sameRows, drawerCode);
+        // Global + Drawer counters
+        const { key } = getProductKeyFromRow(CURRENT);
+        const agg = aggregateForProductKey(key, true);
+        renderGlobalAndDrawerBadges(agg, drawerCode);
 
+        // Prefill modal
         document.getElementById("fldName").value = CURRENT.productName || "";
         document.getElementById("fldCode").value = CURRENT.productCode || "";
         document.getElementById("fldDesc").value = CURRENT.description || "";
-
-        document.getElementById('hardRefreshBtn')?.addEventListener('click', reloadAllUI);
       })
       .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
 
@@ -669,7 +665,7 @@
       }finally{ fileInput.value = ''; }
     });
 
-    // --- Edit info modal / process chooser (dup) ---
+    // --- Edit info modal ---
     const editBtn = document.getElementById('editInfoBtn');
     const editDescBtn = document.getElementById('editDescBtn');
     const modal = document.getElementById('editModal');
@@ -696,9 +692,15 @@
     }
 
     document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
-    document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{ setModeSticky(null); modal.close(); setEditLocked('none'); });
-    document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{ setModeSticky(null); modal.close(); setEditLocked('none'); });
 
+    document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{
+      setModeSticky(null); modal.close(); setEditLocked('none');
+    });
+    document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{
+      setModeSticky(null); modal.close(); setEditLocked('none');
+    });
+
+    // Process chooser / existing picker
     const dupModal = document.getElementById('dupModal');
     const dupMsg   = document.getElementById('dupMsg');
     const dupStats = document.getElementById('dupStats');
@@ -737,43 +739,6 @@
     const dupProceedExistingBtn = document.getElementById('dupProceedExisting');
     const existingPreview = document.getElementById('existingPreview');
     const existingPreviewBox = document.getElementById('existingPreviewBox');
-
-    function uniqueProductNamesFromData(data){
-      const count = new Map();
-      for (const r of data){
-        const raw = (r.productName || '').trim();
-        if (!raw) continue;
-        const key = normalizeName(raw);
-        const prev = count.get(key) || { display: raw, n: 0 };
-        prev.n += 1;
-        count.set(key, prev);
-      }
-      return [...count.entries()]
-        .sort((a,b)=> b[1].n - a[1].n)
-        .map(([key, v]) => ({ key, display: v.display, n: v.n }));
-    }
-
-    function modeNonEmpty(arr){
-      const m = new Map();
-      for (const v of arr){
-        const s = String(v || '').trim();
-        if (!s) continue;
-        m.set(s, (m.get(s)||0)+1);
-      }
-      let best = '', bestN = 0;
-      for (const [val, n] of m.entries()){
-        if (n > bestN){ best = val; bestN = n; }
-      }
-      return best;
-    }
-
-    function canonicalByProductName(name){
-      const key = normalizeName(name);
-      const rows = ALL_DATA.filter(r => normalizeName(r.productName||'') === key);
-      const codes = rows.map(r => r.productCode || '');
-      const descs = rows.map(r => r.description || '');
-      return { productName: name.trim(), productCode: modeNonEmpty(codes) || '', description: modeNonEmpty(descs) || '' };
-    }
 
     function openExistingPicker(){
       const items = uniqueProductNamesFromData(ALL_DATA);
@@ -827,10 +792,27 @@
       dupFt1.style.display   = '';
     });
 
-    dupExistingBtn.onclick = () => { openExistingPicker(); };
-    dupNewBtn.onclick      = () => { setModeSticky("NEW"); setEditLocked('none'); dupModal.close(); modal.showModal(); };
+    // EXISTING → Save now
+    dupProceedExistingBtn.addEventListener('click', async ()=>{
+      const val = (existingSelect.value || '').trim();
+      if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
+      const canon = canonicalByProductName(val);
 
-    document.getElementById('editInfoBtn').addEventListener("click", async () => {
+      setModeSticky('EXISTING');
+      applyCanonToFields(canon);
+      setEditLocked('existing');
+      dupModal.close();
+
+      const res = await attemptSaveInfo({ forceName: canon.productName || '', forceMode: 'EXISTING' });
+      setEditLocked('none');
+
+      if (res.done){
+        setModeSticky(null);
+        showPostSaveBanner(60);
+      }
+    });
+
+    async function checkDuplicatesBeforeEdit() {
       const name = (CURRENT?.productName || "").trim();
       if (!name) { setModeSticky("NEW"); setEditLocked('none'); return modal.showModal(); }
 
@@ -852,6 +834,9 @@
           dupMsg.textContent = "You’re about to modify this drawer. Do you want to create a NEW PRODUCT or add an EXISTING PRODUCT?";
         }
 
+        dupExistingBtn.onclick = () => { openExistingPicker(); };
+        dupNewBtn.onclick      = () => { setModeSticky("NEW"); setEditLocked('none'); dupModal.close(); modal.showModal(); };
+
         try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
       } catch (err) {
         console.error("Error checking duplicates:", err);
@@ -859,6 +844,17 @@
         setEditLocked('none');
         modal.showModal(); // fallback
       }
+    }
+    editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
+
+    // Edit Description only
+    editDescBtn.addEventListener('click', () => {
+      setModeSticky('DESC_ONLY');
+      fldName.value = CURRENT?.productName || '';
+      fldCode.value = CURRENT?.productCode || '';
+      fldDesc.value = CURRENT?.description || '';
+      setEditLocked('desc-only');
+      try { modal.showModal(); } catch { modal.setAttribute('open',''); }
     });
 
     async function postUpdateInfo(payload){
@@ -870,7 +866,7 @@
       return r;
     }
 
-    // attemptSaveInfo — NO propagation on NEW
+    // attemptSaveInfo with propagateAll
     async function attemptSaveInfo({ forceName = null, forceMode = null, _tried409Once = false } = {}){
       const name = (forceName ?? fldName.value).trim();
       const code = fldCode.value.trim();
@@ -879,7 +875,8 @@
       const payload = { drawerCode, productName: name, productCode: code, description: desc };
       const effectiveMode = (forceMode || getModeSticky() || '').toUpperCase();
       if (effectiveMode) payload.mode = effectiveMode;
-      payload.propagateAll = (effectiveMode !== 'NEW');
+
+      payload.propagateAll = true;
 
       const res = await postUpdateInfo(payload);
 
@@ -895,10 +892,6 @@
           CURRENT.productCode = updated.productCode || code;
           CURRENT.description = updated.description || desc;
         }
-
-        // Re-render distribution with updated CURRENT
-        const sameRows = filterRowsSameProduct(ALL_DATA, CURRENT);
-        renderDistributionFromRows(sameRows, drawerCode);
 
         showToast('✔️ Product info updated');
         showPostSaveBanner(60);
@@ -938,7 +931,7 @@
       return { done:false };
     }
 
-    document.getElementById('saveInfoBtn').addEventListener('click', async (ev)=>{
+    const saveInfoBtnHandler = async (ev)=>{
       ev.preventDefault();
       const mode = (getModeSticky() || '').toUpperCase();
 
@@ -991,7 +984,9 @@
       setEditLocked('all');
       await attemptSaveInfo({ forceMode: 'NEW' });
       setEditLocked('none');
-    });
+    };
+
+    document.getElementById('saveInfoBtn').addEventListener('click', saveInfoBtnHandler);
 
     // --- QR ---
     const qrBtn = document.getElementById('qrBtn');
