@@ -53,9 +53,7 @@
     .stock-ui .warn.pulse{display:block;animation:pulse 1s infinite}
     .stock-ui .warn.pulse::before{content:"❗❗"; margin-right:8px; display:inline-block; animation:wiggle .8s infinite;}
     @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,53,69,.35)}70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}}
-    @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}
-
-    }
+    @keyframes wiggle{0%{transform:translateY(0)}50%{transform:translateY(-2px)}100%{transform:translateY(0)}}
 
     #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background-color:#198754;color:white;padding:10px 20px;border-radius:10px;font-weight:700;display:none;animation:fade 3s ease forwards;z-index:1000}
     @keyframes fade{
@@ -102,7 +100,7 @@
     #postSaveBanner .counter{font-variant-numeric:tabular-nums; font-weight:700}
     #postSaveBanner button{background:#ffffff; color:#0f1b2f; border:1px solid #cfe4ff66; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer}
 
-    /* Badges: GLOBAL / DRAWER — ara a la part inferior */
+    /* Badges: GLOBAL / DRAWER — a baix */
     #stockBadges{display:flex;gap:.5rem;flex-wrap:wrap;margin:.75rem 0 0}
     .badge{
       display:inline-flex;align-items:center;gap:.4rem;
@@ -112,10 +110,11 @@
     }
     .badge.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; }
 
-    /* Clickable distribution pills */
+    /* Distribution pills */
     .distLink{
       display:inline-block; padding:.25rem .5rem; border:1px solid var(--line);
       border-radius:999px; background:#fff; text-decoration:none; color:#1f2937;
+      margin:.2rem;
     }
     .distLink:hover{ box-shadow:0 2px 10px rgba(0,0,0,.06) }
     .distLink.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; font-weight:600 }
@@ -199,7 +198,7 @@
       <div id="description-text" style="line-height:1.6">loading...</div>
     </div>
 
-    <!-- ⬇️ DISTRIBUTION (just before stock) -->
+    <!-- ⬇️ DISTRIBUTION (just after description) -->
     <div id="distributionWrap" style="margin-top:14px"></div>
 
     <!-- Force refresh (data) -->
@@ -227,7 +226,7 @@
       <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
     </div>
 
-    <!-- ⬇️ GLOBAL/DRAWER badges moved to the bottom -->
+    <!-- badges -->
     <div id="stockBadges">
       <span id="badgeGlobal" class="badge">GLOBAL: <strong id="globalStockCount">—</strong></span>
       <span id="badgeDrawer" class="badge">DRAWER: <strong id="drawerStockCount">—</strong></span>
@@ -442,70 +441,25 @@
 
     const normalizeName = s => String(s || '').normalize('NFKC').replace(/\s+/g,' ').trim().toLowerCase();
 
-    function uniqueProductNamesFromData(data){
-      const count = new Map();
-      for (const r of data){
-        const raw = (r.productName || '').trim();
-        if (!raw) continue;
-        const key = normalizeName(raw);
-        const prev = count.get(key) || { display: raw, n: 0 };
-        prev.n += 1;
-        count.set(key, prev);
+    // STRICT product filter: if current has code -> match by code ONLY.
+    // If current has NO code -> match only rows WITHOUT code AND same normalized name.
+    function filterRowsSameProduct(all, current){
+      const curCode = (current.productCode || '').trim().toLowerCase();
+      const curName = normalizeName(current.productName || '');
+      if (curCode){
+        return all.filter(r => (r.productCode || '').trim().toLowerCase() === curCode);
+      } else {
+        return all.filter(r => {
+          const code = (r.productCode || '').trim();
+          if (code) return false; // exclude coded rows
+          return normalizeName(r.productName || '') === curName;
+        });
       }
-      return [...count.entries()]
-        .sort((a,b)=> b[1].n - a[1].n)
-        .map(([key, v]) => ({ key, display: v.display, n: v.n }));
     }
 
-    function modeNonEmpty(arr){
-      const m = new Map();
-      for (const v of arr){
-        const s = String(v || '').trim();
-        if (!s) continue;
-        m.set(s, (m.get(s)||0)+1);
-      }
-      let best = '', bestN = 0;
-      for (const [val, n] of m.entries()){
-        if (n > bestN){ best = val; bestN = n; }
-      }
-      return best;
-    }
-
-    function canonicalByProductName(name){
-      const key = normalizeName(name);
-      const rows = ALL_DATA.filter(r => normalizeName(r.productName||'') === key);
-      const codes = rows.map(r => r.productCode || '');
-      const descs = rows.map(r => r.description || '');
-      return {
-        productName: name.trim(),
-        productCode: modeNonEmpty(codes) || '',
-        description: modeNonEmpty(descs) || ''
-      };
-    }
-
-    // ---- STRICT aggregation only for the CURRENT product
-    function aggregateForCurrentProduct(){
-      if (!CURRENT) return { total:0, byDrawer:{}, minByDrawer:{} };
-      const curCode = String(CURRENT.productCode || '').trim().toLowerCase();
-      const curName = normalizeName(CURRENT.productName || '');
-
+    function aggregateFromRows(rows){
       const agg = { total:0, byDrawer:{}, minByDrawer:{} };
-
-      for (const r of ALL_DATA){
-        const rCode = String(r.productCode || '').trim().toLowerCase();
-        const rName = normalizeName(r.productName || '');
-
-        let match = false;
-        if (curCode) {
-          // If current has code → match strictly by SAME CODE
-          match = (rCode === curCode);
-        } else if (curName) {
-          // If current has NO code → match by SAME NAME, but ONLY rows WITHOUT code (avoid mixing coded products)
-          match = (rName === curName) && !rCode;
-        }
-
-        if (!match) continue;
-
+      for(const r of rows){
         const d = (r.drawerCode||"").trim();
         const q = parseInt(r.stockQty||"0",10) || 0;
         const m = parseInt(r.minStock||"0",10) || 0;
@@ -516,46 +470,44 @@
       return agg;
     }
 
-    function renderGlobalAndDrawerBadges_ForCurrent(){
-      const agg = aggregateForCurrentProduct();
+    function renderDistributionFromRows(rows, currentDrawer){
+      const distWrap = document.getElementById('distributionWrap');
       const gEl = document.getElementById('globalStockCount');
       const dEl = document.getElementById('drawerStockCount');
       const badgeDrawer = document.getElementById('badgeDrawer');
-      const distWrap = document.getElementById('distributionWrap');
+
+      const agg = aggregateFromRows(rows);
 
       if (gEl) gEl.textContent = String(agg.total);
-
-      const dq = drawerCode ? (agg.byDrawer[drawerCode] || 0) : 0;
+      const dq = currentDrawer ? (agg.byDrawer[currentDrawer] || 0) : 0;
       if (dEl) dEl.textContent = String(dq);
       if (badgeDrawer){
-        const min = drawerCode ? (agg.minByDrawer[drawerCode] || 0) : 0;
+        const min = currentDrawer ? (agg.minByDrawer[currentDrawer] || 0) : 0;
         badgeDrawer.classList.toggle('low', min>0 && dq <= min);
         badgeDrawer.title = min ? `Drawer minimum: ${min}` : '';
       }
 
-      // Distribution panel (only the strictly matching drawers)
-      if (distWrap){
-        const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
-        if (!entries.length){ distWrap.innerHTML = ''; return; }
-        let html = `
-          <div class="card">
-            <div style="font-weight:600;margin-bottom:.4rem">Distribution by drawers (${entries.length})</div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.4rem;">
-        `;
-        for (const [d,q] of entries){
-          const min = agg.minByDrawer[d]||0;
-          const lowCls = (min>0 && q<=min) ? 'low' : '';
-          const href = `./${d}.html`;
-          html += `
-            <div>
-              <a class="distLink ${lowCls}" href="${href}" aria-label="Open drawer ${d}">
-                ${d}: <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}
-              </a>
-            </div>`;
-        }
-        html += `</div></div>`;
-        distWrap.innerHTML = html;
+      const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
+      if (!entries.length){ distWrap.innerHTML = ''; return; }
+
+      let html = `
+        <div class="card">
+          <div style="font-weight:600;margin-bottom:.4rem">Distribution by drawers (${entries.length})</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.4rem;">
+      `;
+      for (const [d,q] of entries){
+        const min = agg.minByDrawer[d]||0;
+        const lowCls = (min>0 && q<=min) ? 'low' : '';
+        const href = `./${d}.html`;
+        html += `
+          <div>
+            <a class="distLink ${lowCls}" href="${href}" aria-label="Open drawer ${d}">
+              ${d}: <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}
+            </a>
+          </div>`;
       }
+      html += `</div></div>`;
+      distWrap.innerHTML = html;
     }
 
     // ---- Full UI reload (for Force refresh) ----
@@ -573,7 +525,8 @@
         document.getElementById("stock-display").innerText = "📦 STOCK: " + (CURRENT.stockQty || "0");
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
 
-        renderGlobalAndDrawerBadges_ForCurrent();
+        const sameRows = filterRowsSameProduct(ALL_DATA, CURRENT);
+        renderDistributionFromRows(sameRows, drawerCode);
 
         document.getElementById("fldName").value = CURRENT.productName || "";
         document.getElementById("fldCode").value = CURRENT.productCode || "";
@@ -601,8 +554,9 @@
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
 
-        // NEW strict aggregation:
-        renderGlobalAndDrawerBadges_ForCurrent();
+        // DISTRIBUTION (filtered strictly)
+        const sameRows = filterRowsSameProduct(ALL_DATA, CURRENT);
+        renderDistributionFromRows(sameRows, drawerCode);
 
         document.getElementById("fldName").value = CURRENT.productName || "";
         document.getElementById("fldCode").value = CURRENT.productCode || "";
@@ -654,8 +608,6 @@
           cur = newVal; delta = 0; refresh();
           showToast('✔️ Stock successfully updated');
           showPostSaveBanner(60);
-          // Re-render distribution with strict rule
-          renderGlobalAndDrawerBadges_ForCurrent();
         }catch(e){
           console.error(e);
           showToast('❌ Error updating stock', '#b3261e');
@@ -717,7 +669,7 @@
       }finally{ fileInput.value = ''; }
     });
 
-    // --- Edit info modal / process chooser ---
+    // --- Edit info modal / process chooser (dup) ---
     const editBtn = document.getElementById('editInfoBtn');
     const editDescBtn = document.getElementById('editDescBtn');
     const modal = document.getElementById('editModal');
@@ -785,6 +737,43 @@
     const dupProceedExistingBtn = document.getElementById('dupProceedExisting');
     const existingPreview = document.getElementById('existingPreview');
     const existingPreviewBox = document.getElementById('existingPreviewBox');
+
+    function uniqueProductNamesFromData(data){
+      const count = new Map();
+      for (const r of data){
+        const raw = (r.productName || '').trim();
+        if (!raw) continue;
+        const key = normalizeName(raw);
+        const prev = count.get(key) || { display: raw, n: 0 };
+        prev.n += 1;
+        count.set(key, prev);
+      }
+      return [...count.entries()]
+        .sort((a,b)=> b[1].n - a[1].n)
+        .map(([key, v]) => ({ key, display: v.display, n: v.n }));
+    }
+
+    function modeNonEmpty(arr){
+      const m = new Map();
+      for (const v of arr){
+        const s = String(v || '').trim();
+        if (!s) continue;
+        m.set(s, (m.get(s)||0)+1);
+      }
+      let best = '', bestN = 0;
+      for (const [val, n] of m.entries()){
+        if (n > bestN){ best = val; bestN = n; }
+      }
+      return best;
+    }
+
+    function canonicalByProductName(name){
+      const key = normalizeName(name);
+      const rows = ALL_DATA.filter(r => normalizeName(r.productName||'') === key);
+      const codes = rows.map(r => r.productCode || '');
+      const descs = rows.map(r => r.description || '');
+      return { productName: name.trim(), productCode: modeNonEmpty(codes) || '', description: modeNonEmpty(descs) || '' };
+    }
 
     function openExistingPicker(){
       const items = uniqueProductNamesFromData(ALL_DATA);
@@ -907,12 +896,12 @@
           CURRENT.description = updated.description || desc;
         }
 
+        // Re-render distribution with updated CURRENT
+        const sameRows = filterRowsSameProduct(ALL_DATA, CURRENT);
+        renderDistributionFromRows(sameRows, drawerCode);
+
         showToast('✔️ Product info updated');
         showPostSaveBanner(60);
-
-        // Recompute strict aggregation immediately so que només surti el drawer aplicat si és NEW
-        renderGlobalAndDrawerBadges_ForCurrent();
-
         return { done:true };
       }
 
