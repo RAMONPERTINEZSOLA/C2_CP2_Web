@@ -336,7 +336,7 @@
     const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A1/fitxes/A1_0.html";
+    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A/fitxes/A1_0.html";
 
     // Sticky mode
     let CHOSEN_MODE = null;
@@ -461,20 +461,21 @@
       };
     }
 
-    // --- Aggregation by product key (prefer code, fallback name) ---
+    // --- Product key from CURRENT row (prefer code if present)
     function getProductKeyFromRow(row){
       const code = (row.productCode || "").trim();
       if (code) return { key: code.toLowerCase(), type: "code" };
       return { key: normalizeName(row.productName || ""), type: "name" };
     }
-    function aggregateForProductKey(productKey, useCodePrefer=true){
+
+    // --- Aggregation (respecting key type: code vs name)
+    function aggregateForProductKey(productKeyObj){
+      const { key, type } = productKeyObj; // "code" | "name"
       const agg = { total:0, byDrawer:{}, minByDrawer:{} };
       for(const r of ALL_DATA){
         const code = (r.productCode||"").trim().toLowerCase();
         const name = normalizeName(r.productName||"");
-        const match = useCodePrefer
-          ? (code ? code===productKey : name===productKey)
-          : (name===productKey);
+        const match = (type === "code") ? (code === key) : (name === key);
         if (!match) continue;
         const d = (r.drawerCode||"").trim();
         const q = parseInt(r.stockQty||"0",10) || 0;
@@ -485,6 +486,36 @@
       }
       return agg;
     }
+
+    // --- Map drawerCode → href robust
+    function drawerCodeToHref(d){
+      // C2_CP2_* → folder C2_CP2
+      if (d.startsWith('C2_CP2_')) return `https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/${d}.html`;
+
+      // Captura prefix tipus "A1_0" → letters=A, digits=1  → carpeta A
+      // "C3_5_I" → letters=C, digits=3 → carpeta C3
+      const m = d.match(/^([A-Z]+)(\d*)(?:_|$)/);
+      if (m){
+        const letters = m[1];     // ex. "A" o "C"
+        const digits  = m[2]||''; // ex. "1" o "3"
+        // Casos coneguts:
+        if (letters === 'A' || letters === 'B' || letters === 'D' || letters === 'E'){
+          return `https://ramonpertinezsola.github.io/C2_CP2_Web/${letters}/fitxes/${d}.html`;
+        }
+        if (letters === 'C'){
+          // C3, C4, C5...
+          const folder = digits ? `C${digits}` : 'C';
+          return `https://ramonpertinezsola.github.io/C2_CP2_Web/${folder}/fitxes/${d}.html`;
+        }
+        // Fallback: primer bloc abans del primer "_"
+        const fallback = d.split('_')[0];
+        return `https://ramonpertinezsola.github.io/C2_CP2_Web/${fallback}/fitxes/${d}.html`;
+      }
+      // Fallback dur
+      const fb = d.split('_')[0];
+      return `https://ramonpertinezsola.github.io/C2_CP2_Web/${fb}/fitxes/${d}.html`;
+    }
+
     function renderGlobalAndDrawerBadges(agg, currentDrawer){
       const gEl = document.getElementById('globalStockCount');
       const dEl = document.getElementById('drawerStockCount');
@@ -501,19 +532,22 @@
         badgeDrawer.title = min ? `Drawer minimum: ${min}` : '';
       }
 
-      // Optional distribution panel
       if (distWrap){
         const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
         if (!entries.length){ distWrap.innerHTML = ''; return; }
         let html = `
           <div style="border:1px solid var(--line);border-radius:12px;padding:.75rem;background:#fff">
             <div style="font-weight:600;margin-bottom:.4rem">Distribution by drawers (${entries.length})</div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.4rem;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.4rem;">
         `;
         for (const [d,q] of entries){
           const min = agg.minByDrawer[d]||0;
           const low = (min>0 && q<=min) ? 'style="color:#b3261e;font-weight:600"' : '';
-          html += `<div ${low}>${d}: <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}</div>`;
+          const href = drawerCodeToHref(d);
+          html += `<div ${low}>
+            <a href="${href}" style="text-decoration:none; font-weight:700">${d}</a>:
+            <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}
+          </div>`;
         }
         html += `</div></div>`;
         distWrap.innerHTML = html;
@@ -536,9 +570,9 @@
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
 
-        // NEW: Global + Drawer counters
-        const { key } = getProductKeyFromRow(CURRENT);
-        const agg = aggregateForProductKey(key, true);
+        // Global + Drawer counters (usant objecte {key,type})
+        const productKeyObj = getProductKeyFromRow(CURRENT);
+        const agg = aggregateForProductKey(productKeyObj);
         renderGlobalAndDrawerBadges(agg, drawerCode);
 
         // Prefill modal
