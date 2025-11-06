@@ -420,6 +420,25 @@
 
     const normalizeName = s => String(s || '').normalize('NFKC').replace(/\s+/g,' ').trim().toLowerCase();
 
+    // --- Utils per detectar ambigüitat de CODE ↔ NAME
+    function buildCodeNameMap(data){
+      const map = new Map(); // codeLower -> Set(normalizedName)
+      for (const r of data){
+        const code = String(r.productCode || "").trim().toLowerCase();
+        if (!code) continue;
+        const nrmName = normalizeName(r.productName || "");
+        if (!map.has(code)) map.set(code, new Set());
+        if (nrmName) map.get(code).add(nrmName);
+      }
+      return map;
+    }
+    let CODE_NAME_MAP = new Map();  // es recalcula al load
+    function codeIsAmbiguous(codeLower){
+      const set = CODE_NAME_MAP.get(codeLower);
+      return !!(set && set.size > 1);
+    }
+
+
     function uniqueProductNamesFromData(data){
       const count = new Map();
       for (const r of data){
@@ -462,30 +481,49 @@
     }
 
     // --- Product key from CURRENT row (prefer code if present)
-    function getProductKeyFromRow(row){
-      const code = (row.productCode || "").trim();
-      if (code) return { key: code.toLowerCase(), type: "code" };
-      return { key: normalizeName(row.productName || ""), type: "name" };
-    }
+      function getProductKeyFromRow(row){
+        const code = String(row.productCode || "").trim().toLowerCase();
+        const nameN = normalizeName(row.productName || "");
+        if (code){
+          // Si el code és ambigu (apareix amb diversos noms), agreguem pel parell (name+code)
+          if (codeIsAmbiguous(code)) return { type: "pair", code, name: nameN };
+          // Si no és ambigu, agreguem pel code
+          return { type: "code", key: code };
+        }
+        // Sense code → agreguem pel name
+        return { type: "name", key: nameN };
+      }
+
 
     // --- Aggregation (respecting key type: code vs name)
+   // --- Agregació segons la clau (code | name | pair)
     function aggregateForProductKey(productKeyObj){
-      const { key, type } = productKeyObj; // "code" | "name"
       const agg = { total:0, byDrawer:{}, minByDrawer:{} };
       for(const r of ALL_DATA){
-        const code = (r.productCode||"").trim().toLowerCase();
-        const name = normalizeName(r.productName||"");
-        const match = (type === "code") ? (code === key) : (name === key);
+        const rCode = String(r.productCode || "").trim().toLowerCase();
+        const rName = normalizeName(r.productName || "");
+        let match = false;
+
+        if (productKeyObj.type === "code"){
+          match = (rCode === productKeyObj.key);
+        } else if (productKeyObj.type === "name"){
+          match = (rName === productKeyObj.key);
+        } else if (productKeyObj.type === "pair"){
+          match = (rCode === productKeyObj.code) && (rName === productKeyObj.name);
+        }
+
         if (!match) continue;
-        const d = (r.drawerCode||"").trim();
-        const q = parseInt(r.stockQty||"0",10) || 0;
-        const m = parseInt(r.minStock||"0",10) || 0;
+
+        const d = String(r.drawerCode || "").trim();
+        const q = parseInt(r.stockQty || "0", 10) || 0;
+        const m = parseInt(r.minStock || "0", 10) || 0;
         agg.total += q;
-        agg.byDrawer[d] = (agg.byDrawer[d]||0)+q;
+        agg.byDrawer[d] = (agg.byDrawer[d] || 0) + q;
         agg.minByDrawer[d] = m;
       }
       return agg;
     }
+
 
     // --- Map drawerCode → href robust
     function drawerCodeToHref(d){
@@ -558,6 +596,7 @@
     loadCSVFromCandidates()
       .then(csv => {
         ALL_DATA = parseCSV(csv);
+        CODE_NAME_MAP = buildCodeNameMap(ALL_DATA);
         CURRENT  = ALL_DATA.find(r => (r.drawerCode || "").trim() === drawerCode);
         if (!CURRENT) throw new Error("Drawer not found");
 
@@ -912,6 +951,10 @@
           CURRENT.productCode = updated.productCode || code;
           CURRENT.description = updated.description || desc;
         }
+      // Recalcular mapa de codes i distribució després de canvis d'info
+      CODE_NAME_MAP = buildCodeNameMap(ALL_DATA);
+      const pkObj = getProductKeyFromRow(CURRENT);
+      renderGlobalAndDrawerBadges(aggregateForProductKey(pkObj), drawerCode);
 
         showToast('✔️ Product info updated');
         showPostSaveBanner(60);
