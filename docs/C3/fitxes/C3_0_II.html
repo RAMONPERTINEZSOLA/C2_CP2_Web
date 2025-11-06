@@ -111,7 +111,6 @@
     .badge.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; }
   </style>
 
-  <!-- Override per assegurar el diàleg al davant -->
   <style>
     dialog.modal{ z-index: 10010 !important; }
     dialog.modal::backdrop{ z-index: 10000 !important; }
@@ -337,7 +336,7 @@
     const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/C3/fitxes/C3_0_II.html";
+    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A/fitxes/C3_0_II.html";
 
     // Sticky mode
     let CHOSEN_MODE = null;
@@ -439,6 +438,7 @@
       return !!(set && set.size > 1);
     }
 
+
     function uniqueProductNamesFromData(data){
       const count = new Map();
       for (const r of data){
@@ -481,17 +481,22 @@
     }
 
     // --- Product key from CURRENT row (prefer code if present)
-    function getProductKeyFromRow(row){
-      const code = String(row.productCode || "").trim().toLowerCase();
-      const nameN = normalizeName(row.productName || "");
-      if (code){
-        if (codeIsAmbiguous(code)) return { type: "pair", code, name: nameN };
-        return { type: "code", key: code };
+      function getProductKeyFromRow(row){
+        const code = String(row.productCode || "").trim().toLowerCase();
+        const nameN = normalizeName(row.productName || "");
+        if (code){
+          // Si el code és ambigu (apareix amb diversos noms), agreguem pel parell (name+code)
+          if (codeIsAmbiguous(code)) return { type: "pair", code, name: nameN };
+          // Si no és ambigu, agreguem pel code
+          return { type: "code", key: code };
+        }
+        // Sense code → agreguem pel name
+        return { type: "name", key: nameN };
       }
-      return { type: "name", key: nameN };
-    }
 
-    // --- Agregació segons la clau (code | name | pair)
+
+    // --- Aggregation (respecting key type: code vs name)
+   // --- Agregació segons la clau (code | name | pair)
     function aggregateForProductKey(productKeyObj){
       const agg = { total:0, byDrawer:{}, minByDrawer:{} };
       for(const r of ALL_DATA){
@@ -519,23 +524,32 @@
       return agg;
     }
 
+
     // --- Map drawerCode → href robust
     function drawerCodeToHref(d){
+      // C2_CP2_* → folder C2_CP2
       if (d.startsWith('C2_CP2_')) return `https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/${d}.html`;
+
+      // Captura prefix tipus "C3_0_II" → letters=A, digits=1  → carpeta A
+      // "C3_5_I" → letters=C, digits=3 → carpeta C3
       const m = d.match(/^([A-Z]+)(\d*)(?:_|$)/);
       if (m){
-        const letters = m[1];
-        const digits  = m[2]||'';
+        const letters = m[1];     // ex. "A" o "C"
+        const digits  = m[2]||''; // ex. "1" o "3"
+        // Casos coneguts:
         if (letters === 'A' || letters === 'B' || letters === 'D' || letters === 'E'){
           return `https://ramonpertinezsola.github.io/C2_CP2_Web/${letters}/fitxes/${d}.html`;
         }
         if (letters === 'C'){
+          // C3, C4, C5...
           const folder = digits ? `C${digits}` : 'C';
           return `https://ramonpertinezsola.github.io/C2_CP2_Web/${folder}/fitxes/${d}.html`;
         }
+        // Fallback: primer bloc abans del primer "_"
         const fallback = d.split('_')[0];
         return `https://ramonpertinezsola.github.io/C2_CP2_Web/${fallback}/fitxes/${d}.html`;
       }
+      // Fallback dur
       const fb = d.split('_')[0];
       return `https://ramonpertinezsola.github.io/C2_CP2_Web/${fb}/fitxes/${d}.html`;
     }
@@ -595,7 +609,7 @@
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
 
-        // Global + Drawer counters
+        // Global + Drawer counters (usant objecte {key,type})
         const productKeyObj = getProductKeyFromRow(CURRENT);
         const agg = aggregateForProductKey(productKeyObj);
         renderGlobalAndDrawerBadges(agg, drawerCode);
@@ -863,7 +877,7 @@
 
       try {
         const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
-        const url = `https://stock-api.ramonpertinezsola.workers.dev/product-duplicates-check?${qs}`;
+        const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
         const r = await fetch(url);
         if (!r.ok) throw new Error(await r.text());
         const body = await r.json();
@@ -921,7 +935,6 @@
       const effectiveMode = (forceMode || getModeSticky() || '').toUpperCase();
       if (effectiveMode) payload.mode = effectiveMode;
 
-      // propagar a totes les línies del producte
       payload.propagateAll = true;
 
       const res = await postUpdateInfo(payload);
@@ -938,10 +951,10 @@
           CURRENT.productCode = updated.productCode || code;
           CURRENT.description = updated.description || desc;
         }
-        // Recalcular mapes i distribució després de canvis
-        CODE_NAME_MAP = buildCodeNameMap(ALL_DATA);
-        const pkObj = getProductKeyFromRow(CURRENT);
-        renderGlobalAndDrawerBadges(aggregateForProductKey(pkObj), drawerCode);
+      // Recalcular mapa de codes i distribució després de canvis d'info
+      CODE_NAME_MAP = buildCodeNameMap(ALL_DATA);
+      const pkObj = getProductKeyFromRow(CURRENT);
+      renderGlobalAndDrawerBadges(aggregateForProductKey(pkObj), drawerCode);
 
         showToast('✔️ Product info updated');
         showPostSaveBanner(60);
@@ -981,7 +994,7 @@
       return { done:false };
     }
 
-    document.getElementById('saveInfoBtn').addEventListener('click', async (ev)=>{
+    const saveInfoBtnHandler = async (ev)=>{
       ev.preventDefault();
       const mode = (getModeSticky() || '').toUpperCase();
 
@@ -1007,7 +1020,7 @@
 
       try {
         const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
-        const url = `https://stock-api.ramonpertinezsola.workers.dev/product-duplicates-check?${qs}`;
+        const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
         const r = await fetch(url);
         if (r.ok) {
           const body = await r.json();
@@ -1034,7 +1047,9 @@
       setEditLocked('all');
       await attemptSaveInfo({ forceMode: 'NEW' });
       setEditLocked('none');
-    });
+    };
+
+    document.getElementById('saveInfoBtn').addEventListener('click', saveInfoBtnHandler);
 
     // --- QR ---
     const qrBtn = document.getElementById('qrBtn');
