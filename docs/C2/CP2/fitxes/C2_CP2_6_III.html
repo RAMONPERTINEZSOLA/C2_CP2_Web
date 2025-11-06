@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>C2_CP2_6_III — Parcsafe Drawer</title>
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -29,7 +28,7 @@
     .drawer-code{font-size:12px;color:#475467;background:#eef4ff;border:1px solid #d6e4ff;padding:4px 8px;border-radius:999px;font-weight:700;letter-spacing:.3px}
 
     .meta{display:grid;grid-template-columns:1fr auto;gap:6px 18px;margin-bottom:6px;align-items:center}
-    .meta .codeWrap{display:flex;align-items:center;gap:10px}
+    .meta .codeWrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     .meta strong{color:var(--ink)}
     .btn{border:none;border-radius:12px;padding:8px 12px;font-weight:600;cursor:pointer;background:var(--green);color:#fff;box-shadow:var(--brand-shadow);transition:transform .04s ease, background .2s ease}
     .btn:hover{background:var(--green-2)} .btn:active{transform:translateY(1px)}
@@ -64,7 +63,6 @@
       100%{opacity:0;transform:translate(-50%,10px)}
     }
 
-    /* Modals */
     dialog.modal{border:none;border-radius:22px;padding:0;max-width:760px;width:96%;box-shadow:0 24px 80px rgba(16,24,40,.35);background:linear-gradient(180deg,#fff, #f9fbfa)}
     dialog.modal::backdrop{background:rgba(10,12,14,.45);backdrop-filter:blur(3px)}
     .modal .hd{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#f0f7ec}
@@ -75,65 +73,104 @@
     .fld{display:flex;flex-direction:column;gap:6px}
     .fld label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
     .fld input,.fld textarea{padding:14px 16px;border-radius:14px;border:1px solid #d0d5dd;background:#fff;font-family:inherit;font-size:16px;outline:none}
+    .fld input:disabled,.fld textarea:disabled{background:#f6f7f8;color:#98a2b3}
     .fld input:focus,.fld textarea:focus{border-color:#b7df9f; box-shadow:0 0 0 3px rgba(109,189,69,.18)}
     .fld textarea{min-height:140px;resize:vertical}
     .note{color:var(--muted);font-size:12px;margin-top:6px;grid-column:1 / -1}
     .modal .ft{padding:18px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
-
-    /* Z-index per sobre de tot */
-    dialog.modal{ z-index: 10010 !important; }
-    dialog.modal::backdrop{ z-index: 10000 !important; }
     .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;background:#eef2f6;border:1px solid #dde3ea;padding:2px 6px;border-radius:6px}
+
+    .imggrid{ display:grid; gap:12px; }
+    .imggrid.two-cols{ grid-template-columns: 1fr 1fr; }
+    .imggrid figure{ margin:0; border:1px dashed #cdd4d9; background:#fafafa; border-radius:12px; overflow:hidden; }
+    .imggrid figure img{ display:block; width:100%; height:auto; object-fit:contain; }
+
+    @media (max-width: 900px){
+      .imggrid.two-cols{ grid-template-columns: 1fr; }
+    }
+
+    /* Banner post-save */
+    #postSaveBanner{
+      position:fixed; inset:auto 20px 20px 20px;
+      background:#0f1b2f; color:#e8f3ff; border:1px solid #cfe4ff33;
+      border-radius:14px; padding:12px 14px; box-shadow:0 12px 40px rgba(0,0,0,.35);
+      display:none; z-index:2000;
+    }
+    #postSaveBanner .row{justify-content:space-between}
+    #postSaveBanner .counter{font-variant-numeric:tabular-nums; font-weight:700}
+    #postSaveBanner button{background:#ffffff; color:#0f1b2f; border:1px solid #cfe4ff66; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer}
+
+    /* Badges: GLOBAL / DRAWER */
+    #stockBadges{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+    .badge{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.35rem .6rem;border:1px solid var(--line);border-radius:999px;
+      background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.04); font-size:.9rem;
+      font-variant-numeric:tabular-nums;
+    }
+    .badge.low{ background:#fff5f5; border-color:#ffd6d6; color:#b3261e; }
   </style>
 
-  <!-- PDF + QR lib -->
+  <style>
+    dialog.modal{ z-index: 10010 !important; }
+    dialog.modal::backdrop{ z-index: 10000 !important; }
+  </style>
+  
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script type="module">
     import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
-    const lib = (m && m.QrCode) ? m : ((m && m.default && m.default.QrCode) ? m.default : m);
+    const lib = (m && m.QrCode) ? m : (m && m.default && m.default.QrCode) ? m.default : m;
     window.qrcodegen = lib;
   </script>
 </head>
 <body>
   <div class="container">
-    <!-- Header -->
+
     <header class="bar">
       <a class="back" href="../index.html">← Back to index</a>
-      <div class="brand"><img class="logo" id="logo" alt="Parcsafe"></div>
+      <div class="brand">
+        <img class="logo" id="logo" alt="Parcsafe">
+      </div>
     </header>
 
-    <!-- Title -->
-    <h1 class="title">Drawer details <span class="drawer-code">C2_CP2_6_III</span></h1>
+    <h1 class="title">
+      Drawer details
+      <span class="drawer-code">C2_CP2_6_III</span>
+    </h1>
 
-    <!-- Meta -->
     <div class="meta">
       <div id="product-name"><strong>Product Name:</strong> loading...</div>
       <div class="codeWrap">
         <div id="product-code"><strong>Product Code:</strong> loading...</div>
         <button class="btn secondary" id="editInfoBtn" type="button">✏️ Edit Product Info</button>
+        <button class="btn ghost" id="editDescBtn" type="button">📝 Edit Description</button>
         <button class="btn ghost" id="qrBtn" type="button">📎 QR</button>
       </div>
     </div>
 
-    <!-- Cards -->
+    <!-- GLOBAL / DRAWER badges -->
+    <div id="stockBadges">
+      <span id="badgeGlobal" class="badge">GLOBAL: <strong id="globalStockCount">—</strong></span>
+      <span id="badgeDrawer" class="badge">DRAWER: <strong id="drawerStockCount">—</strong></span>
+    </div>
+    <div id="distributionWrap" style="margin-top:.25rem"></div>
+
     <div class="cards">
-      <!-- Drawer photo -->
       <div class="card">
         <h3>Drawer Photo</h3>
         <div class="imgwrap">
-          <img id="drawerImg" alt="Drawer image C2_CP2_6_III" />
+          <img id="drawerImg" src="../images/C2_CP2_6_III.jpg" alt="Drawer image C2_CP2_6_III"
+               onerror="this.onerror=null; this.src='../../images/C2_CP2_6_III.jpg';" />
         </div>
         <div class="spacer"></div>
         <div class="row">
           <button class="btn" id="uploadPhotoBtn" type="button">🖼️ Update Drawer Photo</button>
           <button class="btn ghost" id="refreshImgBtn" type="button">Refresh</button>
-          <span class="note">The new image will be saved as <strong>C2_CP2_6_III.jpg</strong> in <em>images/</em> and <em>img/</em>. (JPEG only)</span>
+          <span class="note">The new image will be renamed to <strong>C2_CP2_6_III.jpg</strong> automatically.</span>
         </div>
-        <!-- JPEG only -->
-        <input type="file" id="fileInput" accept="image/jpeg" style="display:none" />
+        <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display:none" />
       </div>
 
-      <!-- Cabinet highlight -->
       <div class="card">
         <h3>Cabinet Highlight</h3>
         <div class="imgwrap">
@@ -143,13 +180,11 @@
       </div>
     </div>
 
-    <!-- Description -->
     <div class="card" style="margin-top:20px">
       <h3>Description</h3>
       <div id="description-text" style="line-height:1.6">loading...</div>
     </div>
 
-    <!-- Stock -->
     <div class="stock-display" id="stock-display">Loading stock...</div>
 
     <div class="stock-ui" id="stockUI">
@@ -160,7 +195,7 @@
       </div>
       <div class="row" style="margin-top:10px">
         <button id="minusBtn" type="button">−1</button>
-        <button id="plusBtn" type="button">+1</button>
+        <button id="plusBtn"  type="button">+1</button>
         <label>Exact: <input id="exactInput" type="number" min="0" step="1" /></label>
         <button class="secondary" id="resetBtn" type="button">Reset</button>
         <button class="save" id="saveBtn" type="button">Save</button>
@@ -171,13 +206,26 @@
     <div id="toast"></div>
   </div>
 
-  <!-- ===================== Edit Info Modal ===================== -->
-  <dialog class="modal" id="editModal">
-    <div class="hd">
-      <strong>Edit product info</strong>
-      <button class="close-x" type="button" onclick="document.getElementById('editModal').close()">✕</button>
+  <!-- Post-save banner (countdown) -->
+  <div id="postSaveBanner" role="status" aria-live="polite">
+    <div class="row">
+      <div>
+        <strong>Change saved.</strong>
+        Please wait about <span class="counter" id="psbCounter">60</span>s and then refresh the page to see it everywhere.
+      </div>
+      <div class="row">
+        <button id="psbRefreshBtn" type="button">Refresh now</button>
+      </div>
     </div>
+  </div>
+
+  <!-- Edit Info Modal -->
+  <dialog class="modal" id="editModal">
     <form method="dialog" id="editForm">
+      <div class="hd">
+        <strong>Edit product info</strong>
+        <button class="close-x" value="cancel" aria-label="Close" type="button">✕</button>
+      </div>
       <div class="bd">
         <div class="fld">
           <label for="fldName">Product Name</label>
@@ -191,22 +239,68 @@
           <label for="fldDesc">Description</label>
           <textarea id="fldDesc" required></textarea>
         </div>
-        <div class="note">
-          Tip: press <span class="kbd">Esc</span> to close.
-        </div>
+        <div class="note">Tip: press <span class="kbd">Esc</span> to close.</div>
       </div>
       <div class="ft">
-        <button class="btn ghost" type="button" onclick="document.getElementById('editModal').close()">Cancel</button>
-        <button class="btn" id="saveInfoBtn" value="default" type="submit">Save changes</button>
+        <button class="btn ghost" value="cancel" type="button">Cancel</button>
+        <button class="btn" id="saveInfoBtn" type="button">Save changes</button>
       </div>
     </form>
   </dialog>
 
-  <!-- ===================== QR Modal ===================== -->
+  <!-- Process chooser + EXISTING picker -->
+  <dialog class="modal" id="dupModal">
+    <div class="hd">
+      <strong>⚠️ Product process</strong>
+      <button class="close-x" aria-label="Close" id="dupClose" type="button">✕</button>
+    </div>
+
+    <div class="bd" style="grid-template-columns:1fr; gap:14px">
+      <!-- Step 1 -->
+      <div class="fld fld--wide" id="dupStep1">
+        <label>Message</label>
+        <div id="dupMsg" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;line-height:1.5">
+          You’re about to modify this drawer. Do you want to <b>create a NEW PRODUCT</b> or <b>add an EXISTING PRODUCT</b>?
+        </div>
+        <div class="fld fld--wide" id="dupStatsWrap" style="display:none; margin-top:10px">
+          <label>Stock overview (existing product)</label>
+          <div id="dupStats" style="background:#f7f9fb;border:1px solid #e6edf3;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
+        </div>
+        <div class="note">
+          If the name already exists in other drawers, recommended: <strong>EXISTING PRODUCT</strong> (keeps canonical name and aggregates stock).
+        </div>
+      </div>
+
+      <!-- Step 2: existing picker -->
+      <div class="fld fld--wide" id="dupStep2" style="display:none">
+        <label for="existingSelect">Choose an existing product (by NAME)</label>
+        <select id="existingSelect" style="padding:12px;border:1px solid #d0d5dd;border-radius:12px;font-size:16px"></select>
+        <div class="note">
+          The <b>code</b> and <b>description</b> will be preloaded with canonical values (most frequent) for this name and applied to all rows.
+        </div>
+        <div class="fld fld--wide" id="existingPreview" style="display:none">
+          <label>Canonical preview</label>
+          <div id="existingPreviewBox" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;font-family:ui-monospace,monospace"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ft" id="dupFt1">
+      <button class="btn ghost" id="dupNew" type="button">Create NEW PRODUCT</button>
+      <button class="btn" id="dupExisting" type="button">Add EXISTING PRODUCT</button>
+    </div>
+
+    <div class="ft" id="dupFt2" style="display:none">
+      <button class="btn ghost" id="dupBack" type="button">← Back</button>
+      <button class="btn" id="dupProceedExisting" type="button">Save now</button>
+    </div>
+  </dialog>
+
+  <!-- QR MODAL -->
   <dialog class="modal" id="qrModal">
     <div class="hd">
       <strong>Product QR</strong>
-      <button class="close-x" type="button" id="qrClose">✕</button>
+      <button class="close-x" value="cancel" aria-label="Close" id="qrClose" type="button">✕</button>
     </div>
     <div class="bd">
       <div class="fld fld--wide" style="align-items:center">
@@ -222,30 +316,29 @@
   </dialog>
 
   <script>
-    /* ====================== Const / endpoints ====================== */
-    const drawerCode = "C2_CP2_6_III";
-    const STOCK_API = "https://stock-api.ramonpertinez.workers.dev/stock/item";
-    const UPLOAD_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/upload-image";
-    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    const QR_STATIC_VALUE = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP2/fitxes/C2_CP2_6_III.html";
-
-    /* ====================== Utils ====================== */
-    async function ensureQrLib(timeoutMs = 1200) {
+    // --- QR lib wait ---
+    async function ensureQrLib(timeoutMs = 1000) {
       const t0 = performance.now();
       while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
         if (performance.now() - t0 > timeoutMs) throw new Error("QR lib not ready");
         await new Promise(r => setTimeout(r, 20));
       }
     }
-    const toast = document.getElementById("toast");
-    function showToast(msg, color="#198754"){
-      toast.textContent = msg;
-      toast.style.backgroundColor = color;
-      toast.style.display = "block";
-      setTimeout(()=> toast.style.display="none", 2600);
-    }
 
-    /* ====================== Logo loader ====================== */
+    // --- Constants ---
+    const drawerCode = "C2_CP2_6_III";
+    const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
+    const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
+    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
+    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/C2_CP2_6_III.html";
+
+    // Sticky mode
+    let CHOSEN_MODE = null;
+    const MODE_KEY = `mode_${drawerCode}`;
+    function setModeSticky(m){ CHOSEN_MODE = m || null; sessionStorage.setItem(MODE_KEY, CHOSEN_MODE || ''); }
+    function getModeSticky(){ const v = sessionStorage.getItem(MODE_KEY) || ''; CHOSEN_MODE = v ? v : null; return CHOSEN_MODE; }
+
+    // Logo loader
     (function loadLogo(){
       const logo = document.getElementById('logo');
       const candidates = [
@@ -257,43 +350,267 @@
         "../../../parcsafe-logo.png"
       ];
       let i = 0;
-      const tryNext = () => {
-        if(i >= candidates.length){ logo.remove(); return; }
-        logo.src = candidates[i++];
-      };
+      const tryNext = () => { if(i >= candidates.length){ logo.remove(); return; } logo.src = candidates[i++]; };
       logo.onerror = tryNext;
       tryNext();
     })();
 
-    /* ====================== CSV loader ====================== */
+    // Toast
+    const toast = document.getElementById("toast");
+    function showToast(msg, color="#198754"){
+      toast.textContent = msg;
+      toast.style.backgroundColor = color;
+      toast.style.display = "block";
+      setTimeout(()=> toast.style.display="none", 2600);
+    }
+
+    // Post-save banner with countdown
+    const psb = document.getElementById('postSaveBanner');
+    const psbCounter = document.getElementById('psbCounter');
+    const psbRefreshBtn = document.getElementById('psbRefreshBtn');
+    psbRefreshBtn.addEventListener('click', ()=> location.reload());
+    let psbTimer = null;
+    function showPostSaveBanner(seconds = 60){
+      clearInterval(psbTimer);
+      psbCounter.textContent = String(seconds);
+      psb.style.display = 'block';
+      psbTimer = setInterval(() => {
+        let v = parseInt(psbCounter.textContent || '0', 10);
+        v = Math.max(0, v - 1);
+        psbCounter.textContent = String(v);
+        if (v <= 0){ clearInterval(psbTimer); }
+      }, 1000);
+    }
+
+    // CSV globals
+    let ALL_DATA = [];
+    let CURRENT  = null;
+
     async function loadCSVFromCandidates() {
       const candidates = [
-        "../../stock.csv","../stock.csv","../../../stock.csv","./stock.csv","/docs/stock.csv",
-        window.location.origin + "/docs/stock.csv",
+        "../../stock.csv","../stock.csv","../../../stock.csv","./stock.csv","/docs/stock.csv",window.location.origin + "/docs/stock.csv",
       ];
       for (const url of candidates) {
         try {
           const res = await fetch(url + "?t=" + Date.now());
           if (res.ok) {
             const txt = await res.text();
-            if (txt.includes("drawerCode")) return txt;
+            if (txt.includes("drawerCode")) { return txt; }
           }
-        } catch {}
+        } catch (_) {}
       }
       throw new Error("stock.csv not found via any path");
     }
 
-    /* ====================== Stock UI ====================== */
+    function parseCSV(txt){
+      const rows = txt.trim().split(/\r?\n/);
+      const headers = rows[0].split(",").map(h => h.trim());
+      const data = rows.slice(1).map(r => {
+        const vals = r.split(",");
+        return headers.reduce((o, h, i) => { o[h] = vals[i] ? vals[i].trim() : ""; return o; }, {});
+      });
+      return data;
+    }
+
+    const normalizeName = s => String(s || '').normalize('NFKC').replace(/\s+/g,' ').trim().toLowerCase();
+
+    // --- Utils per detectar ambigüitat de CODE ↔ NAME
+    function buildCodeNameMap(data){
+      const map = new Map(); // codeLower -> Set(normalizedName)
+      for (const r of data){
+        const code = String(r.productCode || "").trim().toLowerCase();
+        if (!code) continue;
+        const nrmName = normalizeName(r.productName || "");
+        if (!map.has(code)) map.set(code, new Set());
+        if (nrmName) map.get(code).add(nrmName);
+      }
+      return map;
+    }
+    let CODE_NAME_MAP = new Map();  // es recalcula al load
+    function codeIsAmbiguous(codeLower){
+      const set = CODE_NAME_MAP.get(codeLower);
+      return !!(set && set.size > 1);
+    }
+
+    function uniqueProductNamesFromData(data){
+      const count = new Map();
+      for (const r of data){
+        const raw = (r.productName || '').trim();
+        if (!raw) continue;
+        const key = normalizeName(raw);
+        const prev = count.get(key) || { display: raw, n: 0 };
+        prev.n += 1;
+        count.set(key, prev);
+      }
+      return [...count.entries()]
+        .sort((a,b)=> b[1].n - a[1].n)
+        .map(([key, v]) => ({ key, display: v.display, n: v.n }));
+    }
+
+    function modeNonEmpty(arr){
+      const m = new Map();
+      for (const v of arr){
+        const s = String(v || '').trim();
+        if (!s) continue;
+        m.set(s, (m.get(s)||0)+1);
+      }
+      let best = '', bestN = 0;
+      for (const [val, n] of m.entries()){
+        if (n > bestN){ best = val; bestN = n; }
+      }
+      return best;
+    }
+
+    function canonicalByProductName(name){
+      const key = normalizeName(name);
+      const rows = ALL_DATA.filter(r => normalizeName(r.productName||'') === key);
+      const codes = rows.map(r => r.productCode || '');
+      const descs = rows.map(r => r.description || '');
+      return {
+        productName: name.trim(),
+        productCode: modeNonEmpty(codes) || '',
+        description: modeNonEmpty(descs) || ''
+      };
+    }
+
+    // --- Product key from CURRENT row (prefer code if present)
+    function getProductKeyFromRow(row){
+      const code = String(row.productCode || "").trim().toLowerCase();
+      const nameN = normalizeName(row.productName || "");
+      if (code){
+        if (codeIsAmbiguous(code)) return { type: "pair", code, name: nameN };
+        return { type: "code", key: code };
+      }
+      return { type: "name", key: nameN };
+    }
+
+    // --- Agregació segons la clau (code | name | pair)
+    function aggregateForProductKey(productKeyObj){
+      const agg = { total:0, byDrawer:{}, minByDrawer:{} };
+      for(const r of ALL_DATA){
+        const rCode = String(r.productCode || "").trim().toLowerCase();
+        const rName = normalizeName(r.productName || "");
+        let match = false;
+
+        if (productKeyObj.type === "code"){
+          match = (rCode === productKeyObj.key);
+        } else if (productKeyObj.type === "name"){
+          match = (rName === productKeyObj.key);
+        } else if (productKeyObj.type === "pair"){
+          match = (rCode === productKeyObj.code) && (rName === productKeyObj.name);
+        }
+
+        if (!match) continue;
+
+        const d = String(r.drawerCode || "").trim();
+        const q = parseInt(r.stockQty || "0", 10) || 0;
+        const m = parseInt(r.minStock || "0", 10) || 0;
+        agg.total += q;
+        agg.byDrawer[d] = (agg.byDrawer[d] || 0) + q;
+        agg.minByDrawer[d] = m;
+      }
+      return agg;
+    }
+
+    // --- Map drawerCode → href robust
+    function drawerCodeToHref(d){
+      if (d.startsWith('C2_CP2_')) return `https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/${d}.html`;
+      const m = d.match(/^([A-Z]+)(\d*)(?:_|$)/);
+      if (m){
+        const letters = m[1];
+        const digits  = m[2]||'';
+        if (letters === 'A' || letters === 'B' || letters === 'D' || letters === 'E'){
+          return `https://ramonpertinezsola.github.io/C2_CP2_Web/${letters}/fitxes/${d}.html`;
+        }
+        if (letters === 'C'){
+          const folder = digits ? `C${digits}` : 'C';
+          return `https://ramonpertinezsola.github.io/C2_CP2_Web/${folder}/fitxes/${d}.html`;
+        }
+        const fallback = d.split('_')[0];
+        return `https://ramonpertinezsola.github.io/C2_CP2_Web/${fallback}/fitxes/${d}.html`;
+      }
+      const fb = d.split('_')[0];
+      return `https://ramonpertinezsola.github.io/C2_CP2_Web/${fb}/fitxes/${d}.html`;
+    }
+
+    function renderGlobalAndDrawerBadges(agg, currentDrawer){
+      const gEl = document.getElementById('globalStockCount');
+      const dEl = document.getElementById('drawerStockCount');
+      const badgeDrawer = document.getElementById('badgeDrawer');
+      const distWrap = document.getElementById('distributionWrap');
+
+      if (gEl) gEl.textContent = String(agg.total);
+
+      const dq = currentDrawer ? (agg.byDrawer[currentDrawer] || 0) : 0;
+      if (dEl) dEl.textContent = String(dq);
+      if (badgeDrawer){
+        const min = currentDrawer ? (agg.minByDrawer[currentDrawer] || 0) : 0;
+        badgeDrawer.classList.toggle('low', min>0 && dq <= min);
+        badgeDrawer.title = min ? `Drawer minimum: ${min}` : '';
+      }
+
+      if (distWrap){
+        const entries = Object.entries(agg.byDrawer).sort((a,b)=>a[0].localeCompare(b[0]));
+        if (!entries.length){ distWrap.innerHTML = ''; return; }
+        let html = `
+          <div style="border:1px solid var(--line);border-radius:12px;padding:.75rem;background:#fff">
+            <div style="font-weight:600;margin-bottom:.4rem">Distribution by drawers (${entries.length})</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.4rem;">
+        `;
+        for (const [d,q] of entries){
+          const min = agg.minByDrawer[d]||0;
+          const low = (min>0 && q<=min) ? 'style="color:#b3261e;font-weight:600"' : '';
+          const href = drawerCodeToHref(d);
+          html += `<div ${low}>
+            <a href="${href}" style="text-decoration:none; font-weight:700">${d}</a>:
+            <strong>${q}</strong>${min?` <small>(min ${min})</small>`:''}
+          </div>`;
+        }
+        html += `</div></div>`;
+        distWrap.innerHTML = html;
+      }
+    }
+
+    // --- Boot ---
+    loadCSVFromCandidates()
+      .then(csv => {
+        ALL_DATA = parseCSV(csv);
+        CODE_NAME_MAP = buildCodeNameMap(ALL_DATA);
+        CURRENT  = ALL_DATA.find(r => (r.drawerCode || "").trim() === drawerCode);
+        if (!CURRENT) throw new Error("Drawer not found");
+
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${CURRENT.productName || ""}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${CURRENT.productCode || ""}`;
+        document.getElementById("description-text").textContent = CURRENT.description || "";
+
+        const MIN_STOCK = parseInt(CURRENT.minStock || "10", 10);
+        document.getElementById("stock-display").innerText = "📦 STOCK: " + (CURRENT.stockQty || "0");
+        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
+        initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
+
+        // Global + Drawer counters (usant objecte {key,type})
+        const productKeyObj = getProductKeyFromRow(CURRENT);
+        const agg = aggregateForProductKey(productKeyObj);
+        renderGlobalAndDrawerBadges(agg, drawerCode);
+
+        // Prefill modal
+        document.getElementById("fldName").value = CURRENT.productName || "";
+        document.getElementById("fldCode").value = CURRENT.productCode || "";
+        document.getElementById("fldDesc").value = CURRENT.description || "";
+      })
+      .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
+
+    // --- Stock UI ---
     function initStockUI(initialQty, MIN_STOCK = 10) {
-      const curEl   = document.getElementById('curQty');
+      const curEl = document.getElementById('curQty');
       const deltaEl = document.getElementById('delta');
-      const newEl   = document.getElementById('newQty');
-      const minus   = document.getElementById('minusBtn');
-      const plus    = document.getElementById('plusBtn');
-      const exact   = document.getElementById('exactInput');
-      const reset   = document.getElementById('resetBtn');
-      const save    = document.getElementById('saveBtn');
-      const warn    = document.getElementById('minWarn');
+      const newEl = document.getElementById('newQty');
+      const minus = document.getElementById('minusBtn');
+      const plus = document.getElementById('plusBtn');
+      const exact = document.getElementById('exactInput');
+      const reset = document.getElementById('resetBtn');
+      const save = document.getElementById('saveBtn');
+      const warn = document.getElementById('minWarn');
       let cur = initialQty, delta = 0;
 
       function refresh(){
@@ -308,7 +625,7 @@
       }
 
       minus.addEventListener('click', ()=>{ delta -= 1; refresh(); });
-      plus.addEventListener('click',  ()=>{ delta += 1; refresh(); });
+      plus.addEventListener('click', ()=>{ delta += 1; refresh(); });
       exact.addEventListener('input', ()=>{ const v=parseInt(exact.value,10); if(!isNaN(v)){ delta=v-cur; refresh(); }});
       reset.addEventListener('click', ()=>{ delta=0; refresh(); });
 
@@ -324,28 +641,19 @@
           if (!r.ok) throw new Error(await r.text());
           cur = newVal; delta = 0; refresh();
           showToast('✔️ Stock successfully updated');
+          showPostSaveBanner(60);
         }catch(e){
           console.error(e);
           showToast('❌ Error updating stock', '#b3261e');
         }
       });
-
       refresh();
     }
 
-    /* ====================== Drawer image (JPEG only) ====================== */
-    // Versió local per cache-busting persistent
+    // --- Drawer image (JPEG only) ---
     const IMG_VER_KEY = `imgVer_${drawerCode}`;
-    function getImgVersion(){
-      const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10);
-      return isNaN(v) ? 1 : v;
-    }
-    function bumpImgVersion(){
-      const v = getImgVersion() + 1;
-      localStorage.setItem(IMG_VER_KEY, String(v));
-      return v;
-    }
-
+    const getImgVersion = () => { const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10); return isNaN(v) ? 1 : v; };
+    const bumpImgVersion = () => { const v = getImgVersion() + 1; localStorage.setItem(IMG_VER_KEY, String(v)); return v; };
     function imageCandidatesWithVersion(version){
       const ts = `?v=${version}`;
       return [
@@ -355,35 +663,24 @@
         `../../img/${drawerCode}.jpg${ts}`,
       ];
     }
-
     function setDrawerImg(forceBump=false){
       const el = document.getElementById('drawerImg');
       const v = forceBump ? bumpImgVersion() : getImgVersion();
       const candidates = imageCandidatesWithVersion(v);
       let i = 0;
-      const tryNext = () => {
-        if (i >= candidates.length) return; // queda en blanc si cap carrega
-        el.onerror = () => { i++; tryNext(); };
-        el.src = candidates[i];
-      };
+      const tryNext = () => { if (i >= candidates.length) return; el.onerror = () => { i++; tryNext(); }; el.src = candidates[i]; };
       tryNext();
     }
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') setDrawerImg(false); });
 
-    // Intenta evitar que tornis a la imatge antiga quan fas Ctrl+F5:
-    // - Sempre porta ?v=<localVersion>
-    // - En fer "Refresh" o després d'upload, fem bump de versió.
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') setDrawerImg(false);
-    });
-
-    /* ====================== Upload (JPEG only) ====================== */
+    // Upload (JPEG)
     const uploadBtn     = document.getElementById('uploadPhotoBtn');
     const refreshImgBtn = document.getElementById('refreshImgBtn');
     const fileInput     = document.getElementById('fileInput');
 
     document.addEventListener('DOMContentLoaded', () => setDrawerImg(false));
     uploadBtn.addEventListener('click', ()=> fileInput.click());
-    refreshImgBtn.addEventListener('click', ()=> setDrawerImg(true)); // bump & reload
+    refreshImgBtn.addEventListener('click', ()=> setDrawerImg(true));
 
     fileInput.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0];
@@ -398,61 +695,345 @@
         const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
         if(!r.ok) throw new Error(await r.text());
         showToast('✔️ Image updated successfully');
-        setDrawerImg(true); // bump version after upload
+        setDrawerImg(true);
+        showPostSaveBanner(60);
       }catch(err){
         console.error(err);
         showToast('❌ Error uploading image', '#b3261e');
       }finally{ fileInput.value = ''; }
     });
 
-    /* ====================== Edit Info logic ====================== */
-    const editBtn   = document.getElementById('editInfoBtn');
-    const modal     = document.getElementById('editModal');
+    // --- Edit info modal ---
+    const editBtn = document.getElementById('editInfoBtn');
+    const editDescBtn = document.getElementById('editDescBtn');
+    const modal = document.getElementById('editModal');
     const saveInfoBtn = document.getElementById('saveInfoBtn');
-    const fldName   = document.getElementById('fldName');
-    const fldCode   = document.getElementById('fldCode');
-    const fldDesc   = document.getElementById('fldDesc');
+    const fldName = document.getElementById('fldName');
+    const fldCode = document.getElementById('fldCode');
+    const fldDesc = document.getElementById('fldDesc');
 
-    editBtn.addEventListener('click', ()=> modal.showModal());
-    modal.addEventListener('click', (e)=>{
-      const rect = modal.getBoundingClientRect();
-      const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-      if(!inside) modal.close();
+    function setEditLocked(mode){
+      if (mode === 'existing'){
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = true;
+      } else if (mode === 'desc-only'){
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = false;
+      } else if (mode === 'all'){
+        fldName.disabled = true; fldCode.disabled = true; fldDesc.disabled = true;
+      } else {
+        fldName.disabled = false; fldCode.disabled = false; fldDesc.disabled = false;
+      }
+    }
+    function applyCanonToFields(canon){
+      fldName.value = canon.productName || '';
+      fldCode.value = canon.productCode || '';
+      fldDesc.value = canon.description || '';
+    }
+
+    document.getElementById('editForm')?.addEventListener('submit', (e)=> e.preventDefault());
+
+    document.querySelector('#editModal .close-x')?.addEventListener('click', ()=>{
+      setModeSticky(null); modal.close(); setEditLocked('none');
+    });
+    document.querySelector('#editModal .btn.ghost[value="cancel"]')?.addEventListener('click', ()=>{
+      setModeSticky(null); modal.close(); setEditLocked('none');
     });
 
-    saveInfoBtn.addEventListener('click', async (ev)=>{
-      ev.preventDefault();
-      const name = (fldName.value || '').trim();
-      const code = (fldCode.value || '').trim();
-      const desc = (fldDesc.value || '').trim();
-      if(!name || !code || !desc){ showToast('Please fill all fields', '#b3261e'); return; }
-      try{
-        const r = await fetch(UPDATE_INFO_ENDPOINT, {
-          method:'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ drawerCode, productName:name, productCode:code, description:desc })
-        });
-        if(!r.ok) throw new Error(await r.text());
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${name}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${code}`;
-        document.getElementById("description-text").textContent = desc;
-        modal.close();
-        showToast('✔️ Product info updated');
-      }catch(err){
-        console.error(err);
-        showToast('❌ Error updating info', '#b3261e');
+    // Process chooser / existing picker
+    const dupModal = document.getElementById('dupModal');
+    const dupMsg   = document.getElementById('dupMsg');
+    const dupStats = document.getElementById('dupStats');
+    const dupStatsWrap = document.getElementById('dupStatsWrap');
+    const dupClose = document.getElementById('dupClose');
+    const dupExistingBtn = document.getElementById('dupExisting');
+    const dupNewBtn      = document.getElementById('dupNew');
+
+    dupClose.addEventListener('click', ()=>{ setModeSticky(null); dupModal.close(); });
+    dupModal.addEventListener('click', (e)=>{
+      const r = dupModal.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if(!inside){ setModeSticky(null); dupModal.close(); }
+    });
+
+    function renderDupStats(agg, productName){
+      const lines = (agg.perLine || [])
+        .map(x => `- ${x.drawerCode} → qty: ${x.qty}${x.productCode ? ' | code: ' + x.productCode : ''}`)
+        .join('<br>');
+      return `
+        <div><strong>productName:</strong> ${productName || ''}</div>
+        <div><strong>Lines:</strong> ${agg.countLines ?? 0}</div>
+        <div><strong>TOTAL STOCK:</strong> ${agg.totalQty ?? 0}</div>
+        <hr>
+        <div style="font-weight:600; margin:4px 0">Per-line detail</div>
+        <div>${lines || '(none)'}</div>
+      `;
+    }
+
+    const dupStep1 = document.getElementById('dupStep1');
+    const dupStep2 = document.getElementById('dupStep2');
+    const dupFt1   = document.getElementById('dupFt1');
+    const dupFt2   = document.getElementById('dupFt2');
+    const existingSelect = document.getElementById('existingSelect');
+    const dupBackBtn     = document.getElementById('dupBack');
+    const dupProceedExistingBtn = document.getElementById('dupProceedExisting');
+    const existingPreview = document.getElementById('existingPreview');
+    const existingPreviewBox = document.getElementById('existingPreviewBox');
+
+    function openExistingPicker(){
+      const items = uniqueProductNamesFromData(ALL_DATA);
+      existingSelect.innerHTML = '';
+      const opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = '— Select a product —';
+      existingSelect.appendChild(opt0);
+
+      for (const it of items){
+        const o = document.createElement('option');
+        o.value = it.display;
+        o.textContent = `${it.display} (${it.n})`;
+        existingSelect.appendChild(o);
+      }
+
+      const curName = (CURRENT?.productName || '').trim();
+      if (curName){
+        for (const o of existingSelect.options){
+          if (normalizeName(o.value) === normalizeName(curName)) { existingSelect.value = o.value; break; }
+        }
+      }
+
+      const renderPreview = ()=>{
+        const val = existingSelect.value.trim();
+        if (!val){
+          existingPreview.style.display = 'none';
+          existingPreviewBox.innerHTML = '';
+          return;
+        }
+        const canon = canonicalByProductName(val);
+        existingPreviewBox.innerHTML =
+          `name: ${canon.productName || ''}<br>` +
+          `code: ${canon.productCode || ''}<br>` +
+          `desc: ${canon.description || ''}`;
+        existingPreview.style.display = '';
+      };
+      existingSelect.onchange = renderPreview;
+      renderPreview();
+
+      dupStep1.style.display = 'none';
+      dupFt1.style.display   = 'none';
+      dupStep2.style.display = '';
+      dupFt2.style.display   = '';
+    }
+
+    dupBackBtn.addEventListener('click', ()=>{
+      dupStep2.style.display = 'none';
+      dupFt2.style.display   = 'none';
+      dupStep1.style.display = '';
+      dupFt1.style.display   = '';
+    });
+
+    // EXISTING → Save now
+    dupProceedExistingBtn.addEventListener('click', async ()=>{
+      const val = (existingSelect.value || '').trim();
+      if (!val){ showToast('Please select an existing product', '#b3261e'); return; }
+      const canon = canonicalByProductName(val);
+
+      setModeSticky('EXISTING');
+      applyCanonToFields(canon);
+      setEditLocked('existing');
+      dupModal.close();
+
+      const res = await attemptSaveInfo({ forceName: canon.productName || '', forceMode: 'EXISTING' });
+      setEditLocked('none');
+
+      if (res.done){
+        setModeSticky(null);
+        showPostSaveBanner(60);
       }
     });
 
-    /* ====================== QR modal ====================== */
-    const qrBtn      = document.getElementById('qrBtn');
-    const qrModal    = document.getElementById('qrModal');
-    const qrClose    = document.getElementById('qrClose');
-    const qrCanvas   = document.getElementById('qrCanvas');
-    const dlPngBtn   = document.getElementById('dlPngBtn');
-    const dlPdfBtn   = document.getElementById('dlPdfBtn');
-    const copyLinkBtn= document.getElementById('copyLinkBtn');
-    const qrUrlNote  = document.getElementById('qrUrlNote');
+    async function checkDuplicatesBeforeEdit() {
+      const name = (CURRENT?.productName || "").trim();
+      if (!name) { setModeSticky("NEW"); setEditLocked('none'); return modal.showModal(); }
+
+      try {
+        const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
+        const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(await r.text());
+        const body = await r.json();
+
+        if (body.exists) {
+          const agg = body.aggregate || {};
+          dupStatsWrap.style.display = "";
+          dupStats.innerHTML = renderDupStats(agg, name);
+          dupMsg.textContent = "⚠️ This product (same NAME) already exists in other drawers. Choose the process:";
+        } else {
+          dupStatsWrap.style.display = "none";
+          dupStats.innerHTML = "";
+          dupMsg.textContent = "You’re about to modify this drawer. Do you want to create a NEW PRODUCT or add an EXISTING PRODUCT?";
+        }
+
+        dupExistingBtn.onclick = () => { openExistingPicker(); };
+        dupNewBtn.onclick      = () => { setModeSticky("NEW"); setEditLocked('none'); dupModal.close(); modal.showModal(); };
+
+        try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
+      } catch (err) {
+        console.error("Error checking duplicates:", err);
+        showToast("❌ Error loading duplicates", "#b3261e");
+        setEditLocked('none');
+        modal.showModal(); // fallback
+      }
+    }
+    editBtn.addEventListener("click", checkDuplicatesBeforeEdit);
+
+    // Edit Description only
+    editDescBtn.addEventListener('click', () => {
+      setModeSticky('DESC_ONLY');
+      fldName.value = CURRENT?.productName || '';
+      fldCode.value = CURRENT?.productCode || '';
+      fldDesc.value = CURRENT?.description || '';
+      setEditLocked('desc-only');
+      try { modal.showModal(); } catch { modal.setAttribute('open',''); }
+    });
+
+    async function postUpdateInfo(payload){
+      const r = await fetch(UPDATE_INFO_ENDPOINT, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+      return r;
+    }
+
+    // attemptSaveInfo with propagateAll
+    async function attemptSaveInfo({ forceName = null, forceMode = null, _tried409Once = false } = {}){
+      const name = (forceName ?? fldName.value).trim();
+      const code = fldCode.value.trim();
+      const desc = fldDesc.value.trim();
+
+      const payload = { drawerCode, productName: name, productCode: code, description: desc };
+      const effectiveMode = (forceMode || getModeSticky() || '').toUpperCase();
+      if (effectiveMode) payload.mode = effectiveMode;
+
+      // clau important: propagar a totes les línies del producte
+      payload.propagateAll = true;
+
+      const res = await postUpdateInfo(payload);
+
+      if (res.ok) {
+        const body = await res.json().catch(()=> ({}));
+        const updated = body?.drawerUpdated || {};
+        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${updated.productName || name}`;
+        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${updated.productCode || code}`;
+        document.getElementById("description-text").textContent = updated.description || desc;
+
+        if (CURRENT){
+          CURRENT.productName = updated.productName || name;
+          CURRENT.productCode = updated.productCode || code;
+          CURRENT.description = updated.description || desc;
+        }
+        // Recalcular mapes i distribució després de canvis
+        CODE_NAME_MAP = buildCodeNameMap(ALL_DATA);
+        const pkObj = getProductKeyFromRow(CURRENT);
+        renderGlobalAndDrawerBadges(aggregateForProductKey(pkObj), drawerCode);
+
+        showToast('✔️ Product info updated');
+        showPostSaveBanner(60);
+        return { done:true };
+      }
+
+      if (res.status === 409) {
+        let body = {};
+        try { body = await res.json(); } catch {}
+
+        if ((effectiveMode === 'EXISTING') && !_tried409Once) {
+          const expected = (body && body.expectedProductName) ? String(body.expectedProductName).trim() : null;
+          return attemptSaveInfo({ forceName: expected || name, forceMode: 'EXISTING', _tried409Once: true });
+        }
+
+        if (effectiveMode === 'EXISTING'){
+          showToast('⚠️ Could not save in EXISTING mode (conflict). Check CSV name duplicates.', '#b3261e');
+          return { done:false };
+        }
+
+        if (body?.warning) {
+          setModeSticky(null);
+          dupStatsWrap.style.display = "none";
+          dupStats.innerHTML = "";
+          dupMsg.textContent = "You’re about to modify this drawer. Do you want to create a NEW PRODUCT or add an EXISTING PRODUCT?";
+          try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
+          return { done:false, warned:true };
+        }
+
+        showToast('❌ Conflict updating info', '#b3261e');
+        return { done:false };
+      }
+
+      const text = await res.text().catch(()=> 'Error');
+      console.error('Update info response:', res.status, text);
+      showToast('❌ Error updating info', '#b3261e');
+      return { done:false };
+    }
+
+    document.getElementById('saveInfoBtn').addEventListener('click', async (ev)=>{
+      ev.preventDefault();
+      const mode = (getModeSticky() || '').toUpperCase();
+
+      const name = (fldName.value || '').trim();
+      const code = (fldCode.value || '').trim();
+      const desc = (fldDesc.value || '').trim();
+
+      if (mode === 'DESC_ONLY'){
+        if (!desc){ showToast('Description cannot be empty', '#b3261e'); return; }
+        setEditLocked('all');
+        const res = await attemptSaveInfo({ forceMode: 'DESC_ONLY' });
+        setEditLocked('none');
+        if (res.done){ setModeSticky(null); }
+        return;
+      }
+
+      if (mode === 'EXISTING'){ return; }
+
+      if(!name || !code || !desc){
+        showToast('Please fill all fields', '#b3261e');
+        return;
+      }
+
+      try {
+        const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
+        const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
+        const r = await fetch(url);
+        if (r.ok) {
+          const body = await r.json();
+          if (body.exists) {
+            const agg = body.aggregate || {};
+            dupStatsWrap.style.display = "";
+            dupStats.innerHTML = renderDupStats(agg, name);
+            dupMsg.textContent = "⚠️ You’re creating a NEW PRODUCT with a NAME that already exists. Switch to EXISTING PRODUCT?";
+
+            dupExistingBtn.onclick = () => { openExistingPicker(); };
+            dupNewBtn.onclick      = async () => {
+              setModeSticky("NEW");
+              dupModal.close();
+              setEditLocked('all');
+              await attemptSaveInfo({ forceMode: 'NEW' });
+              setEditLocked('none');
+            };
+            try { dupModal.showModal(); } catch { dupModal.setAttribute("open",""); }
+            return;
+          }
+        }
+      } catch(e){ console.warn("Duplicate check on save (NEW) failed:", e); }
+
+      setEditLocked('all');
+      await attemptSaveInfo({ forceMode: 'NEW' });
+      setEditLocked('none');
+    });
+
+    // --- QR ---
+    const qrBtn = document.getElementById('qrBtn');
+    const qrModal = document.getElementById('qrModal');
+    const qrClose = document.getElementById('qrClose');
+    const qrCanvas = document.getElementById('qrCanvas');
 
     const LOGO_CANDIDATES = ["../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"];
     let qrLogoPromise;
@@ -472,8 +1053,6 @@
       });
       return qrLogoPromise;
     }
-
-    function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
 
     async function drawQR(url){
       const size = 1024;
@@ -504,32 +1083,27 @@
         const logoBox = Math.floor(size * 0.22);
         const cx = size/2, cy = size/2;
         const r = Math.floor(logoBox/2) + 14;
-
-        ctx.save();
-        ctx.fillStyle = '#FFF';
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI*2);
-        ctx.fill();
-        ctx.restore();
+        ctx.save(); ctx.fillStyle = '#FFF'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill(); ctx.restore();
 
         const pad = 18;
         const w = logoBox - pad*2;
         const h = logoBox - pad*2;
-
         const aspect = logoImg.width / logoImg.height;
         let drawW = w, drawH = w / aspect;
         if (drawH > h) { drawH = h; drawW = h * aspect; }
-
         ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
       }
     }
 
+    function safeOpenDialog(dlg){ try{ dlg.showModal(); }catch{ dlg.setAttribute('open',''); } }
+
     async function openQrModal(){
-      qrUrlNote.textContent = QR_STATIC_VALUE;
+      const url = QR_STATIC_VALUE;
+      document.getElementById('qrUrlNote').textContent = url;
       safeOpenDialog(qrModal);
       await new Promise(r=>requestAnimationFrame(r));
       await ensureQrLib();
-      await drawQR(QR_STATIC_VALUE);
+      await drawQR(url);
     }
 
     qrBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openQrModal(); });
@@ -540,23 +1114,23 @@
       if(!inside) qrModal.close();
     });
 
-    copyLinkBtn?.addEventListener('click', async ()=>{
-      try{ await navigator.clipboard.writeText(QR_STATIC_VALUE); showToast('🔗 Link copied'); }
+    document.getElementById('copyLinkBtn')?.addEventListener('click', async ()=>{
+      const url = QR_STATIC_VALUE;
+      try{ await navigator.clipboard.writeText(url); showToast('🔗 Link copied'); }
       catch{
-        const ta=document.createElement('textarea'); ta.value=QR_STATIC_VALUE;
-        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-        showToast('🔗 Link copied');
+        const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); ta.remove(); showToast('🔗 Link copied');
       }
     });
 
-    dlPngBtn?.addEventListener('click', ()=>{
+    document.getElementById('dlPngBtn')?.addEventListener('click', ()=>{
       const a = document.createElement('a');
       a.href = qrCanvas.toDataURL('image/png');
       a.download = `${drawerCode}_QR.png`;
       a.click();
     });
 
-    dlPdfBtn?.addEventListener('click', ()=>{
+    document.getElementById('dlPdfBtn')?.addEventListener('click', ()=>{
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ unit:'mm', format:'A4' });
       const png = qrCanvas.toDataURL('image/png');
@@ -569,34 +1143,6 @@
       pdf.text(QR_STATIC_VALUE, margin, pageH - margin/2);
       pdf.save(`${drawerCode}_QR.pdf`);
     });
-
-    /* ====================== Bootstrapping (CSV → UI) ====================== */
-    loadCSVFromCandidates()
-      .then(csv => {
-        const rows = csv.trim().split("\n");
-        const headers = rows[0].split(",");
-        const data = rows.slice(1).map(r => {
-          const vals = r.split(",");
-          return headers.reduce((o, h, i) => { o[h.trim()] = vals[i] ? vals[i].trim() : ""; return o; }, {});
-        });
-        const match = data.find(r => (r.drawerCode || "").trim() === drawerCode);
-        if (!match) throw new Error("Drawer not found");
-
-        document.getElementById("product-name").innerHTML = `<strong>Product Name:</strong> ${match.productName || ""}`;
-        document.getElementById("product-code").innerHTML = `<strong>Product Code:</strong> ${match.productCode || ""}`;
-        document.getElementById("description-text").textContent = match.description || "";
-
-        const MIN_STOCK = parseInt(match.minStock || "10", 10);
-        document.getElementById("stock-display").innerText = "📦 STOCK: " + (match.stockQty || "0");
-        document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
-        initStockUI(parseInt(match.stockQty || "0", 10), MIN_STOCK);
-
-        // Precarrega modal
-        document.getElementById("fldName").value = match.productName || "";
-        document.getElementById("fldCode").value = match.productCode || "";
-        document.getElementById("fldDesc").value = match.description || "";
-      })
-      .catch(e => { document.getElementById("stock-display").innerText = "❌ Error: " + e.message; });
   </script>
 </body>
 </html>
