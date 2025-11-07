@@ -17,6 +17,8 @@
       --radius:14px;
       --shadow:0 6px 18px rgba(0,0,0,.08);
       --link:#2563eb;
+      --danger:#b3261e;
+      --ok:#14532d;
     }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
@@ -27,10 +29,7 @@
       background:var(--bg);
     }
 
-    /* ───────────────── Sidebar (ALWAYS visible) */
-    .layout{
-      display:flex;
-    }
+    .layout{display:flex;}
     nav.sidebar{
       position:fixed; left:0; top:0; bottom:0;
       width:260px; background:#fff; border-right:1px solid #e5e7eb;
@@ -50,9 +49,8 @@
     .toc a:hover{background:#f1f5f9}
     .toc a.active{background:var(--green); color:#fff}
 
-    /* ───────────────── Main */
     main{
-      margin-left:260px; /* keep room for fixed sidebar */
+      margin-left:260px;
       padding:42px 56px; max-width:1100px;
     }
     .card{
@@ -65,7 +63,6 @@
     p,li{line-height:1.75; color:var(--ink)}
     .lead{color:var(--muted)}
 
-    /* Tables & code */
     table{width:100%; border-collapse:collapse; margin:14px 0}
     th{background:var(--green); color:#fff; text-align:left; padding:10px}
     td{border-bottom:1px solid #e5e7eb; padding:10px; color:var(--muted)}
@@ -76,34 +73,30 @@
       background:#0f172a; color:#e2e8f0; padding:16px; border-radius:10px; overflow:auto; font-size:.92rem;
     }
 
-    /* Floating back button (mobile/helper) */
     .floating-back{
       position:fixed; right:18px; bottom:18px; z-index:60;
       background:var(--green); color:#fff; text-decoration:none; font-weight:600;
       padding:12px 16px; border-radius:999px; box-shadow:0 10px 24px rgba(109,189,69,.35);
     }
-
     footer{color:var(--muted); font-size:13px; text-align:center; margin:40px 0 10px}
 
-    /* Responsive - keep sidebar visible; content gets narrower */
-    @media (max-width:980px){
-      nav.sidebar{width:220px}
-      main{margin-left:220px; padding:28px}
-    }
-    @media (max-width:760px){
-      /* Even on mobile we keep the sidebar visible but slimmer */
-      nav.sidebar{width:200px; padding:18px 10px}
-      main{margin-left:200px; padding:24px}
-      .back-btn{display:block; text-align:center}
-    }
+    .badge{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700}
+    .ok{background:#ecfdf5; color:var(--ok); border:1px solid #bbf7d0}
+    .warn{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+    .tip{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+    .muted{color:var(--muted)}
+    .kbd{border:1px solid #e5e7eb; border-bottom-width:3px; padding:2px 6px; border-radius:6px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; background:#fff}
+
+    .checklist li{margin:8px 0}
+    .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    @media (max-width:980px){nav.sidebar{width:220px} main{margin-left:220px; padding:28px}}
+    @media (max-width:760px){nav.sidebar{width:200px; padding:18px 10px} main{margin-left:200px; padding:24px} .back-btn{display:block; text-align:center} .two-col{grid-template-columns:1fr}}
   </style>
 
   <script>
-    // Active section highlight
     document.addEventListener('DOMContentLoaded', () => {
       const links = [...document.querySelectorAll('.toc a')];
       const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
-
       const io = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if(entry.isIntersecting){
@@ -112,7 +105,6 @@
           }
         });
       }, {rootMargin: '-40% 0px -55% 0px', threshold: 0});
-
       sections.forEach(s => io.observe(s));
     });
   </script>
@@ -120,7 +112,6 @@
 
 <body>
   <div class="layout">
-    <!-- Sidebar (fixed & scrollable) -->
     <nav class="sidebar">
       <div class="brand">
         <img src="assets/parcsafe-logo.png" alt="Parcsafe logo">
@@ -129,19 +120,24 @@
 
       <div class="toc">
         <a href="#overview">Overview</a>
+        <a href="#quickstart">Quick Start (60s)</a>
+        <a href="#roles">Who does what?</a>
+        <a href="#daily-weekly">Daily / Weekly tasks</a>
         <a href="#architecture">System Architecture</a>
         <a href="#data-model">Data Model (CSV)</a>
         <a href="#api">API Contract</a>
         <a href="#worker">Cloudflare Worker</a>
-        <a href="#security">Security & Access</a>
-        <a href="#deployment">Deployment & Environments</a>
         <a href="#github">GitHub & Pages</a>
         <a href="#frontend">Frontend & UX</a>
-        <a href="#caching">Caching & Performance</a>
         <a href="#images">Images & Naming</a>
-        <a href="#n8n">n8n Automation (Optional)</a>
-        <a href="#maintenance">Operations & Maintenance</a>
+        <a href="#qr-labels">QR Labels & Paths</a>
+        <a href="#drawers-new">Create a new drawer</a>
+        <a href="#move-products">Move/duplicate products</a>
+        <a href="#backup">Backup & Restore CSV</a>
         <a href="#troubleshooting">Troubleshooting</a>
+        <a href="#limits">Known Limitations</a>
+        <a href="#browser">Browser & Mobile tips</a>
+        <a href="#security">Security & Access</a>
         <a href="#faq">FAQ</a>
         <a href="#roadmap">Roadmap</a>
         <a href="#glossary">Glossary</a>
@@ -150,252 +146,278 @@
       </div>
     </nav>
 
-    <!-- Main content -->
     <main>
       <section id="overview" class="card">
         <h1>Parcsafe Stock Management System</h1>
         <p class="lead">
-          This documentation describes how the Parcsafe warehouse stock platform is designed, deployed, and maintained. The system is fully serverless, combining <strong>GitHub Pages</strong> (hosting & UI), a <strong>Cloudflare Worker</strong> (write API to GitHub), and optional <strong>n8n automation</strong> (photo/file syncing). It is engineered to be low-cost, transparent, and resilient.
+          Warehouse stock from your browser. Open a drawer page, check quantities, edit, and upload photos. Changes are versioned in GitHub and appear within seconds.
         </p>
-        <p>
-          Typical user flow: a teammate opens a drawer page, edits the quantity, and clicks <em>Save</em>. The browser calls the Worker, which updates <code>docs/stock.csv</code> and commits to GitHub. Pages redeploys automatically; the new quantity is visible within seconds. All changes are versioned and auditable.
-        </p>
+        <p class="badge ok">Safe to use without technical knowledge</p>
+        <p class="muted">Tip: this guide is for everyday use. Technical details exist but are skippable.</p>
+      </section>
+
+      <section id="quickstart" class="card">
+        <h2>⚡ Quick Start (60 seconds)</h2>
+        <ol class="checklist">
+          <li>Open the <strong>Main Menu</strong> → choose the <strong>Rack</strong> (A, C2-CP2, C3, C4…).</li>
+          <li>Click the <strong>Drawer code</strong> (e.g. <span class="kbd">A1_0</span>) to open its page.</li>
+          <li>To change a quantity, type the new number and press <strong>Save</strong>.</li>
+          <li>Wait <strong>30–60 s</strong> and refresh the page to see it updated for everyone.</li>
+          <li>To change <em>Name / Code / Description</em>, edit the fields and <strong>Save</strong> (shared across drawers of the same product).</li>
+          <li>To update the photo, use <em>Upload</em> on the image, then refresh after a few seconds.</li>
+        </ol>
+        <p class="tip badge">If in doubt: Save → wait half a minute → refresh.</p>
+      </section>
+
+      <section id="roles" class="card">
+        <h2>👥 Who does what?</h2>
+        <div class="two-col">
+          <div>
+            <h3>Basic user (warehouse team)</h3>
+            <ul>
+              <li>Search racks/drawers, update <strong>stockQty</strong>.</li>
+              <li>Update product <strong>description/code/name</strong> when needed.</li>
+              <li>Upload/replace drawer photos.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Power user (supervisor)</h3>
+            <ul>
+              <li>Create a new drawer page (template) and add rows to CSV.</li>
+              <li>Move/duplicate lines between drawers, keeping product info consistent.</li>
+              <li>Handle CSV backup/restore if something goes wrong.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="daily-weekly" class="card">
+        <h2>🗓️ Daily / Weekly tasks</h2>
+        <div class="two-col">
+          <div>
+            <h3>Daily</h3>
+            <ul>
+              <li>Open drawers you will pick from and verify <strong>stockQty</strong>.</li>
+              <li>After picking, update the quantities and <strong>Save</strong>.</li>
+              <li>Refresh once after 30–60 s to double-check.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Weekly</h3>
+            <ul>
+              <li>Clean up descriptions (short, consistent wording).</li>
+              <li>Compress/replace large or blurry photos.</li>
+              <li>Export a <strong>CSV backup</strong> (see “Backup & Restore”).</li>
+            </ul>
+          </div>
+        </div>
       </section>
 
       <section id="architecture" class="card">
         <h2>🧠 System Architecture</h2>
-        <p>
-          The solution is organized into clear layers. Each layer is optional outside its responsibility; coupling is minimal to favor maintenance and evolvability.
-        </p>
-        <table>
-          <tr><th>Component</th><th>Description</th></tr>
-          <tr>
-            <td>Frontend (GitHub Pages)</td>
-            <td>Interactive HTML/CSS/JS site that renders racks & drawers, provides controls, and shows photos & QR codes.</td>
-          </tr>
-          <tr>
-            <td>Cloudflare Worker</td>
-            <td>Stateless API that validates input and updates <code>stock.csv</code> via GitHub API, with CORS enforcement and commit messages.</td>
-          </tr>
-          <tr>
-            <td>GitHub Repository</td>
-            <td>Single source of truth: stores CSV, HTML, images, and Worker code. Triggers GitHub Pages builds.</td>
-          </tr>
-          <tr>
-            <td>n8n (optional)</td>
-            <td>Automation pipeline for local → Git synchronization of photos and docs at a fixed cadence.</td>
-          </tr>
-        </table>
+        <p>Frontend on <strong>GitHub Pages</strong> + <strong>Cloudflare Worker</strong> write API + optional <strong>n8n</strong> for photo sync.</p>
         <h3>Data Flow (high level)</h3>
         <ol>
-          <li>User edits quantity → Browser sends <code>POST /stock/item</code> to Worker.</li>
-          <li>Worker patches <code>stock.csv</code> (row match by <code>drawerCode</code>) and commits.</li>
-          <li>Pages rebuild → UI fetches new data → visual update.</li>
+          <li>User updates a value → Browser calls <code>POST /stock/item</code> on the Worker.</li>
+          <li>Worker patches <code>docs/stock.csv</code> and commits to GitHub.</li>
+          <li>GitHub Pages rebuilds → updated UI.</li>
         </ol>
       </section>
 
       <section id="data-model" class="card">
         <h2>🗃️ Data Model (CSV)</h2>
-        <p>
-          The system uses a single CSV file as the canonical data store. This keeps the stack simple, portable, and auditable. Columns:
-        </p>
         <table>
           <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
-          <tr><td>drawerCode</td><td>string (ID)</td><td>Unique code: e.g., <code>C2_CP2_0_I</code>. Acts as primary key.</td></tr>
-          <tr><td>stockQty</td><td>integer ≥ 0</td><td>Displayed quantity. API enforces integer semantics.</td></tr>
-          <tr><td>productName</td><td>string</td><td>Human-readable name. Optional but recommended.</td></tr>
-          <tr><td>productCode</td><td>string</td><td>Internal/ERP or vendor reference.</td></tr>
-          <tr><td>description</td><td>string (markdown-safe)</td><td>Short technical description.</td></tr>
-          <tr><td>minStock</td><td>integer ≥ 0</td><td>Threshold for low-stock alerts (if email workflows are re-enabled).</td></tr>
+          <tr><td>drawerCode</td><td>string (ID)</td><td>e.g., <code>C2_CP2_0_I</code>. Primary key per row.</td></tr>
+          <tr><td>stockQty</td><td>integer ≥ 0</td><td>Visible quantity. No decimals.</td></tr>
+          <tr><td>productName</td><td>string</td><td>Human-readable name.</td></tr>
+          <tr><td>productCode</td><td>string</td><td>ERP/vendor ref.</td></tr>
+          <tr><td>description</td><td>string</td><td>Short, consistent; avoid line breaks.</td></tr>
+          <tr><td>minStock</td><td>integer ≥ 0</td><td>For low-stock alerts (optional workflow).</td></tr>
         </table>
-        <h3>Validation Rules</h3>
-        <ul>
-          <li>Header must match exactly the columns above.</li>
-          <li><code>drawerCode</code> must be unique; case-sensitive.</li>
-          <li>Quantities must be integers; no floats, <code>NaN</code>, or negative numbers.</li>
-          <li>Descriptions should avoid line breaks; use semicolons or dashes for lists.</li>
-        </ul>
+        <p class="warn badge"><strong>Shared info:</strong> product <em>name/code/description</em> are shared if the same product exists in multiple drawers.</p>
       </section>
 
       <section id="api" class="card">
         <h2>🔗 API Contract</h2>
-        <p>The Cloudflare Worker exposes a minimal JSON API. Example endpoint for item update:</p>
-        <pre><code>POST  /stock/item
+        <pre><code>POST /stock/item
 Content-Type: application/json
 
-{
-  "drawerCode": "C2_CP2_0_I",
-  "newQty": 7
-}</code></pre>
-        <h3>Responses</h3>
+{"drawerCode":"C2_CP2_0_I","newQty":7}</code></pre>
         <table>
           <tr><th>Status</th><th>Body</th><th>Meaning</th></tr>
-          <tr><td>200</td><td><code>{"ok":true,"updated":{"drawerCode":"C2_CP2_0_I","stockQty":7}}</code></td><td>Update committed to GitHub.</td></tr>
-          <tr><td>400</td><td><code>{"ok":false,"error":"INVALID_INPUT"}</code></td><td>Missing fields, non-integer, or invalid header.</td></tr>
-          <tr><td>404</td><td><code>{"ok":false,"error":"DRAWER_NOT_FOUND"}</code></td><td>No matching <code>drawerCode</code> in CSV.</td></tr>
-          <tr><td>401/403</td><td><code>{"ok":false,"error":"AUTH"}</code></td><td>Token missing/invalid or repo permission issue.</td></tr>
-          <tr><td>500</td><td><code>{"ok":false,"error":"GITHUB_WRITE_FAILED"}</code></td><td>Commit or API failure; retry.</td></tr>
+          <tr><td>200</td><td><code>{"ok":true,"updated":{"drawerCode":"...","stockQty":7}}</code></td><td>Committed.</td></tr>
+          <tr><td>400</td><td><code>{"ok":false,"error":"INVALID_INPUT"}</code></td><td>Missing/invalid fields.</td></tr>
+          <tr><td>404</td><td><code>{"ok":false,"error":"DRAWER_NOT_FOUND"}</code></td><td>No matching row.</td></tr>
+          <tr><td>401/403</td><td><code>{"ok":false,"error":"AUTH"}</code></td><td>Token/permission issue.</td></tr>
+          <tr><td>500</td><td><code>{"ok":false,"error":"GITHUB_WRITE_FAILED"}</code></td><td>Commit/GitHub failure.</td></tr>
         </table>
-        <p><strong>CORS:</strong> only approved origins are allowed (site domain). Requests must include <code>Content-Type: application/json</code>.</p>
       </section>
 
       <section id="worker" class="card">
         <h2>🪄 Cloudflare Worker</h2>
         <h3>Deploy</h3>
-        <pre><code>npm install -g wrangler
+        <pre><code>npm i -g wrangler
 wrangler login
 wrangler deploy
 wrangler secret put GH_TOKEN</code></pre>
-        <p><strong>Secrets:</strong> <code>GH_TOKEN</code> must be a fine-grained GitHub token with <em>Contents: Read &amp; Write</em> for this repository.</p>
-        <h3>Commit Messages</h3>
-        <pre><code>chore(stock): C2_CP2_0_I → 7</code></pre>
-        <h3>Error Handling</h3>
         <ul>
-          <li>Graceful JSON error payloads (see API table).</li>
-          <li>Hard validation prevents corrupted CSV commits.</li>
-          <li>Rate limiting and logging can be added if needed.</li>
+          <li><strong>GH_TOKEN</strong> scope: Repo Contents (Read/Write) for this repository only.</li>
+          <li>CORS restricts to the production origin.</li>
         </ul>
-      </section>
-
-      <section id="security" class="card">
-        <h2>🔒 Security & Access</h2>
-        <ul>
-          <li><strong>Token location:</strong> never hard-coded. Stored via Cloudflare Secrets KV only.</li>
-          <li><strong>Least privilege:</strong> token limited to this repo; no organization-wide scope.</li>
-          <li><strong>CORS:</strong> requests accepted only from the production origin.</li>
-          <li><strong>Auditability:</strong> each update is a commit tied to a Worker identity.</li>
-          <li><strong>Recovery:</strong> in case of token compromise, revoke and re-issue immediately; no downtime apart from redeploy.</li>
-        </ul>
-      </section>
-
-      <section id="deployment" class="card">
-        <h2>🚀 Deployment & Environments</h2>
-        <h3>Environments</h3>
-        <ul>
-          <li><strong>Production:</strong> GitHub Pages default branch + Cloudflare Worker bound to the prod domain.</li>
-          <li><strong>Staging (optional):</strong> use a separate branch & Worker route; update <code>ORIGIN</code> accordingly.</li>
-        </ul>
-        <h3>Ownership Transfer</h3>
-        <ol>
-          <li>Move repo to <em>Parcsafe</em> GitHub organization.</li>
-          <li>Deploy Worker under corporate Cloudflare account.</li>
-          <li>Recreate <code>GH_TOKEN</code> under a shared automation account.</li>
-          <li>Update endpoints in JS if the Worker URL changes.</li>
-        </ol>
       </section>
 
       <section id="github" class="card">
         <h2>🐙 GitHub & Pages</h2>
         <ul>
-          <li>Pages builds automatically from the default branch.</li>
-          <li>Each update to <code>stock.csv</code> triggers a rebuild; cache is short-lived.</li>
-          <li>Use PRs for bigger content changes; fast-forward commits for single-line updates.</li>
+          <li>Default branch builds GitHub Pages automatically.</li>
+          <li>Each CSV update is a commit → rebuild happens shortly after.</li>
+        </ul>
+        <h3>Repository at a glance</h3>
+        <ul class="muted">
+          <li><code>docs/stock.csv</code> — canonical data</li>
+          <li><code>docs/readme.html</code> — this document</li>
+          <li><code>docs/&lt;Rack&gt;/fitxes/&lt;DrawerCode&gt;.html</code> — drawer pages (e.g. <code>A/fitxes/A1_0.html</code>, <code>C3/fitxes/C3_5_I.html</code>)</li>
+          <li><code>docs/&lt;Rack&gt;/images/</code> — photos per rack</li>
         </ul>
       </section>
 
       <section id="frontend" class="card">
         <h2>🖥️ Frontend & UX</h2>
-        <h3>Drawer Pages</h3>
         <ul>
-          <li>Each drawer page exposes a <em>Save</em> action that posts to the Worker.</li>
-          <li>After success, the UI updates immediately (optimistic) and confirms with a toast.</li>
-          <li>Error toasts are explicit and guide the user to retry or contact support.</li>
-        </ul>
-        <h3>Accessibility</h3>
-        <ul>
-          <li>High-contrast green for primary actions.</li>
-          <li>Buttons have clear focus styles; labels use semantic HTML.</li>
-        </ul>
-      </section>
-
-      <section id="caching" class="card">
-        <h2>⚡ Caching & Performance</h2>
-        <ul>
-          <li>Use cache-busting via a small <code>version.json</code> if aggressive CDN caching is observed.</li>
-          <li>Prefer responsive images (intrinsic size) to reduce layout shift.</li>
-          <li>Lazy-load large photos in non-critical views.</li>
+          <li>Each drawer page has <strong>Save</strong> for CSV updates and <strong>Upload</strong> for photos.</li>
+          <li>After saving: wait 30–60 s and refresh (mobile: close/open tab).</li>
         </ul>
       </section>
 
       <section id="images" class="card">
         <h2>🖼️ Images & Naming</h2>
         <ul>
-          <li>Use JPG for photos; PNG only for UI assets (logos, icons).</li>
-          <li>Recommended max size: 1MB per image. Compress before commit.</li>
-          <li>Naming convention: <code>PARCsafe-[NNN]-BP-2022.jpg</code> or <code>C2_CP2_0_I.jpg</code> matching drawer code.</li>
-          <li>Store in rack-specific folders to keep repo organized.</li>
+          <li>Use <strong>JPG</strong> for photos (max ~1 MB). <strong>PNG</strong> only for logos/icons.</li>
+          <li>Name drawer photos like the <strong>drawerCode</strong> when possible (e.g., <code>A1_0.jpg</code>).</li>
+          <li>Store in the rack’s <code>images</code> folder (e.g., <code>A/images/</code>, <code>C3/images/</code>).</li>
         </ul>
       </section>
 
-      <section id="n8n" class="card">
-        <h2>🧩 n8n Automation (Optional)</h2>
-        <p>
-          The n8n workflow keeps photos and files synced from a local folder to the repo. It’s useful for high-throughput photo updates and removes manual Git steps.
-        </p>
-        <h3>Flow</h3>
+      <section id="qr-labels" class="card">
+        <h2>🏷️ QR Labels & Paths</h2>
+        <p>QRs should open the exact drawer page URL. Use these path patterns (working examples):</p>
+        <ul>
+          <li><code>A/fitxes/A1_0.html</code> ✅ (not <code>A1/fitxes/A1_0.html</code>)</li>
+          <li><code>C3/fitxes/C3_5_I.html</code> ✅ (not <code>C3/0/fitxes/...</code>)</li>
+          <li><code>C2_CP2/fitxes/C2_CP2_0_I.html</code> (adapt to your current rack structure)</li>
+        </ul>
+        <p class="tip badge">When a QR doesn’t open: check the folder structure and that the rack segment exists (e.g., <code>A/fitxes/…</code>).</p>
+      </section>
+
+      <section id="drawers-new" class="card">
+        <h2>🧩 Create a new drawer</h2>
         <ol>
-          <li>Cron trigger every 30–60 seconds.</li>
-          <li>Detect new/changed files; normalize filenames.</li>
-          <li>Route to correct destination folder.</li>
-          <li>Git Pull → Add → Commit → Push.</li>
+          <li>Duplicate an existing drawer HTML in the same rack’s <code>fitxes</code> folder.</li>
+          <li>Rename the file to the new <strong>drawerCode</strong> (e.g., <code>A/fitxes/A1_1.html</code>).</li>
+          <li>Open it and update the page title and initial table rows (empty or template rows).</li>
+          <li>Add corresponding rows to <code>docs/stock.csv</code> for that <strong>drawerCode</strong>.</li>
+          <li>Commit and open the page → verify fields save correctly.</li>
         </ol>
-        <h3>Operations</h3>
-        <ul>
-          <li>Run locally on a warehouse PC (auto-start) or in n8n Cloud.</li>
-          <li>Keep credentials in environment variables; never in the workflow JSON.</li>
-        </ul>
+        <p class="warn badge">Make sure <strong>drawerCode</strong> in CSV matches the HTML filename and internal code exactly (case-sensitive).</p>
       </section>
 
-      <section id="maintenance" class="card">
-        <h2>🧰 Operations & Maintenance</h2>
-        <ul>
-          <li>Rotate the GitHub token every 6–12 months.</li>
-          <li>Weekly backup of <code>stock.csv</code> (export as CSV + commit tag).</li>
-          <li>Quarterly image sweep: compress and remove orphaned assets.</li>
-          <li>Document any endpoint or secret changes in this file (Changelog).</li>
-        </ul>
+      <section id="move-products" class="card">
+        <h2>🔁 Move / duplicate products between drawers</h2>
+        <ol>
+          <li>In <strong>CSV</strong>: copy the row(s) and change only the <strong>drawerCode</strong> and <strong>stockQty</strong> for the new location.</li>
+          <li>Keep the same <strong>productName/productCode/description</strong> to preserve shared info.</li>
+          <li>Commit the change and open both drawers to verify counts and text.</li>
+        </ol>
+        <p class="tip badge">Descriptions and codes are shared: edit once, it updates everywhere that product appears.</p>
+      </section>
+
+      <section id="backup" class="card">
+        <h2>🛟 Backup & Restore CSV</h2>
+        <h3>Backup (weekly)</h3>
+        <ol>
+          <li>Open <code>docs/stock.csv</code> in GitHub → <em>Raw</em> → save locally as <code>stock-YYYY-MM-DD.csv</code>.</li>
+          <li>Optionally create a tag/commit message: <code>backup(stock): YYYY-MM-DD</code>.</li>
+        </ol>
+        <h3>Restore</h3>
+        <ol>
+          <li>Upload the backup file to replace <code>docs/stock.csv</code> (via PR or direct commit).</li>
+          <li>Wait for Pages rebuild and verify a couple of drawers.</li>
+        </ol>
+        <p class="warn badge">Never paste spreadsheet exports that alter separator/encoding. Keep the header exactly as defined.</p>
       </section>
 
       <section id="troubleshooting" class="card">
         <h2>🩺 Troubleshooting</h2>
         <table>
           <tr><th>Issue</th><th>Cause</th><th>Fix</th></tr>
-          <tr><td>401 Unauthorized</td><td>Token missing/expired</td><td>Run <code>wrangler secret put GH_TOKEN</code> with a fresh token</td></tr>
-          <tr><td>CSV not updating</td><td>Wrong <code>drawerCode</code> or invalid header</td><td>Verify header & PK; check API response</td></tr>
-          <tr><td>Worker down</td><td>Suspended account or mis-deploy</td><td>Re-deploy with Wrangler; check Cloudflare logs</td></tr>
-          <tr><td>Page stale</td><td>Cache</td><td>Hard refresh (Ctrl+F5) or bump <code>version.json</code></td></tr>
+          <tr><td>Change not visible</td><td>CDN cache / rebuild delay</td><td>Wait 30–60 s and refresh (Ctrl/Cmd+R). On mobile, close and reopen tab.</td></tr>
+          <tr><td>Description changed elsewhere</td><td>Shared product info</td><td>Expected. Product text is shared across drawers for the same product.</td></tr>
+          <tr><td>Cannot upload photo</td><td>File too large / wrong type</td><td>Use JPG ~1 MB; retry on good Wi-Fi.</td></tr>
+          <tr><td>404 on QR</td><td>Wrong path in QR</td><td>Use <code>A/fitxes/A1_0.html</code> style (see “QR Labels & Paths”).</td></tr>
+          <tr><td>401/403 from API</td><td>Token/permission issue</td><td>Refresh Worker secret <code>GH_TOKEN</code> and re-deploy.</td></tr>
+          <tr><td>CSV not updating</td><td>Header mismatch / wrong drawerCode</td><td>Check header order & exact ID; see API 400/404.</td></tr>
         </table>
+      </section>
+
+      <section id="limits" class="card">
+        <h2>⚠️ Known Limitations</h2>
+        <ul>
+          <li>Edits may take up to ~1 minute to appear for everyone (static hosting rebuild + cache).</li>
+          <li>CSV is single-source of truth: concurrent manual edits in GitHub UI can conflict.</li>
+          <li>Mobile uploads depend on network quality; large photos may be slow.</li>
+        </ul>
+      </section>
+
+      <section id="browser" class="card">
+        <h2>📱 Browser & Mobile tips</h2>
+        <ul>
+          <li>Use latest Chrome/Edge/Safari. Allow popups for Worker auth prompts if any.</li>
+          <li>Add the Main Menu to your phone’s home screen for 1-tap access.</li>
+          <li>When in doubt: refresh after saving.</li>
+        </ul>
+      </section>
+
+      <section id="security" class="card">
+        <h2>🔒 Security & Access</h2>
+        <ul>
+          <li><strong>Token storage:</strong> never hard-coded; Cloudflare secret only.</li>
+          <li><strong>Least privilege:</strong> GitHub token limited to this repo.</li>
+          <li><strong>CORS:</strong> only the production origin can call the API.</li>
+          <li><strong>Audit:</strong> each update is a commit by the Worker identity.</li>
+        </ul>
       </section>
 
       <section id="faq" class="card">
         <h2>❓ FAQ</h2>
-        <h3>Can we add new columns to CSV?</h3>
-        <p>Yes, but the Worker must be updated to preserve column order and validation. Keep backward compatibility by treating new columns as optional.</p>
-        <h3>Can we restrict edits to internal users only?</h3>
-        <p>Yes: add a signed token or session layer on the frontend, and validate in the Worker.</p>
+        <h3>Can we add new CSV columns?</h3>
+        <p>Yes, but update the Worker to keep validation and column order. Treat new columns as optional at first.</p>
+        <h3>Can we restrict edits?</h3>
+        <p>Yes. Add a signed token/session on the frontend and validate it in the Worker.</p>
       </section>
 
       <section id="roadmap" class="card">
         <h2>🗺️ Roadmap</h2>
         <ul>
-          <li>Inline CSV editor dashboard with auth.</li>
-          <li>Audit trail view (who changed what, when).</li>
-          <li>Automated WebP/AVIF optimization pipeline.</li>
-          <li>Integration with Circontrol / NWave data sources.</li>
+          <li>Inline CSV editor dashboard with auth</li>
+          <li>Audit trail view (who/what/when)</li>
+          <li>Automated image optimization (WebP/AVIF)</li>
+          <li>Integrations (Circontrol / NWave)</li>
         </ul>
       </section>
 
       <section id="glossary" class="card">
         <h2>📚 Glossary</h2>
-        <p><strong>DrawerCode</strong>: Unique identifier of a drawer (e.g., <code>C2_CP2_0_I</code>).</p>
-        <p><strong>Worker</strong>: Serverless function hosted on Cloudflare that updates the repo.</p>
+        <p><strong>DrawerCode</strong>: Unique drawer identifier (e.g., <code>A1_0</code>, <code>C2_CP2_0_I</code>).</p>
+        <p><strong>Worker</strong>: Cloudflare serverless function that updates the repo.</p>
         <p><strong>Pages</strong>: GitHub static hosting for the site.</p>
       </section>
 
       <section id="changelog" class="card">
         <h2>📝 Change Log</h2>
         <ul>
-          <li><strong>v1.0</strong> — Initial corporate documentation, fixed sidebar, back-to-menu button, extended technical sections.</li>
+          <li><strong>v1.1</strong> — Added Quick Start, tasks, new drawer guide, QR paths, backup/restore, limitations, and mobile tips.</li>
+          <li><strong>v1.0</strong> — Initial corporate documentation, fixed sidebar, back-to-menu button, technical sections.</li>
         </ul>
       </section>
 
@@ -405,11 +427,10 @@ wrangler secret put GH_TOKEN</code></pre>
         <p>Brisbane, Australia — 2025 · <a href="mailto:ramonpertinezsola@gmail.com">ramonpertinezsola@gmail.com</a></p>
       </section>
 
-      <footer>© 2025 Parcsafe — Internal Technical Documentation · Version 1.0</footer>
+      <footer>© 2025 Parcsafe — Internal Documentation · Version 1.1</footer>
     </main>
   </div>
 
-  <!-- Floating quick back button (extra) -->
   <a class="floating-back" href="index.html" title="Back to Main Menu">Main Menu</a>
 </body>
 </html>
