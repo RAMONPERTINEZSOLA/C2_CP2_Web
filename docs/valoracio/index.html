@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Parcsafe — Project Valuation & Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root{
+      /* Parcsafe brand tweaks */
+      --green:#6dbd45; --green-2:#5aa83a; --ink:#121212; --muted:#667085;
+      --bg:#f5f7f8; --card:#ffffff; --line:#e6e8eb; --danger:#b3261e;
+      --radius:18px; --shadow:0 10px 30px rgba(16,24,40,.08)
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:"Poppins",system-ui,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    a{color:var(--green-2);text-decoration:none}
+    .layout{display:grid;grid-template-columns:300px 1fr;gap:24px;max-width:1280px;margin:0 auto;padding:24px}
+    .sidebar{position:sticky;top:16px;height:calc(100vh - 32px);background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);overflow:auto}
+    .sidebar h2{font-size:18px;margin:0 0 12px 0}
+    .nav{display:flex;flex-direction:column;gap:6px}
+    .nav a{padding:10px 12px;border-radius:10px;color:#111;border:1px solid transparent}
+    .nav a:hover{background:#f3f6f4;border-color:#dbe7d6}
+    .badge{display:inline-flex;align-items:center;gap:6px;background:#eef7ea;color:#2b5b15;border:1px solid #d7eccc;border-radius:999px;font-size:12px;padding:6px 10px}
+    .content{display:flex;flex-direction:column;gap:24px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+    .card h3{margin-top:0}
+    header.hero{background:linear-gradient(180deg,#f6fbf3, #ffffff);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:var(--shadow)}
+    header.hero h1{margin:0 0 8px 0;font-size:28px}
+    header.hero p{margin:4px 0;color:var(--muted)}
+    .brandbar{display:flex;align-items:center;justify-content:space-between;margin:-8px -8px 16px -8px;padding:10px;border-bottom:1px solid var(--line)}
+    .brandbar .left{display:flex;align-items:center;gap:12px}
+    .brand-logo{height:32px;width:auto;object-fit:contain}
+    .back-btn{appearance:none;border:1px solid #cfe6c6;background:#ecf7e9;color:#1b3f0d;padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer}
+    .back-btn:hover{filter:brightness(.98)}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .kpi .k{background:#fbfdf9;border:1px solid #e5f3dc;border-radius:14px;padding:14px}
+    .k .t{color:#2b5b15;font-size:12px}
+    .k .v{font-size:20px;font-weight:600}
+    .two{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    .table{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
+    .table th,.table td{padding:10px 12px;border-bottom:1px solid var(--line)}
+    .table th{background:#f8faf9;font-weight:600;text-align:left}
+    .pill{background:#eef7ea;border:1px solid #d7eccc;color:#2b5b15;border-radius:999px;padding:3px 8px;font-size:12px}
+    .btn{appearance:none;border:1px solid #cfe6c6;background:#ecf7e9;color:#204e0f;padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer}
+    .btn:hover{filter:brightness(.98)}
+    .btn-ghost{background:#fff;border-color:#dfe4ea;color:#222}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .muted{color:var(--muted)}
+    .code{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;overflow:auto;font-size:12.5px}
+    footer{color:#667085;font-size:12px;text-align:center;padding:16px}
+    .sticky-top{position:sticky;top:0;background:white;z-index:10;border-bottom:1px solid var(--line);padding:8px 0;margin:-20px -20px 16px -20px;border-top-left-radius:16px;border-top-right-radius:16px}
+    .callout{background:#fff8e1;border:1px solid #fde7a0;color:#553e02;border-radius:14px;padding:12px 14px}
+    @media(max-width:1024px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.kpi{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brandbar">
+        <div class="left">
+          <!-- Place your logo at docs/assets/parcsafe-logo.png or adjust the path below -->
+          <img src="../assets/parcsafe-logo.png" alt="Parcsafe" class="brand-logo" onerror="this.style.display='none'">
+          <strong>Parcsafe</strong>
+        </div>
+        <!-- Back button to the main menu of racks -->
+        <a href="../index.html" class="back-btn" title="Back to Main Menu">← Back to Main Menu</a>
+      </div>
+      <h2>📑 Index</h2>
+      <nav class="nav">
+        <a href="#summary">1. Executive Summary</a>
+        <a href="#scope">2. Scope and Achievements</a>
+        <a href="#valuation">3. Valuation Methodology</a>
+        <a href="#benchmark">4. Market Benchmark</a>
+        <a href="#infra">5. Infrastructure & Privacy Costs</a>
+        <a href="#maintenance">6. Maintenance Options</a>
+        <a href="#roi">7. ROI and Savings Estimation</a>
+        <a href="#roadmap">8. Roadmap (Simpro Integration)</a>
+        <a href="#risks">9. Risks if Not Scaled</a>
+        <a href="#annex">10. Annex and Editable Data</a>
+      </nav>
+      <div style="margin-top:16px">
+        <span class="badge">v2025 • Interactive Document</span>
+      </div>
+      <div style="margin-top:16px" class="callout">
+        Edit base figures (<em>Annex</em>) and all charts recalculate in real time.
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="hero" id="summary">
+        <h1>Parcsafe Inventory System — Valuation & Roadmap</h1>
+        <p>Author: Ramon Pertíñez Solà • Product Specialist & Site Commissioning</p>
+        <p class="muted">Development period: ~2 months (part-time) • Status: Functional Demo</p>
+        <div class="kpi" style="margin-top:16px">
+          <div class="k"><div class="t">Replacement Cost (Estimate)</div><div class="v" id="kpiCapex">—</div></div>
+          <div class="k"><div class="t">Annual Maintenance Cost (Proposed)</div><div class="v" id="kpiOpex">—</div></div>
+          <div class="k"><div class="t">Estimated Annual Savings</div><div class="v" id="kpiSavings">—</div></div>
+          <div class="k"><div class="t">12‑Month Payback (Est.)</div><div class="v" id="kpiROI">—</div></div>
+        </div>
+      </header>
+
+      <section class="card" id="scope">
+        <div class="sticky-top"><strong>2. Scope and Achievements</strong></div>
+        <div class="two">
+          <div>
+            <h3>What has been built</h3>
+            <ul>
+              <li><strong>Frontend</strong>: rack maps, drawer pages, product cross‑listing, responsive UI.</li>
+              <li><strong>Data layer</strong>: <code>stock.csv</code> with <em>drawerCode, stockQty, productName, productCode, description, minStock</em>.</li>
+              <li><strong>Cloudflare Worker API</strong>: CSV updates, image handling, conflict control (409/422).</li>
+              <li><strong>Automations</strong>: n8n / GitHub Actions for validation and deployment.</li>
+              <li><strong>QR & Labels</strong>: A4 templates with QR codes linking to drawers.</li>
+              <li><strong>Technical docs</strong> and internal usage guides.</li>
+            </ul>
+            <p class="muted">Serverless architecture with low recurring cost and high maintainability.</p>
+          </div>
+          <div>
+            <h3>Architecture (diagram)</h3>
+            <div class="code"><pre><code class="language-mermaid">flowchart LR
+  UI[Web UI (GitHub Pages)] -->|CSV fetch| DATA[stock.csv]
+  UI -->|Edit| API[Cloudflare Worker]
+  API -->|Validate/commit| GH[GitHub Repo]
+  UI --> IMG[Image Repository]
+  GH -->|Actions| DEP[Deploy]
+  EXT[n8n / Integrations] --> API
+</code></pre></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="valuation">
+        <div class="sticky-top"><strong>3. Valuation Methodology</strong></div>
+        <div class="grid-2">
+          <div>
+            <h3>Approaches used</h3>
+            <ol>
+              <li><strong>Replacement Cost (CAPEX)</strong>: current market price to commission the same outcome from a third party.</li>
+              <li><strong>Market Value</strong>: benchmark vs. comparable projects (web + API + automation + docs).</li>
+              <li><strong>Economic Impact</strong>: operational savings and payback.</li>
+            </ol>
+            <p>The combination of these supports the value range <strong id="capexRange">—</strong>.</p>
+          </div>
+          <div>
+            <h3>Breakdown by roles & hours</h3>
+            <table class="table" id="tblHrs">
+              <thead><tr><th>Role</th><th>Task</th><th>Hours</th><th>Rate</th><th>Subtotal</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <canvas id="chartCapex" height="110" style="margin-top:12px"></canvas>
+      </section>
+
+      <section class="card" id="benchmark">
+        <div class="sticky-top"><strong>4. Market Benchmark</strong></div>
+        <p>Indicative ranges for comparable custom builds in EU/AU markets using senior freelancers or small agencies.</p>
+        <table class="table" id="tblBench">
+          <thead><tr><th>Project Type</th><th>Scope</th><th>Market Range (AUD)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="muted">These ranges validate that the current system sits within professional valuations for similar scope.</p>
+      </section>
+
+      <section class="card" id="infra">
+        <div class="sticky-top"><strong>5. Infrastructure & Privacy Costs</strong></div>
+        <div class="grid-2">
+          <div>
+            <h3>Options to make it private</h3>
+            <ul>
+              <li><strong>Private repo + controlled access</strong> (GitHub or similar): per‑user monthly license.</li>
+              <li><strong>Custom domain + private Pages/VPS</strong>: own domain and lightweight server.</li>
+              <li><strong>Authentication</strong> (basic or OAuth) for internal access.</li>
+            </ul>
+            <table class="table" id="tblInfra">
+              <thead><tr><th>Item</th><th>Monthly Cost (AUD)</th><th>Notes</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div>
+            <h3>Estimated Annual OPEX</h3>
+            <canvas id="chartOpex" height="140"></canvas>
+            <p class="muted">Goal: keep costs low and predictable while gaining control and privacy.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="maintenance">
+        <div class="sticky-top"><strong>6. Maintenance Options (proposed)</strong></div>
+        <p>Support packages to guarantee continuity, documentation handover and small evolutions.</p>
+        <div class="grid-2">
+          <div>
+            <table class="table" id="tblRetainers">
+              <thead><tr><th>Plan</th><th>Hours/month</th><th>Rate AUD/h</th><th>Monthly Fee</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <p class="muted">Unused hours can roll over 1 month. Extra hours at the same rate.</p>
+          </div>
+          <div>
+            <canvas id="chartRetainers" height="130"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="roi">
+        <div class="sticky-top"><strong>7. ROI and Savings Estimation</strong></div>
+        <div class="two">
+          <div>
+            <h3>Editable assumptions</h3>
+            <ul>
+              <li>Teams using the tool: <span id="hypTeams">—</span></li>
+              <li>Time saved per operation: <span id="hypMinutes">—</span> min</li>
+              <li>Weekly operations: <span id="hypOps">—</span></li>
+              <li>Average labour cost: <span id="hypWage">—</span> AUD/h</li>
+            </ul>
+            <p>With these, the annual savings are <strong id="roiSavings">—</strong> and the <strong>payback</strong> is <strong id="roiPayback">—</strong>.</p>
+          </div>
+          <div>
+            <canvas id="chartROI" height="130"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="roadmap">
+        <div class="sticky-top"><strong>8. Roadmap</strong></div>
+        <div class="grid-2">
+          <div>
+            <h3>Q1–Q2: Consolidation & Privacy</h3>
+            <ul>
+              <li>Private repo + domain + authentication.</li>
+              <li>Internal admin dashboard and permissions.</li>
+              <li>Data audit and basic monitoring.</li>
+            </ul>
+            <h3>Q2–Q3: Simpro Integration</h3>
+            <ul>
+              <li>Field mapping (stock.csv ↔ Simpro).</li>
+              <li>Connector (pull/push) and error strategy.</li>
+              <li>Pilot on a product subset.</li>
+            </ul>
+            <h3>Q3–Q4: Optimisation & Scale</h3>
+            <ul>
+              <li>Smart alerts (min levels, slow rotation).</li>
+              <li>Usage analytics and product traceability.</li>
+              <li>Advanced labels and assisted picking.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Roadmap diagram</h3>
+            <div class="code"><pre><code class="language-mermaid">gantt
+  title Parcsafe Roadmap
+  dateFormat  YYYY-MM
+  section Consolidation
+  Private & Auth           :a1, 2025-01, 2M
+  Admin Dashboard          :a2, after a1, 2M
+  section Simpro
+  Field mapping            :b1, 2025-04, 1M
+  Connector Pilot          :b2, after b1, 2M
+  Validation & Scale       :b3, after b2, 2M
+  section Optimisation
+  Alerts & Analytics       :c1, 2025-08, 2M
+  Assisted picking         :c2, after c1, 2M
+</code></pre></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="risks">
+        <div class="sticky-top"><strong>9. Risks if Not Scaled</strong></div>
+        <ul>
+          <li><strong>Key‑person dependency</strong> (know‑how not transferred).</li>
+          <li><strong>Public data</strong> with no formal access control.</li>
+          <li><strong>ERP misalignment</strong> (Simpro) and data duplication.</li>
+          <li><strong>Opportunity cost</strong>: missing savings already achievable.</li>
+        </ul>
+      </section>
+
+      <section class="card" id="annex">
+        <div class="sticky-top"><strong>10. Annex and Editable Data</strong></div>
+        <div class="grid-2">
+          <div>
+            <h3>Model variables</h3>
+            <p>Edit the JSON and press “Apply” to recalc tables, KPIs and charts.</p>
+            <textarea id="dataEditor" class="code" rows="26" style="width:100%"></textarea>
+            <div style="margin-top:12px;display:flex;gap:8px">
+              <button class="btn" id="btnApply">Apply</button>
+              <button class="btn btn-ghost" id="btnReset">Reset Defaults</button>
+            </div>
+          </div>
+          <div>
+            <h3>Notes to Management</h3>
+            <ul>
+              <li>Current system is a <strong>functional demo</strong> built in ~2 months part‑time.</li>
+              <li>With <strong>full‑time focus</strong>, scope and value increase significantly (Simpro, auth, dashboard, alerts).</li>
+              <li>A <strong>retainer</strong> is recommended to ensure continuity and knowledge transfer.</li>
+            </ul>
+            <h3>Useful snippet</h3>
+            <div class="code">Indicative Phase‑2 budget (privacy + Simpro + dashboard): 8,000–14,000 AUD depending on scope and integration.</div>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        Parcsafe • Project Valuation • © 2025 — Interactive HTML document
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    mermaid.initialize({startOnLoad:true, theme:'default'});
+
+    const DEFAULT_DATA = {
+      currency: 'AUD',
+      // Replacement cost — roles (hours & rates)
+      capex: {
+        roles: [
+          { role: 'Full‑stack Engineer', task: 'Frontend + Backend', hours: 120, rate: 95 },
+          { role: 'Cloud/DevOps', task: 'Worker, GitHub API, n8n/Actions', hours: 50, rate: 110 },
+          { role: 'UI/UX & Docs', task: 'Interface, manuals & guides', hours: 40, rate: 80 },
+          { role: 'QA & Testing', task: 'Functional tests & hardening', hours: 25, rate: 80 },
+          { role: 'KT & Training', task: 'Knowledge transfer', hours: 10, rate: 100 }
+        ]
+      },
+      // Market benchmark (range by project type)
+      benchmark: [
+        { type: 'Internal web + API + automation', scope: 'Inventory with docs', min: 12000, max: 18000 },
+        { type: 'CRUD app with auth', scope: 'DB and permissions', min: 18000, max: 26000 },
+        { type: 'Limited custom ERP', scope: 'Inventory + reports', min: 25000, max: 40000 }
+      ],
+      // Infrastructure / privacy
+      infra: [
+        { item: 'Private repo (per user)', cost: 8, notes: 'Per‑collaborator/month license' },
+        { item: 'Custom domain', cost: 2, notes: 'Monthly‑averaged cost' },
+        { item: 'VPS or private Pages', cost: 25, notes: 'Lightweight server / platform' }
+      ],
+      // Retainers (maintenance)
+      retainers: [
+        { plan: 'Basic',   hours: 6, rate: 95 },
+        { plan: 'Standard', hours: 12, rate: 90 },
+        { plan: 'Pro',     hours: 24, rate: 85 }
+      ],
+      // ROI assumptions
+      roi: {
+        teams: 4,
+        minutesPerOp: 3,
+        weeklyOps: 180,
+        wagePerHour: 40
+      }
+    };
+
+    const fmt = (n, unit) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n) + (unit? ' ' + unit: '');
+
+    const els = {
+      kpiCapex: document.getElementById('kpiCapex'),
+      kpiOpex: document.getElementById('kpiOpex'),
+      kpiSavings: document.getElementById('kpiSavings'),
+      kpiROI: document.getElementById('kpiROI'),
+      capexRange: document.getElementById('capexRange'),
+      tblHrs: document.querySelector('#tblHrs tbody'),
+      tblBench: document.querySelector('#tblBench tbody'),
+      tblInfra: document.querySelector('#tblInfra tbody'),
+      tblRetainers: document.querySelector('#tblRetainers tbody'),
+      hypTeams: document.getElementById('hypTeams'),
+      hypMinutes: document.getElementById('hypMinutes'),
+      hypOps: document.getElementById('hypOps'),
+      hypWage: document.getElementById('hypWage'),
+      roiSavings: document.getElementById('roiSavings'),
+      roiPayback: document.getElementById('roiPayback'),
+      editor: document.getElementById('dataEditor')
+    };
+
+    let state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+
+    function calcCapex(roles){
+      let subtotals = roles.map(r => ({...r, subtotal: r.hours * r.rate}));
+      const total = subtotals.reduce((a,b)=>a+b.subtotal,0);
+      return { subtotals, total };
+    }
+
+    function calcOpex(retainers){
+      return retainers.map(r => ({...r, fee: r.hours * r.rate}));
+    }
+
+    function calcSavings(roi){
+      const weeklyHours = (roi.weeklyOps * roi.minutesPerOp) / 60;
+      const weeklyCost = weeklyHours * roi.wagePerHour;
+      const annualCost = weeklyCost * 52;
+      return { weeklyHours, annualCost };
+    }
+
+    // Charts
+    let chartCapex, chartOpex, chartRetainers, chartROI;
+
+    function render(){
+      // CAPEX
+      const cap = calcCapex(state.capex.roles);
+      els.tblHrs.innerHTML = cap.subtotals.map(r=>`<tr><td>${r.role}</td><td>${r.task}</td><td>${r.hours}</td><td>${r.rate} ${state.currency}/h</td><td><strong>${fmt(r.subtotal, state.currency)}</strong></td></tr>`).join('');
+      const capMin = Math.round(cap.total * 0.9), capMax = Math.round(cap.total * 1.25);
+      els.kpiCapex.textContent = `${fmt(cap.total, state.currency)}`;
+      document.getElementById('capexRange').textContent = `${fmt(capMin, state.currency)} – ${fmt(capMax, state.currency)}`;
+
+      // Benchmark
+      els.tblBench.innerHTML = state.benchmark.map(b=>`<tr><td>${b.type}</td><td>${b.scope}</td><td>${fmt(b.min, state.currency)} – ${fmt(b.max, state.currency)}</td></tr>`).join('');
+
+      // Infra / OPEX
+      els.tblInfra.innerHTML = state.infra.map(i=>`<tr><td>${i.item}</td><td>${fmt(i.cost, state.currency)}/mo</td><td>${i.notes||''}</td></tr>`).join('');
+      const infraTotal = state.infra.reduce((a,b)=>a+b.cost,0);
+      els.kpiOpex.textContent = `${fmt(infraTotal*12, state.currency)}/yr`;
+
+      // Retainers
+      const rex = calcOpex(state.retainers);
+      els.tblRetainers.innerHTML = rex.map(r=>`<tr><td>${r.plan}</td><td>${r.hours} h</td><td>${r.rate} ${state.currency}/h</td><td><strong>${fmt(r.fee, state.currency)}/mo</strong></td></tr>`).join('');
+
+      // ROI
+      els.hypTeams.textContent   = state.roi.teams;
+      els.hypMinutes.textContent = state.roi.minutesPerOp;
+      els.hypOps.textContent     = state.roi.weeklyOps;
+      els.hypWage.textContent    = state.roi.wagePerHour;
+      const sav = calcSavings(state.roi);
+      els.kpiSavings.textContent = fmt(Math.round(sav.annualCost), state.currency);
+      els.roiSavings.textContent = `${fmt(Math.round(sav.annualCost), state.currency)}/yr`;
+      const paybackMonths = Math.max(1, Math.round((cap.total / (sav.annualCost/12))));
+      els.kpiROI.textContent = `${paybackMonths} months`;
+      els.roiPayback.textContent = `${paybackMonths} months`;
+
+      // Charts re-render
+      const colors = ['#6dbd45','#a8d37e','#c9e7b1','#82c46b','#549c37'];
+
+      if(chartCapex) chartCapex.destroy();
+      chartCapex = new Chart(document.getElementById('chartCapex').getContext('2d'),{
+        type:'bar',
+        data:{ labels: cap.subtotals.map(r=>r.role), datasets:[{label:`CAPEX by role (${state.currency})`, data: cap.subtotals.map(r=>r.subtotal), backgroundColor: colors}] },
+        options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+      });
+
+      if(chartOpex) chartOpex.destroy();
+      chartOpex = new Chart(document.getElementById('chartOpex').getContext('2d'),{
+        type:'doughnut',
+        data:{ labels: state.infra.map(i=>i.item), datasets:[{data: state.infra.map(i=>i.cost*12), backgroundColor: colors}] },
+        options:{plugins:{legend:{position:'bottom'}}}
+      });
+
+      if(chartRetainers) chartRetainers.destroy();
+      chartRetainers = new Chart(document.getElementById('chartRetainers').getContext('2d'),{
+        type:'bar',
+        data:{labels: state.retainers.map(r=>r.plan), datasets:[{label:`Monthly fee (${state.currency})`, data: rex.map(r=>r.fee), backgroundColor: colors}]},
+        options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+      });
+
+      if(chartROI) chartROI.destroy();
+      chartROI = new Chart(document.getElementById('chartROI').getContext('2d'),{
+        type:'line',
+        data:{labels: ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'],
+              datasets:[{label:`Cumulative savings (${state.currency})`, data: Array.from({length:12}, (_,i)=> (sav.annualCost/12)*(i+1) ), fill:false, tension:.2, borderWidth:3}]},
+        options:{plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}}}
+      });
+
+      // Editor JSON
+      els.editor.value = JSON.stringify(state, null, 2);
+    }
+
+    document.getElementById('btnApply').addEventListener('click',()=>{
+      try{
+        const next = JSON.parse(els.editor.value);
+        state = next; render();
+      }catch(e){
+        alert('Invalid JSON: ' + e.message);
+      }
+    });
+    document.getElementById('btnReset').addEventListener('click',()=>{
+      state = JSON.parse(JSON.stringify(DEFAULT_DATA)); render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
