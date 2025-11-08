@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+
   <!-- ALWAYS-ASK PASSWORD GATE (no storage, no hash bypass) -->
   <style id="pw-gate-style">html{visibility:hidden}</style>
   <script>
@@ -9,20 +10,14 @@
     const PASS = "442266";
     const s = document.getElementById("pw-gate-style");
 
-    // Demana la contrasenya sempre que es carrega la pàgina
+    // Always ask on each load
     var attempt = null;
-    try {
-      attempt = window.prompt("Enter password to access this document:");
-    } catch(_) {}
+    try { attempt = window.prompt("Enter password to access this document:"); } catch(_) {}
 
     if (attempt !== PASS) {
-      // Si falla o es cancel·la, redirigeix sense mostrar contingut
       try { location.replace("../index.html"); } catch(_) { location.href = "../index.html"; }
-      // Manté ocult el document
-      return;
+      return; // keep hidden
     }
-
-    // Desbloqueja la pàgina: elimina l'estil que l'oculta
     if (s && s.parentNode) s.parentNode.removeChild(s);
   })();
   </script>
@@ -36,7 +31,6 @@
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     :root{
-      /* Parcsafe brand tweaks */
       --green:#6dbd45; --green-2:#5aa83a; --ink:#121212; --muted:#667085;
       --bg:#f5f7f8; --card:#ffffff; --line:#e6e8eb; --danger:#b3261e;
       --radius:18px; --shadow:0 10px 30px rgba(16,24,40,.08)
@@ -81,6 +75,18 @@
     footer{color:#667085;font-size:12px;text-align:center;padding:16px}
     .sticky-top{position:sticky;top:0;background:white;z-index:10;border-bottom:1px solid var(--line);padding:8px 0;margin:-20px -20px 16px -20px;border-top-left-radius:16px;border-top-right-radius:16px}
     .callout{background:#fff8e1;border:1px solid #fde7a0;color:#553e02;border-radius:14px;padding:12px 14px}
+
+    /* NEW styles for narrative header */
+    .hidden{display:none}
+    .lead-tight{margin-top:6px;color:var(--muted);line-height:1.7}
+    .callout-soft{background:#f7faf7;border:1px solid #e3efdf;border-radius:14px;padding:12px 14px}
+    .refs h4{margin:10px 0 6px}
+    .refs ul{margin:0 0 10px 18px;color:#475467}
+    .refs a{word-break:break-all}
+    .tag{display:inline-block;font-size:12px;padding:4px 8px;border:1px solid #e5e7eb;border-radius:999px;margin-right:6px;color:#475467;background:#fff}
+    .btn-primary{background:var(--green);border-color:#5fb13d;color:#fff}
+    .btn-primary:hover{filter:brightness(.96)}
+
     @media(max-width:1024px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.kpi{grid-template-columns:1fr 1fr}}
   </style>
 </head>
@@ -89,11 +95,9 @@
     <aside class="sidebar">
       <div class="brandbar">
         <div class="left">
-          <!-- Place your logo at docs/assets/parcsafe-logo.png or adjust the path below -->
           <img src="../assets/parcsafe-logo.png" alt="Parcsafe" class="brand-logo" onerror="this.style.display='none'">
           <strong>Parcsafe</strong>
         </div>
-        <!-- Back button to the main menu of racks -->
         <a href="../index.html" class="back-btn" title="Back to Main Menu">← Back to Main Menu</a>
       </div>
       <h2>📑 Index</h2>
@@ -118,15 +122,74 @@
     </aside>
 
     <main class="content">
+      <!-- NEW narrative header with reveal button & references -->
       <header class="hero" id="summary">
-        <h1>Parcsafe Inventory System — Valuation & Roadmap</h1>
-        <p>Author: Ramon Pertíñez Solà • Product Specialist & Site Commissioning</p>
-        <p class="muted">Development period: ~2 months (part-time) • Status: Functional Demo</p>
-        <div class="kpi" style="margin-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div>
+            <h1>Parcsafe Inventory System — Valuation & Roadmap</h1>
+            <p class="lead-tight">Author: Ramon Pertíñez Solà • Product Specialist & Site Commissioning</p>
+            <p class="lead-tight">Development period: ~2 months (part-time) • Status: Functional Demo</p>
+            <div style="margin-top:8px">
+              <span class="tag">Methodology: Replacement Cost</span>
+              <span class="tag">Market Benchmarks (AU/EU)</span>
+              <span class="tag">Economic Impact (ROI)</span>
+            </div>
+          </div>
+          <div>
+            <button id="btnReveal" class="btn btn-primary">Show estimates</button>
+          </div>
+        </div>
+
+        <!-- KPIs hidden until reveal -->
+        <div id="kpiWrap" class="kpi hidden" style="margin-top:16px">
           <div class="k"><div class="t">Replacement Cost (Estimate)</div><div class="v" id="kpiCapex">—</div></div>
           <div class="k"><div class="t">Annual Maintenance Cost (Proposed)</div><div class="v" id="kpiOpex">—</div></div>
           <div class="k"><div class="t">Estimated Annual Savings</div><div class="v" id="kpiSavings">—</div></div>
           <div class="k"><div class="t">12-Month Payback (Est.)</div><div class="v" id="kpiROI">—</div></div>
+        </div>
+
+        <div class="callout-soft" style="margin-top:16px">
+          <strong>How to read this section.</strong> Figures below are not “price tags” but structured indicators:
+          (1) engineering replacement cost, (2) infrastructure & privacy OPEX, (3) market comparables in Australia and Europe,
+          and (4) conservative savings from time reductions in daily ops. All inputs are editable in the <em>Annex</em>.
+        </div>
+
+        <div class="grid-2" style="margin-top:14px">
+          <div>
+            <details open>
+              <summary><strong>1) Replacement Cost (engineering)</strong></summary>
+              <p class="muted">Breakdown by roles and deliverables: frontend (rack maps, drawers, cross-listing), write-API on Cloudflare Worker (CSV patching, image handling, 409/422), automation (n8n/GitHub Actions), QR labels and documentation. Replacement assumes “small agency / senior freelancer” rate cards.</p>
+              <p class="muted">The detailed table and per-role chart live in <em>Valuation Methodology</em> (chapter 3) and are computed from the editable JSON.</p>
+            </details>
+
+            <details>
+              <summary><strong>2) Infrastructure & Privacy (OPEX)</strong></summary>
+              <p class="muted">Paths to make the system private: private repo with controlled access, custom domain, VPS/private Pages and basic/OAuth authentication. Goal: low predictable OPEX without vendor lock-in.</p>
+            </details>
+
+            <details>
+              <summary><strong>3) Market Benchmarks (Australia & Europe)</strong></summary>
+              <p class="muted">Comparable internal tools (web + API + automations + docs) using boutique studios or senior freelancers. Ranges backed by public rate cards and case studies.</p>
+              <div class="refs">
+                <h4>Australia — indicative sources</h4>
+                <ul id="refAU"></ul>
+                <h4>Europe — indicative sources</h4>
+                <ul id="refEU"></ul>
+              </div>
+            </details>
+
+            <details>
+              <summary><strong>4) Economic Impact (ROI)</strong></summary>
+              <p class="muted">Savings estimate uses conservative hypotheses: teams using the tool, minutes saved per operation, weekly operations and average labour cost. Payback shows months to recover theoretical CAPEX.</p>
+            </details>
+          </div>
+
+          <div>
+            <div class="code"><pre><code>Executive takeaway
+• Value = substitutability + maintainability + economic impact, not just build hours.
+• Today’s system is a solid functional demo. Privacy, internal dashboard and Simpro integration scale the value materially.
+• All figures are recalculable in chapter 10 (Annex) by editing the JSON.</code></pre></div>
+          </div>
         </div>
       </header>
 
@@ -338,9 +401,22 @@
   <script>
     mermaid.initialize({startOnLoad:true, theme:'default'});
 
+    /* ---------- References (placeholders; edit URLs/names) ---------- */
+    const REF_SOURCES = {
+      AU: [
+        {name:'Boutique dev studio pricing (AU)', url:'https://example.au/dev-pricing'},
+        {name:'Cloud & serverless benchmarks (AU)', url:'https://example.au/serverless-benchmarks'},
+        {name:'Custom internal web + API case study (AU)', url:'https://example.au/case-internal-web-api'}
+      ],
+      EU: [
+        {name:'EU small-agency rate cards', url:'https://example.eu/agency-rates'},
+        {name:'Serverless workload TCO (EU)', url:'https://example.eu/tco-serverless'},
+        {name:'Inventory tools with QR & CSV (EU case)', url:'https://example.eu/qr-inventory-case'}
+      ]
+    };
+
     const DEFAULT_DATA = {
       currency: 'AUD',
-      // Replacement cost — roles (hours & rates)
       capex: {
         roles: [
           { role: 'Full-stack Engineer', task: 'Frontend + Backend', hours: 120, rate: 95 },
@@ -350,25 +426,21 @@
           { role: 'KT & Training', task: 'Knowledge transfer', hours: 10, rate: 100 }
         ]
       },
-      // Market benchmark (range by project type)
       benchmark: [
         { type: 'Internal web + API + automation', scope: 'Inventory with docs', min: 12000, max: 18000 },
         { type: 'CRUD app with auth', scope: 'DB and permissions', min: 18000, max: 26000 },
         { type: 'Limited custom ERP', scope: 'Inventory + reports', min: 25000, max: 40000 }
       ],
-      // Infrastructure / privacy
       infra: [
         { item: 'Private repo (per user)', cost: 8, notes: 'Per-collaborator/month license' },
         { item: 'Custom domain', cost: 2, notes: 'Monthly-averaged cost' },
         { item: 'VPS or private Pages', cost: 25, notes: 'Lightweight server / platform' }
       ],
-      // Retainers (maintenance)
       retainers: [
-        { plan: 'Basic',   hours: 6, rate: 95 },
+        { plan: 'Basic',    hours: 6,  rate: 95 },
         { plan: 'Standard', hours: 12, rate: 90 },
-        { plan: 'Pro',     hours: 24, rate: 85 }
+        { plan: 'Pro',      hours: 24, rate: 85 }
       ],
-      // ROI assumptions
       roi: {
         teams: 4,
         minutesPerOp: 3,
@@ -399,17 +471,28 @@
     };
 
     let state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    let SHOW_KPIS = false;
+
+    function renderReferences(){
+      const ulAU = document.getElementById('refAU');
+      const ulEU = document.getElementById('refEU');
+      if(ulAU){ ulAU.innerHTML = REF_SOURCES.AU.map(r=>`<li><a href="${r.url}" target="_blank" rel="noopener">${r.name}</a></li>`).join(''); }
+      if(ulEU){ ulEU.innerHTML = REF_SOURCES.EU.map(r=>`<li><a href="${r.url}" target="_blank" rel="noopener">${r.name}</a></li>`).join(''); }
+    }
+    function toggleKPIs(show){
+      const wrap = document.getElementById('kpiWrap');
+      const btn  = document.getElementById('btnReveal');
+      SHOW_KPIS = !!show;
+      if(wrap){ wrap.classList.toggle('hidden', !SHOW_KPIS); }
+      if(btn){ btn.style.display = SHOW_KPIS ? 'none' : 'inline-block'; }
+    }
 
     function calcCapex(roles){
-      let subtotals = roles.map(r => ({...r, subtotal: r.hours * r.rate}));
+      const subtotals = roles.map(r => ({...r, subtotal: r.hours * r.rate}));
       const total = subtotals.reduce((a,b)=>a+b.subtotal,0);
       return { subtotals, total };
     }
-
-    function calcOpex(retainers){
-      return retainers.map(r => ({...r, fee: r.hours * r.rate}));
-    }
-
+    function calcOpex(retainers){ return retainers.map(r => ({...r, fee: r.hours * r.rate})); }
     function calcSavings(roi){
       const weeklyHours = (roi.weeklyOps * roi.minutesPerOp) / 60;
       const weeklyCost = weeklyHours * roi.wagePerHour;
@@ -417,7 +500,6 @@
       return { weeklyHours, annualCost };
     }
 
-    // Charts
     let chartCapex, chartOpex, chartRetainers, chartROI;
 
     function render(){
@@ -425,78 +507,101 @@
       const cap = calcCapex(state.capex.roles);
       els.tblHrs.innerHTML = cap.subtotals.map(r=>`<tr><td>${r.role}</td><td>${r.task}</td><td>${r.hours}</td><td>${r.rate} ${state.currency}/h</td><td><strong>${fmt(r.subtotal, state.currency)}</strong></td></tr>`).join('');
       const capMin = Math.round(cap.total * 0.9), capMax = Math.round(cap.total * 1.25);
-      els.kpiCapex.textContent = `${fmt(cap.total, state.currency)}`;
-      document.getElementById('capexRange').textContent = `${fmt(capMin, state.currency)} – ${fmt(capMax, state.currency)}`;
+      if (document.getElementById('capexRange')) {
+        document.getElementById('capexRange').textContent = `${fmt(capMin, state.currency)} – ${fmt(capMax, state.currency)}`;
+      }
+      if (els.kpiCapex) els.kpiCapex.textContent = `${fmt(cap.total, state.currency)}`;
 
       // Benchmark
-      els.tblBench.innerHTML = state.benchmark.map(b=>`<tr><td>${b.type}</td><td>${b.scope}</td><td>${fmt(b.min, state.currency)} – ${fmt(b.max, state.currency)}</td></tr>`).join('');
+      if (els.tblBench) {
+        els.tblBench.innerHTML = state.benchmark.map(b=>`<tr><td>${b.type}</td><td>${b.scope}</td><td>${fmt(b.min, state.currency)} – ${fmt(b.max, state.currency)}</td></tr>`).join('');
+      }
 
       // Infra / OPEX
-      els.tblInfra.innerHTML = state.infra.map(i=>`<tr><td>${i.item}</td><td>${fmt(i.cost, state.currency)}/mo</td><td>${i.notes||''}</td></tr>`).join('');
+      if (els.tblInfra) {
+        els.tblInfra.innerHTML = state.infra.map(i=>`<tr><td>${i.item}</td><td>${fmt(i.cost, state.currency)}/mo</td><td>${i.notes||''}</td></tr>`).join('');
+      }
       const infraTotal = state.infra.reduce((a,b)=>a+b.cost,0);
-      els.kpiOpex.textContent = `${fmt(infraTotal*12, state.currency)}/yr`;
+      if (els.kpiOpex) els.kpiOpex.textContent = `${fmt(infraTotal*12, state.currency)}/yr`;
 
       // Retainers
       const rex = calcOpex(state.retainers);
-      els.tblRetainers.innerHTML = rex.map(r=>`<tr><td>${r.plan}</td><td>${r.hours} h</td><td>${r.rate} ${state.currency}/h</td><td><strong>${fmt(r.fee, state.currency)}/mo</strong></td></tr>`).join('');
+      if (els.tblRetainers) {
+        els.tblRetainers.innerHTML = rex.map(r=>`<tr><td>${r.plan}</td><td>${r.hours} h</td><td>${r.rate} ${state.currency}/h</td><td><strong>${fmt(r.fee, state.currency)}/mo</strong></td></tr>`).join('');
+      }
 
       // ROI
-      els.hypTeams.textContent   = state.roi.teams;
-      els.hypMinutes.textContent = state.roi.minutesPerOp;
-      els.hypOps.textContent     = state.roi.weeklyOps;
-      els.hypWage.textContent    = state.roi.wagePerHour;
-      const sav = calcSavings(state.roi);
-      els.kpiSavings.textContent = fmt(Math.round(sav.annualCost), state.currency);
-      els.roiSavings.textContent = `${fmt(Math.round(sav.annualCost), state.currency)}/yr`;
-      const paybackMonths = Math.max(1, Math.round((cap.total / (sav.annualCost/12))));
-      els.kpiROI.textContent = `${paybackMonths} months`;
-      els.roiPayback.textContent = `${paybackMonths} months`;
+      if (els.hypTeams)   els.hypTeams.textContent   = state.roi.teams;
+      if (els.hypMinutes) els.hypMinutes.textContent = state.roi.minutesPerOp;
+      if (els.hypOps)     els.hypOps.textContent     = state.roi.weeklyOps;
+      if (els.hypWage)    els.hypWage.textContent    = state.roi.wagePerHour;
 
-      // Charts re-render
+      const sav = calcSavings(state.roi);
+      if (els.kpiSavings) els.kpiSavings.textContent = fmt(Math.round(sav.annualCost), state.currency);
+      if (els.roiSavings) els.roiSavings.textContent = `${fmt(Math.round(sav.annualCost), state.currency)}/yr`;
+      const paybackMonths = Math.max(1, Math.round((cap.total / (sav.annualCost/12))));
+      if (els.kpiROI)     els.kpiROI.textContent     = `${paybackMonths} months`;
+      if (els.roiPayback) els.roiPayback.textContent = `${paybackMonths} months`;
+
+      // Charts
       const colors = ['#6dbd45','#a8d37e','#c9e7b1','#82c46b','#549c37'];
 
-      if(chartCapex) chartCapex.destroy();
-      chartCapex = new Chart(document.getElementById('chartCapex').getContext('2d'),{
-        type:'bar',
-        data:{ labels: cap.subtotals.map(r=>r.role), datasets:[{label:`CAPEX by role (${state.currency})`, data: cap.subtotals.map(r=>r.subtotal), backgroundColor: colors}] },
-        options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
-      });
+      if(document.getElementById('chartCapex')){
+        if(chartCapex) chartCapex.destroy();
+        chartCapex = new Chart(document.getElementById('chartCapex').getContext('2d'),{
+          type:'bar',
+          data:{ labels: cap.subtotals.map(r=>r.role), datasets:[{label:`CAPEX by role (${state.currency})`, data: cap.subtotals.map(r=>r.subtotal), backgroundColor: colors}] },
+          options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+        });
+      }
 
-      if(chartOpex) chartOpex.destroy();
-      chartOpex = new Chart(document.getElementById('chartOpex').getContext('2d'),{
-        type:'doughnut',
-        data:{ labels: state.infra.map(i=>i.item), datasets:[{data: state.infra.map(i=>i.cost*12), backgroundColor: colors}] },
-        options:{plugins:{legend:{position:'bottom'}}}
-      });
+      if(document.getElementById('chartOpex')){
+        if(chartOpex) chartOpex.destroy();
+        chartOpex = new Chart(document.getElementById('chartOpex').getContext('2d'),{
+          type:'doughnut',
+          data:{ labels: state.infra.map(i=>i.item), datasets:[{data: state.infra.map(i=>i.cost*12), backgroundColor: colors}] },
+          options:{plugins:{legend:{position:'bottom'}}}
+        });
+      }
 
-      if(chartRetainers) chartRetainers.destroy();
-      chartRetainers = new Chart(document.getElementById('chartRetainers').getContext('2d'),{
-        type:'bar',
-        data:{labels: state.retainers.map(r=>r.plan), datasets:[{label:`Monthly fee (${state.currency})`, data: rex.map(r=>r.fee), backgroundColor: colors}]},
-        options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
-      });
+      if(document.getElementById('chartRetainers')){
+        if(chartRetainers) chartRetainers.destroy();
+        chartRetainers = new Chart(document.getElementById('chartRetainers').getContext('2d'),{
+          type:'bar',
+          data:{labels: state.retainers.map(r=>r.plan), datasets:[{label:`Monthly fee (${state.currency})`, data: rex.map(r=>r.fee), backgroundColor: colors}]},
+          options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+        });
+      }
 
-      if(chartROI) chartROI.destroy();
-      chartROI = new Chart(document.getElementById('chartROI').getContext('2d'),{
-        type:'line',
-        data:{labels: ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'],
-              datasets:[{label:`Cumulative savings (${state.currency})`, data: Array.from({length:12}, (_,i)=> (sav.annualCost/12)*(i+1) ), fill:false, tension:.2, borderWidth:3}]},
-        options:{plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}}}
-      });
+      if(document.getElementById('chartROI')){
+        if(chartROI) chartROI.destroy();
+        chartROI = new Chart(document.getElementById('chartROI').getContext('2d'),{
+          type:'line',
+          data:{labels: ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'],
+                datasets:[{label:`Cumulative savings (${state.currency})`, data: Array.from({length:12}, (_,i)=> (sav.annualCost/12)*(i+1) ), fill:false, tension:.2, borderWidth:3}]},
+          options:{plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}}}
+        });
+      }
 
       // Editor JSON
-      els.editor.value = JSON.stringify(state, null, 2);
+      if (els.editor) els.editor.value = JSON.stringify(state, null, 2);
+
+      // Paint refs & keep KPI state
+      renderReferences();
+      toggleKPIs(SHOW_KPIS);
     }
 
-    document.getElementById('btnApply').addEventListener('click',()=>{
+    document.addEventListener('click', (e)=>{
+      if(e.target && e.target.id === 'btnReveal'){ toggleKPIs(true); }
+    });
+
+    document.getElementById('btnApply')?.addEventListener('click',()=>{
       try{
         const next = JSON.parse(els.editor.value);
         state = next; render();
-      }catch(e){
-        alert('Invalid JSON: ' + e.message);
-      }
+      }catch(e){ alert('Invalid JSON: ' + e.message); }
     });
-    document.getElementById('btnReset').addEventListener('click',()=>{
+    document.getElementById('btnReset')?.addEventListener('click',()=>{
       state = JSON.parse(JSON.stringify(DEFAULT_DATA)); render();
     });
 
