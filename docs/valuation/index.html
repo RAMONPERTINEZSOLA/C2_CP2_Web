@@ -2,32 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- HARDENED PASSWORD GATE (runs before anything else; prevents content flash) -->
+  <!-- ALWAYS-ASK PASSWORD GATE (no storage, no hash bypass) -->
   <style id="pw-gate-style">html{visibility:hidden}</style>
   <script>
   (function(){
     const PASS = "442266";
-    const KEY  = "parcsafe_val_access";
+    const s = document.getElementById("pw-gate-style");
 
-    // Optional: allow quick demo via hash #442266
-    const fromHash = (location.hash || "").replace(/^#/, "");
-    try { if (fromHash === PASS) sessionStorage.setItem(KEY, PASS); } catch(_) {}
+    // Demana la contrasenya sempre que es carrega la pàgina
+    var attempt = null;
+    try {
+      attempt = window.prompt("Enter password to access this document:");
+    } catch(_) {}
 
-    let ok = false;
-    try { ok = (sessionStorage.getItem(KEY) === PASS); } catch(_) {}
-
-    if (!ok) {
-      const attempt = window.prompt("Enter password to access this document:");
-      if (attempt !== PASS) {
-        // Hard redirect; prevents any partial view
-        location.replace("../index.html");
-        return; // keep html hidden
-      }
-      try { sessionStorage.setItem(KEY, PASS); } catch(_) {}
+    if (attempt !== PASS) {
+      // Si falla o es cancel·la, redirigeix sense mostrar contingut
+      try { location.replace("../index.html"); } catch(_) { location.href = "../index.html"; }
+      // Manté ocult el document
+      return;
     }
 
-    // Unlock the page (remove the temporary CSS that hides the document)
-    const s = document.getElementById("pw-gate-style");
+    // Desbloqueja la pàgina: elimina l'estil que l'oculta
     if (s && s.parentNode) s.parentNode.removeChild(s);
   })();
   </script>
