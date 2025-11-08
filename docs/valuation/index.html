@@ -60,6 +60,29 @@
   </style>
 </head>
 <body>
+  <!-- Password gate -->
+  <script>
+    (function(){
+      const PASSWORD = "442266";
+      try{
+        const ok = sessionStorage.getItem("parcsafe_val_access") === PASSWORD;
+        if(!ok){
+          const attempt = prompt("Enter password to access this document:");
+          if(attempt !== PASSWORD){
+            alert("Access denied. Returning to main menu.");
+            location.href = "../index.html";
+            return;
+          }
+          sessionStorage.setItem("parcsafe_val_access", PASSWORD);
+        }
+      }catch(e){
+        // In case sessionStorage is blocked, still ask once:
+        const attempt = prompt("Enter password to access this document:");
+        if(attempt !== PASSWORD){ location.href = "../index.html"; }
+      }
+    })();
+  </script>
+
   <div class="layout">
     <aside class="sidebar">
       <div class="brandbar">
@@ -101,7 +124,7 @@
           <div class="k"><div class="t">Replacement Cost (Estimate)</div><div class="v" id="kpiCapex">—</div></div>
           <div class="k"><div class="t">Annual Maintenance Cost (Proposed)</div><div class="v" id="kpiOpex">—</div></div>
           <div class="k"><div class="t">Estimated Annual Savings</div><div class="v" id="kpiSavings">—</div></div>
-          <div class="k"><div class="t">12‑Month Payback (Est.)</div><div class="v" id="kpiROI">—</div></div>
+          <div class="k"><div class="t">12-Month Payback (Est.)</div><div class="v" id="kpiROI">—</div></div>
         </div>
       </header>
 
@@ -111,7 +134,7 @@
           <div>
             <h3>What has been built</h3>
             <ul>
-              <li><strong>Frontend</strong>: rack maps, drawer pages, product cross‑listing, responsive UI.</li>
+              <li><strong>Frontend</strong>: rack maps, drawer pages, product cross-listing, responsive UI.</li>
               <li><strong>Data layer</strong>: <code>stock.csv</code> with <em>drawerCode, stockQty, productName, productCode, description, minStock</em>.</li>
               <li><strong>Cloudflare Worker API</strong>: CSV updates, image handling, conflict control (409/422).</li>
               <li><strong>Automations</strong>: n8n / GitHub Actions for validation and deployment.</li>
@@ -173,7 +196,7 @@
           <div>
             <h3>Options to make it private</h3>
             <ul>
-              <li><strong>Private repo + controlled access</strong> (GitHub or similar): per‑user monthly license.</li>
+              <li><strong>Private repo + controlled access</strong> (GitHub or similar): per-user monthly license.</li>
               <li><strong>Custom domain + private Pages/VPS</strong>: own domain and lightweight server.</li>
               <li><strong>Authentication</strong> (basic or OAuth) for internal access.</li>
             </ul>
@@ -272,7 +295,7 @@
       <section class="card" id="risks">
         <div class="sticky-top"><strong>9. Risks if Not Scaled</strong></div>
         <ul>
-          <li><strong>Key‑person dependency</strong> (know‑how not transferred).</li>
+          <li><strong>Key-person dependency</strong> (know-how not transferred).</li>
           <li><strong>Public data</strong> with no formal access control.</li>
           <li><strong>ERP misalignment</strong> (Simpro) and data duplication.</li>
           <li><strong>Opportunity cost</strong>: missing savings already achievable.</li>
@@ -294,12 +317,12 @@
           <div>
             <h3>Notes to Management</h3>
             <ul>
-              <li>Current system is a <strong>functional demo</strong> built in ~2 months part‑time.</li>
-              <li>With <strong>full‑time focus</strong>, scope and value increase significantly (Simpro, auth, dashboard, alerts).</li>
+              <li>Current system is a <strong>functional demo</strong> built in ~2 months part-time.</li>
+              <li>With <strong>full-time focus</strong>, scope and value increase significantly (Simpro, auth, dashboard, alerts).</li>
               <li>A <strong>retainer</strong> is recommended to ensure continuity and knowledge transfer.</li>
             </ul>
             <h3>Useful snippet</h3>
-            <div class="code">Indicative Phase‑2 budget (privacy + Simpro + dashboard): 8,000–14,000 AUD depending on scope and integration.</div>
+            <div class="code">Indicative Phase-2 budget (privacy + Simpro + dashboard): 8,000–14,000 AUD depending on scope and integration.</div>
           </div>
         </div>
       </section>
@@ -318,7 +341,7 @@
       // Replacement cost — roles (hours & rates)
       capex: {
         roles: [
-          { role: 'Full‑stack Engineer', task: 'Frontend + Backend', hours: 120, rate: 95 },
+          { role: 'Full-stack Engineer', task: 'Frontend + Backend', hours: 120, rate: 95 },
           { role: 'Cloud/DevOps', task: 'Worker, GitHub API, n8n/Actions', hours: 50, rate: 110 },
           { role: 'UI/UX & Docs', task: 'Interface, manuals & guides', hours: 40, rate: 80 },
           { role: 'QA & Testing', task: 'Functional tests & hardening', hours: 25, rate: 80 },
@@ -333,8 +356,8 @@
       ],
       // Infrastructure / privacy
       infra: [
-        { item: 'Private repo (per user)', cost: 8, notes: 'Per‑collaborator/month license' },
-        { item: 'Custom domain', cost: 2, notes: 'Monthly‑averaged cost' },
+        { item: 'Private repo (per user)', cost: 8, notes: 'Per-collaborator/month license' },
+        { item: 'Custom domain', cost: 2, notes: 'Monthly-averaged cost' },
         { item: 'VPS or private Pages', cost: 25, notes: 'Lightweight server / platform' }
       ],
       // Retainers (maintenance)
