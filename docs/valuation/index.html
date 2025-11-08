@@ -2,6 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- HARDENED PASSWORD GATE (runs before anything else; prevents content flash) -->
+  <style id="pw-gate-style">html{visibility:hidden}</style>
+  <script>
+  (function(){
+    const PASS = "442266";
+    const KEY  = "parcsafe_val_access";
+
+    // Optional: allow quick demo via hash #442266
+    const fromHash = (location.hash || "").replace(/^#/, "");
+    try { if (fromHash === PASS) sessionStorage.setItem(KEY, PASS); } catch(_) {}
+
+    let ok = false;
+    try { ok = (sessionStorage.getItem(KEY) === PASS); } catch(_) {}
+
+    if (!ok) {
+      const attempt = window.prompt("Enter password to access this document:");
+      if (attempt !== PASS) {
+        // Hard redirect; prevents any partial view
+        location.replace("../index.html");
+        return; // keep html hidden
+      }
+      try { sessionStorage.setItem(KEY, PASS); } catch(_) {}
+    }
+
+    // Unlock the page (remove the temporary CSS that hides the document)
+    const s = document.getElementById("pw-gate-style");
+    if (s && s.parentNode) s.parentNode.removeChild(s);
+  })();
+  </script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Parcsafe — Project Valuation & Roadmap</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,29 +90,6 @@
   </style>
 </head>
 <body>
-  <!-- Password gate -->
-  <script>
-    (function(){
-      const PASSWORD = "442266";
-      try{
-        const ok = sessionStorage.getItem("parcsafe_val_access") === PASSWORD;
-        if(!ok){
-          const attempt = prompt("Enter password to access this document:");
-          if(attempt !== PASSWORD){
-            alert("Access denied. Returning to main menu.");
-            location.href = "../index.html";
-            return;
-          }
-          sessionStorage.setItem("parcsafe_val_access", PASSWORD);
-        }
-      }catch(e){
-        // In case sessionStorage is blocked, still ask once:
-        const attempt = prompt("Enter password to access this document:");
-        if(attempt !== PASSWORD){ location.href = "../index.html"; }
-      }
-    })();
-  </script>
-
   <div class="layout">
     <aside class="sidebar">
       <div class="brandbar">
