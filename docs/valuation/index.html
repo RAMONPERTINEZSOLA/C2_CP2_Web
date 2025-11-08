@@ -2,23 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-
-  <!-- ALWAYS-ASK PASSWORD GATE (no storage, no hash bypass) -->
+  <!-- ALWAYS-ASK PASSWORD GATE (no storage, no bypass) -->
   <style id="pw-gate-style">html{visibility:hidden}</style>
   <script>
   (function(){
-    const PASS = "442266";
-    const s = document.getElementById("pw-gate-style");
-
-    // Always ask on each load
-    var attempt = null;
-    try { attempt = window.prompt("Enter password to access this document:"); } catch(_) {}
-
-    if (attempt !== PASS) {
-      try { location.replace("../index.html"); } catch(_) { location.href = "../index.html"; }
-      return; // keep hidden
+    const PASS="442266";
+    const h=document.getElementById("pw-gate-style");
+    let attempt=null;
+    try{ attempt=prompt("Enter password to access this document:"); }catch(_){}
+    if(attempt!==PASS){
+      try{ location.replace("../index.html"); }catch(_){ location.href="../index.html"; }
+      return;
     }
-    if (s && s.parentNode) s.parentNode.removeChild(s);
+    if(h&&h.parentNode) h.parentNode.removeChild(h);
   })();
   </script>
 
@@ -31,63 +27,78 @@
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     :root{
-      --green:#6dbd45; --green-2:#5aa83a; --ink:#121212; --muted:#667085;
-      --bg:#f5f7f8; --card:#ffffff; --line:#e6e8eb; --danger:#b3261e;
-      --radius:18px; --shadow:0 10px 30px rgba(16,24,40,.08)
+      --green:#6dbd45; --green-2:#5aa83a; --ink:#111827; --muted:#667085;
+      --bg:#f6f8f7; --card:#ffffff; --line:#e6e8eb; --danger:#b3261e;
+      --radius:18px; --shadow:0 10px 28px rgba(16,24,40,.08)
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;font-family:"Poppins",system-ui,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--ink)}
-    a{color:var(--green-2);text-decoration:none}
-    .layout{display:grid;grid-template-columns:300px 1fr;gap:24px;max-width:1280px;margin:0 auto;padding:24px}
-    .sidebar{position:sticky;top:16px;height:calc(100vh - 32px);background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);overflow:auto}
-    .sidebar h2{font-size:18px;margin:0 0 12px 0}
+    body{
+      margin:0; background:var(--bg); color:var(--ink);
+      font-family:"Poppins",system-ui,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      font-size:15.5px; line-height:1.6;
+    }
+    a{color:#22543d;text-decoration:none}
+    .layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;max-width:1280px;margin:0 auto;padding:22px}
+    .sidebar{
+      position:sticky; top:16px; height:calc(100vh - 32px);
+      background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+      padding:16px; box-shadow:var(--shadow); overflow:auto
+    }
+    .brandbar{display:flex;align-items:center;justify-content:space-between;margin:-6px -6px 14px -6px;padding:10px;border-bottom:1px solid var(--line)}
+    .brandbar .left{display:flex;align-items:center;gap:10px}
+    .brand-logo{height:30px;width:auto;object-fit:contain}
+    .back-btn{appearance:none;border:1px solid #cfe6c6;background:#ecf7e9;color:#1b3f0d;padding:10px 12px;border-radius:12px;font-weight:600}
+    .sidebar h2{font-size:18px;margin:8px 0 10px}
     .nav{display:flex;flex-direction:column;gap:6px}
-    .nav a{padding:10px 12px;border-radius:10px;color:#111;border:1px solid transparent}
+    .nav a{padding:9px 10px;border-radius:10px;color:#111;border:1px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .nav a:hover{background:#f3f6f4;border-color:#dbe7d6}
     .badge{display:inline-flex;align-items:center;gap:6px;background:#eef7ea;color:#2b5b15;border:1px solid #d7eccc;border-radius:999px;font-size:12px;padding:6px 10px}
-    .content{display:flex;flex-direction:column;gap:24px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
-    .card h3{margin-top:0}
-    header.hero{background:linear-gradient(180deg,#f6fbf3, #ffffff);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:var(--shadow)}
-    header.hero h1{margin:0 0 8px 0;font-size:28px}
-    header.hero p{margin:4px 0;color:var(--muted)}
-    .brandbar{display:flex;align-items:center;justify-content:space-between;margin:-8px -8px 16px -8px;padding:10px;border-bottom:1px solid var(--line)}
-    .brandbar .left{display:flex;align-items:center;gap:12px}
-    .brand-logo{height:32px;width:auto;object-fit:contain}
-    .back-btn{appearance:none;border:1px solid #cfe6c6;background:#ecf7e9;color:#1b3f0d;padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer}
-    .back-btn:hover{filter:brightness(.98)}
-    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-    .kpi .k{background:#fbfdf9;border:1px solid #e5f3dc;border-radius:14px;padding:14px}
-    .k .t{color:#2b5b15;font-size:12px}
+    .callout{background:#fff8e1;border:1px solid #fde7a0;color:#553e02;border-radius:14px;padding:12px 14px}
+
+    .content{display:flex;flex-direction:column;gap:22px}
+    header.hero{
+      background:linear-gradient(180deg,#f7fbf4,#ffffff);
+      border:1px solid var(--line); border-radius:24px; padding:24px; box-shadow:var(--shadow)
+    }
+    header.hero h1{margin:0 0 6px;font-size:28px}
+    header.hero p{margin:2px 0;color:var(--muted)}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+    .chip{padding:6px 10px;border:1px solid #dfe7d6;border-radius:999px;background:#f3f8f1;font-size:12.5px}
+
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .kpi .k{background:#fbfdf9;border:1px solid #e5f3dc;border-radius:14px;padding:12px}
+    .k .t{color:#2b5b15;font-size:12px;margin-bottom:6px}
     .k .v{font-size:20px;font-weight:600}
-    .two{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+    .sticky-top{position:sticky;top:0;background:white;z-index:10;border-bottom:1px solid var(--line);padding:8px 0;margin:-18px -20px 14px;border-top-left-radius:16px;border-top-right-radius:16px}
+    .muted{color:var(--muted)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     .table{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
     .table th,.table td{padding:10px 12px;border-bottom:1px solid var(--line)}
     .table th{background:#f8faf9;font-weight:600;text-align:left}
-    .pill{background:#eef7ea;border:1px solid #d7eccc;color:#2b5b15;border-radius:999px;padding:3px 8px;font-size:12px}
-    .btn{appearance:none;border:1px solid #cfe6c6;background:#ecf7e9;color:#204e0f;padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer}
-    .btn:hover{filter:brightness(.98)}
-    .btn-ghost{background:#fff;border-color:#dfe4ea;color:#222}
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .muted{color:var(--muted)}
-    .code{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;overflow:auto;font-size:12.5px}
+    .code{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px;font-family:ui-monospace,Menlo,Consolas,monospace;overflow:auto;font-size:12.5px}
+
+    /* Section 1 – readable column layout */
+    .s1{display:grid;grid-template-columns:minmax(320px,1.2fr) minmax(320px,1fr);gap:18px;align-items:start}
+    .note{background:#0f172a;color:#cbd5e1;border-radius:12px;padding:14px}
+    .note strong{color:#fff}
+    details.s1blk{border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+    details.s1blk>summary{cursor:pointer;padding:12px 14px;font-weight:600;list-style:none}
+    details.s1blk[open] summary{border-bottom:1px solid #e5e7eb;background:#f8faf9}
+    details.s1blk .inner{padding:12px 14px}
+    .list-tight li{margin:6px 0}
+
     footer{color:#667085;font-size:12px;text-align:center;padding:16px}
-    .sticky-top{position:sticky;top:0;background:white;z-index:10;border-bottom:1px solid var(--line);padding:8px 0;margin:-20px -20px 16px -20px;border-top-left-radius:16px;border-top-right-radius:16px}
-    .callout{background:#fff8e1;border:1px solid #fde7a0;color:#553e02;border-radius:14px;padding:12px 14px}
 
-    /* NEW styles for narrative header */
-    .hidden{display:none}
-    .lead-tight{margin-top:6px;color:var(--muted);line-height:1.7}
-    .callout-soft{background:#f7faf7;border:1px solid #e3efdf;border-radius:14px;padding:12px 14px}
-    .refs h4{margin:10px 0 6px}
-    .refs ul{margin:0 0 10px 18px;color:#475467}
-    .refs a{word-break:break-all}
-    .tag{display:inline-block;font-size:12px;padding:4px 8px;border:1px solid #e5e7eb;border-radius:999px;margin-right:6px;color:#475467;background:#fff}
-    .btn-primary{background:var(--green);border-color:#5fb13d;color:#fff}
-    .btn-primary:hover{filter:brightness(.96)}
-
-    @media(max-width:1024px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.kpi{grid-template-columns:1fr 1fr}}
+    @media (max-width:1100px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:relative;height:auto}
+      .kpi{grid-template-columns:1fr 1fr}
+      .s1,.grid-2{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
@@ -113,92 +124,67 @@
         <a href="#risks">9. Risks if Not Scaled</a>
         <a href="#annex">10. Annex and Editable Data</a>
       </nav>
-      <div style="margin-top:16px">
-        <span class="badge">v2025 • Interactive Document</span>
-      </div>
-      <div style="margin-top:16px" class="callout">
-        Edit base figures (<em>Annex</em>) and all charts recalculate in real time.
-      </div>
+      <div style="margin-top:12px"><span class="badge">v2025 • Interactive Document</span></div>
+      <div style="margin-top:12px" class="callout">Edit the numbers in <em>Annex</em>. All charts recalculate in real time.</div>
     </aside>
 
     <main class="content">
-      <!-- NEW narrative header with reveal button & references -->
+      <!-- ============== HERO / SECTION 1 ============== -->
       <header class="hero" id="summary">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-          <div>
-            <h1>Parcsafe Inventory System — Valuation & Roadmap</h1>
-            <p class="lead-tight">Author: Ramon Pertíñez Solà • Product Specialist & Site Commissioning</p>
-            <p class="lead-tight">Development period: ~2 months (part-time) • Status: Functional Demo</p>
-            <div style="margin-top:8px">
-              <span class="tag">Methodology: Replacement Cost</span>
-              <span class="tag">Market Benchmarks (AU/EU)</span>
-              <span class="tag">Economic Impact (ROI)</span>
-            </div>
-          </div>
-          <div>
-            <button id="btnReveal" class="btn btn-primary">Show estimates</button>
-          </div>
+        <h1>Parcsafe Inventory System — Valuation & Roadmap</h1>
+        <p>Author: Ramon Pertíñez Solà • Product Specialist & Site Commissioning</p>
+        <p class="muted">Development period: ~2 months (part-time) • Status: Functional Demo</p>
+
+        <div class="chips" aria-label="Methodology">
+          <span class="chip">Methodology: Replacement Cost</span>
+          <span class="chip">Market Benchmarks (AU/EU)</span>
+          <span class="chip">Economic Impact (ROI)</span>
         </div>
 
-        <!-- KPIs hidden until reveal -->
-        <div id="kpiWrap" class="kpi hidden" style="margin-top:16px">
+        <div class="kpi" style="margin-top:8px">
           <div class="k"><div class="t">Replacement Cost (Estimate)</div><div class="v" id="kpiCapex">—</div></div>
           <div class="k"><div class="t">Annual Maintenance Cost (Proposed)</div><div class="v" id="kpiOpex">—</div></div>
           <div class="k"><div class="t">Estimated Annual Savings</div><div class="v" id="kpiSavings">—</div></div>
           <div class="k"><div class="t">12-Month Payback (Est.)</div><div class="v" id="kpiROI">—</div></div>
         </div>
 
-        <div class="callout-soft" style="margin-top:16px">
-          <strong>How to read this section.</strong> Figures below are not “price tags” but structured indicators:
-          (1) engineering replacement cost, (2) infrastructure & privacy OPEX, (3) market comparables in Australia and Europe,
-          and (4) conservative savings from time reductions in daily ops. All inputs are editable in the <em>Annex</em>.
+        <div class="callout" style="margin-top:14px">
+          <strong>How to read this section.</strong> These figures are structured indicators, not “price tags”.
+          They combine: (1) engineering replacement cost, (2) infrastructure & privacy OPEX,
+          (3) market comparables in Australia and Europe, and (4) conservative savings from time reductions in daily ops.
+          All inputs are editable in the <em>Annex</em>.
         </div>
 
-        <div class="grid-2" style="margin-top:14px">
-          <div>
-            <details open>
-              <summary><strong>1) Replacement Cost (engineering)</strong></summary>
-              <p class="muted">Breakdown by roles and deliverables: frontend (rack maps, drawers, cross-listing), write-API on Cloudflare Worker (CSV patching, image handling, 409/422), automation (n8n/GitHub Actions), QR labels and documentation. Replacement assumes “small agency / senior freelancer” rate cards.</p>
-              <p class="muted">The detailed table and per-role chart live in <em>Valuation Methodology</em> (chapter 3) and are computed from the editable JSON.</p>
-            </details>
+        <div class="s1" style="margin-top:16px">
+          <details class="s1blk" open>
+            <summary>▼ 1) Replacement Cost (engineering)</summary>
+            <div class="inner">
+              <p><strong>Breakdown by roles & deliverables.</strong> Frontend (rack maps, drawers, cross-listing, responsive UI);
+              write-API on Cloudflare Worker (CSV patching, image handling, GitHub commits with 409/422 control);
+              automations (n8n / GitHub Actions); QR & labels; internal docs.</p>
+              <table class="table" id="tblHrs">
+                <thead><tr><th>Role</th><th>Task</th><th>Hours</th><th>Rate</th><th>Subtotal</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </details>
 
-            <details>
-              <summary><strong>2) Infrastructure & Privacy (OPEX)</strong></summary>
-              <p class="muted">Paths to make the system private: private repo with controlled access, custom domain, VPS/private Pages and basic/OAuth authentication. Goal: low predictable OPEX without vendor lock-in.</p>
-            </details>
-
-            <details>
-              <summary><strong>3) Market Benchmarks (Australia & Europe)</strong></summary>
-              <p class="muted">Comparable internal tools (web + API + automations + docs) using boutique studios or senior freelancers. Ranges backed by public rate cards and case studies.</p>
-              <div class="refs">
-                <h4>Australia — indicative sources</h4>
-                <ul id="refAU"></ul>
-                <h4>Europe — indicative sources</h4>
-                <ul id="refEU"></ul>
-              </div>
-            </details>
-
-            <details>
-              <summary><strong>4) Economic Impact (ROI)</strong></summary>
-              <p class="muted">Savings estimate uses conservative hypotheses: teams using the tool, minutes saved per operation, weekly operations and average labour cost. Payback shows months to recover theoretical CAPEX.</p>
-            </details>
-          </div>
-
-          <div>
-            <div class="code"><pre><code>Executive takeaway
-• Value = substitutability + maintainability + economic impact, not just build hours.
-• Today’s system is a solid functional demo. Privacy, internal dashboard and Simpro integration scale the value materially.
-• All figures are recalculable in chapter 10 (Annex) by editing the JSON.</code></pre></div>
+          <div class="note">
+            <strong>Executive takeaway</strong><br>
+            • Value = substitutability + maintainability + economic impact, not just build hours.<br>
+            • Today’s system is a solid functional demo. Privacy, admin dashboard and Simpro integration scale the value materially.<br>
+            • All figures are recalculable in chapter 10 (Annex) by editing the JSON.
           </div>
         </div>
       </header>
+      <!-- ============ END SECTION 1 ============ -->
 
       <section class="card" id="scope">
         <div class="sticky-top"><strong>2. Scope and Achievements</strong></div>
-        <div class="two">
+        <div class="grid-2">
           <div>
             <h3>What has been built</h3>
-            <ul>
+            <ul class="list-tight">
               <li><strong>Frontend</strong>: rack maps, drawer pages, product cross-listing, responsive UI.</li>
               <li><strong>Data layer</strong>: <code>stock.csv</code> with <em>drawerCode, stockQty, productName, productCode, description, minStock</em>.</li>
               <li><strong>Cloudflare Worker API</strong>: CSV updates, image handling, conflict control (409/422).</li>
@@ -227,32 +213,30 @@
         <div class="grid-2">
           <div>
             <h3>Approaches used</h3>
-            <ol>
-              <li><strong>Replacement Cost (CAPEX)</strong>: current market price to commission the same outcome from a third party.</li>
-              <li><strong>Market Value</strong>: benchmark vs. comparable projects (web + API + automation + docs).</li>
-              <li><strong>Economic Impact</strong>: operational savings and payback.</li>
+            <ol class="list-tight">
+              <li><strong>Replacement Cost (CAPEX):</strong> current market price to commission the same outcome from a third party.</li>
+              <li><strong>Market Value:</strong> benchmark vs. comparable projects (web + API + automation + docs).</li>
+              <li><strong>Economic Impact:</strong> operational savings and payback.</li>
             </ol>
             <p>The combination of these supports the value range <strong id="capexRange">—</strong>.</p>
           </div>
           <div>
-            <h3>Breakdown by roles & hours</h3>
-            <table class="table" id="tblHrs">
-              <thead><tr><th>Role</th><th>Task</th><th>Hours</th><th>Rate</th><th>Subtotal</th></tr></thead>
-              <tbody></tbody>
-            </table>
+            <canvas id="chartCapex" height="120"></canvas>
           </div>
         </div>
-        <canvas id="chartCapex" height="110" style="margin-top:12px"></canvas>
       </section>
 
       <section class="card" id="benchmark">
         <div class="sticky-top"><strong>4. Market Benchmark</strong></div>
-        <p>Indicative ranges for comparable custom builds in EU/AU markets using senior freelancers or small agencies.</p>
+        <p>Indicative ranges for comparable custom builds in AU/EU markets using senior freelancers or small agencies.</p>
         <table class="table" id="tblBench">
           <thead><tr><th>Project Type</th><th>Scope</th><th>Market Range (AUD)</th></tr></thead>
           <tbody></tbody>
         </table>
-        <p class="muted">These ranges validate that the current system sits within professional valuations for similar scope.</p>
+        <div class="muted" style="font-size:13px">
+          References (examples to justify ranges): AU boutique software studios for internal dashboards and CRUD systems; EU agencies for
+          inventory / ERP-lite builds; serverless/API quotes published by cloud consultancies. Replace with your vendor shortlist as needed.
+        </div>
       </section>
 
       <section class="card" id="infra">
@@ -260,7 +244,7 @@
         <div class="grid-2">
           <div>
             <h3>Options to make it private</h3>
-            <ul>
+            <ul class="list-tight">
               <li><strong>Private repo + controlled access</strong> (GitHub or similar): per-user monthly license.</li>
               <li><strong>Custom domain + private Pages/VPS</strong>: own domain and lightweight server.</li>
               <li><strong>Authentication</strong> (basic or OAuth) for internal access.</li>
@@ -280,7 +264,6 @@
 
       <section class="card" id="maintenance">
         <div class="sticky-top"><strong>6. Maintenance Options (proposed)</strong></div>
-        <p>Support packages to guarantee continuity, documentation handover and small evolutions.</p>
         <div class="grid-2">
           <div>
             <table class="table" id="tblRetainers">
@@ -297,10 +280,10 @@
 
       <section class="card" id="roi">
         <div class="sticky-top"><strong>7. ROI and Savings Estimation</strong></div>
-        <div class="two">
+        <div class="grid-2">
           <div>
             <h3>Editable assumptions</h3>
-            <ul>
+            <ul class="list-tight">
               <li>Teams using the tool: <span id="hypTeams">—</span></li>
               <li>Time saved per operation: <span id="hypMinutes">—</span> min</li>
               <li>Weekly operations: <span id="hypOps">—</span></li>
@@ -308,9 +291,7 @@
             </ul>
             <p>With these, the annual savings are <strong id="roiSavings">—</strong> and the <strong>payback</strong> is <strong id="roiPayback">—</strong>.</p>
           </div>
-          <div>
-            <canvas id="chartROI" height="130"></canvas>
-          </div>
+          <div><canvas id="chartROI" height="130"></canvas></div>
         </div>
       </section>
 
@@ -319,19 +300,19 @@
         <div class="grid-2">
           <div>
             <h3>Q1–Q2: Consolidation & Privacy</h3>
-            <ul>
+            <ul class="list-tight">
               <li>Private repo + domain + authentication.</li>
               <li>Internal admin dashboard and permissions.</li>
               <li>Data audit and basic monitoring.</li>
             </ul>
             <h3>Q2–Q3: Simpro Integration</h3>
-            <ul>
+            <ul class="list-tight">
               <li>Field mapping (stock.csv ↔ Simpro).</li>
               <li>Connector (pull/push) and error strategy.</li>
               <li>Pilot on a product subset.</li>
             </ul>
             <h3>Q3–Q4: Optimisation & Scale</h3>
-            <ul>
+            <ul class="list-tight">
               <li>Smart alerts (min levels, slow rotation).</li>
               <li>Usage analytics and product traceability.</li>
               <li>Advanced labels and assisted picking.</li>
@@ -359,7 +340,7 @@
 
       <section class="card" id="risks">
         <div class="sticky-top"><strong>9. Risks if Not Scaled</strong></div>
-        <ul>
+        <ul class="list-tight">
           <li><strong>Key-person dependency</strong> (know-how not transferred).</li>
           <li><strong>Public data</strong> with no formal access control.</li>
           <li><strong>ERP misalignment</strong> (Simpro) and data duplication.</li>
@@ -375,13 +356,13 @@
             <p>Edit the JSON and press “Apply” to recalc tables, KPIs and charts.</p>
             <textarea id="dataEditor" class="code" rows="26" style="width:100%"></textarea>
             <div style="margin-top:12px;display:flex;gap:8px">
-              <button class="btn" id="btnApply">Apply</button>
-              <button class="btn btn-ghost" id="btnReset">Reset Defaults</button>
+              <button class="badge" id="btnApply" style="cursor:pointer">Apply</button>
+              <button class="badge" id="btnReset" style="cursor:pointer;background:#fff;border-color:#e5e7eb">Reset Defaults</button>
             </div>
           </div>
           <div>
             <h3>Notes to Management</h3>
-            <ul>
+            <ul class="list-tight">
               <li>Current system is a <strong>functional demo</strong> built in ~2 months part-time.</li>
               <li>With <strong>full-time focus</strong>, scope and value increase significantly (Simpro, auth, dashboard, alerts).</li>
               <li>A <strong>retainer</strong> is recommended to ensure continuity and knowledge transfer.</li>
@@ -392,28 +373,12 @@
         </div>
       </section>
 
-      <footer>
-        Parcsafe • Project Valuation • © 2025 — Interactive HTML document
-      </footer>
+      <footer>Parcsafe • Project Valuation • © 2025 — Interactive HTML document</footer>
     </main>
   </div>
 
   <script>
     mermaid.initialize({startOnLoad:true, theme:'default'});
-
-    /* ---------- References (placeholders; edit URLs/names) ---------- */
-    const REF_SOURCES = {
-      AU: [
-        {name:'Boutique dev studio pricing (AU)', url:'https://example.au/dev-pricing'},
-        {name:'Cloud & serverless benchmarks (AU)', url:'https://example.au/serverless-benchmarks'},
-        {name:'Custom internal web + API case study (AU)', url:'https://example.au/case-internal-web-api'}
-      ],
-      EU: [
-        {name:'EU small-agency rate cards', url:'https://example.eu/agency-rates'},
-        {name:'Serverless workload TCO (EU)', url:'https://example.eu/tco-serverless'},
-        {name:'Inventory tools with QR & CSV (EU case)', url:'https://example.eu/qr-inventory-case'}
-      ]
-    };
 
     const DEFAULT_DATA = {
       currency: 'AUD',
@@ -437,16 +402,11 @@
         { item: 'VPS or private Pages', cost: 25, notes: 'Lightweight server / platform' }
       ],
       retainers: [
-        { plan: 'Basic',    hours: 6,  rate: 95 },
-        { plan: 'Standard', hours: 12, rate: 90 },
-        { plan: 'Pro',      hours: 24, rate: 85 }
+        { plan: 'Basic',   hours: 6,  rate: 95 },
+        { plan: 'Standard',hours: 12, rate: 90 },
+        { plan: 'Pro',     hours: 24, rate: 85 }
       ],
-      roi: {
-        teams: 4,
-        minutesPerOp: 3,
-        weeklyOps: 180,
-        wagePerHour: 40
-      }
+      roi: { teams: 4, minutesPerOp: 3, weeklyOps: 180, wagePerHour: 40 }
     };
 
     const fmt = (n, unit) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n) + (unit? ' ' + unit: '');
@@ -471,21 +431,6 @@
     };
 
     let state = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    let SHOW_KPIS = false;
-
-    function renderReferences(){
-      const ulAU = document.getElementById('refAU');
-      const ulEU = document.getElementById('refEU');
-      if(ulAU){ ulAU.innerHTML = REF_SOURCES.AU.map(r=>`<li><a href="${r.url}" target="_blank" rel="noopener">${r.name}</a></li>`).join(''); }
-      if(ulEU){ ulEU.innerHTML = REF_SOURCES.EU.map(r=>`<li><a href="${r.url}" target="_blank" rel="noopener">${r.name}</a></li>`).join(''); }
-    }
-    function toggleKPIs(show){
-      const wrap = document.getElementById('kpiWrap');
-      const btn  = document.getElementById('btnReveal');
-      SHOW_KPIS = !!show;
-      if(wrap){ wrap.classList.toggle('hidden', !SHOW_KPIS); }
-      if(btn){ btn.style.display = SHOW_KPIS ? 'none' : 'inline-block'; }
-    }
 
     function calcCapex(roles){
       const subtotals = roles.map(r => ({...r, subtotal: r.hours * r.rate}));
@@ -495,113 +440,87 @@
     function calcOpex(retainers){ return retainers.map(r => ({...r, fee: r.hours * r.rate})); }
     function calcSavings(roi){
       const weeklyHours = (roi.weeklyOps * roi.minutesPerOp) / 60;
-      const weeklyCost = weeklyHours * roi.wagePerHour;
-      const annualCost = weeklyCost * 52;
+      const weeklyCost  = weeklyHours * roi.wagePerHour;
+      const annualCost  = weeklyCost * 52;
       return { weeklyHours, annualCost };
     }
 
+    // Charts
     let chartCapex, chartOpex, chartRetainers, chartROI;
 
     function render(){
-      // CAPEX
+      // CAPEX table + KPIs
       const cap = calcCapex(state.capex.roles);
       els.tblHrs.innerHTML = cap.subtotals.map(r=>`<tr><td>${r.role}</td><td>${r.task}</td><td>${r.hours}</td><td>${r.rate} ${state.currency}/h</td><td><strong>${fmt(r.subtotal, state.currency)}</strong></td></tr>`).join('');
       const capMin = Math.round(cap.total * 0.9), capMax = Math.round(cap.total * 1.25);
-      if (document.getElementById('capexRange')) {
-        document.getElementById('capexRange').textContent = `${fmt(capMin, state.currency)} – ${fmt(capMax, state.currency)}`;
-      }
-      if (els.kpiCapex) els.kpiCapex.textContent = `${fmt(cap.total, state.currency)}`;
+      els.kpiCapex.textContent = `${fmt(cap.total, state.currency)}`;
+      document.getElementById('capexRange').textContent = `${fmt(capMin, state.currency)} – ${fmt(capMax, state.currency)}`;
 
       // Benchmark
-      if (els.tblBench) {
-        els.tblBench.innerHTML = state.benchmark.map(b=>`<tr><td>${b.type}</td><td>${b.scope}</td><td>${fmt(b.min, state.currency)} – ${fmt(b.max, state.currency)}</td></tr>`).join('');
-      }
+      els.tblBench.innerHTML = state.benchmark.map(b=>`<tr><td>${b.type}</td><td>${b.scope}</td><td>${fmt(b.min, state.currency)} – ${fmt(b.max, state.currency)}</td></tr>`).join('');
 
       // Infra / OPEX
-      if (els.tblInfra) {
-        els.tblInfra.innerHTML = state.infra.map(i=>`<tr><td>${i.item}</td><td>${fmt(i.cost, state.currency)}/mo</td><td>${i.notes||''}</td></tr>`).join('');
-      }
+      els.tblInfra.innerHTML = state.infra.map(i=>`<tr><td>${i.item}</td><td>${fmt(i.cost, state.currency)}/mo</td><td>${i.notes||''}</td></tr>`).join('');
       const infraTotal = state.infra.reduce((a,b)=>a+b.cost,0);
-      if (els.kpiOpex) els.kpiOpex.textContent = `${fmt(infraTotal*12, state.currency)}/yr`;
+      els.kpiOpex.textContent = `${fmt(infraTotal*12, state.currency)}/yr`;
 
       // Retainers
       const rex = calcOpex(state.retainers);
-      if (els.tblRetainers) {
-        els.tblRetainers.innerHTML = rex.map(r=>`<tr><td>${r.plan}</td><td>${r.hours} h</td><td>${r.rate} ${state.currency}/h</td><td><strong>${fmt(r.fee, state.currency)}/mo</strong></td></tr>`).join('');
-      }
+      els.tblRetainers.innerHTML = rex.map(r=>`<tr><td>${r.plan}</td><td>${r.hours} h</td><td>${r.rate} ${state.currency}/h</td><td><strong>${fmt(r.fee, state.currency)}/mo</strong></td></tr>`).join('');
 
       // ROI
-      if (els.hypTeams)   els.hypTeams.textContent   = state.roi.teams;
-      if (els.hypMinutes) els.hypMinutes.textContent = state.roi.minutesPerOp;
-      if (els.hypOps)     els.hypOps.textContent     = state.roi.weeklyOps;
-      if (els.hypWage)    els.hypWage.textContent    = state.roi.wagePerHour;
-
+      els.hypTeams.textContent   = state.roi.teams;
+      els.hypMinutes.textContent = state.roi.minutesPerOp;
+      els.hypOps.textContent     = state.roi.weeklyOps;
+      els.hypWage.textContent    = state.roi.wagePerHour;
       const sav = calcSavings(state.roi);
-      if (els.kpiSavings) els.kpiSavings.textContent = fmt(Math.round(sav.annualCost), state.currency);
-      if (els.roiSavings) els.roiSavings.textContent = `${fmt(Math.round(sav.annualCost), state.currency)}/yr`;
+      els.kpiSavings.textContent = fmt(Math.round(sav.annualCost), state.currency);
+      els.roiSavings.textContent = `${fmt(Math.round(sav.annualCost), state.currency)}/yr`;
       const paybackMonths = Math.max(1, Math.round((cap.total / (sav.annualCost/12))));
-      if (els.kpiROI)     els.kpiROI.textContent     = `${paybackMonths} months`;
-      if (els.roiPayback) els.roiPayback.textContent = `${paybackMonths} months`;
+      els.kpiROI.textContent = `${paybackMonths} months`;
+      els.roiPayback.textContent = `${paybackMonths} months`;
 
       // Charts
-      const colors = ['#6dbd45','#a8d37e','#c9e7b1','#82c46b','#549c37'];
+      const colors = ['#6dbd45','#9fd07a','#c8e7b1','#82c46b','#549c37'];
 
-      if(document.getElementById('chartCapex')){
-        if(chartCapex) chartCapex.destroy();
-        chartCapex = new Chart(document.getElementById('chartCapex').getContext('2d'),{
-          type:'bar',
-          data:{ labels: cap.subtotals.map(r=>r.role), datasets:[{label:`CAPEX by role (${state.currency})`, data: cap.subtotals.map(r=>r.subtotal), backgroundColor: colors}] },
-          options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
-        });
-      }
+      if(chartCapex) chartCapex.destroy();
+      chartCapex = new Chart(document.getElementById('chartCapex').getContext('2d'),{
+        type:'bar',
+        data:{ labels: cap.subtotals.map(r=>r.role), datasets:[{label:`CAPEX by role (${state.currency})`, data: cap.subtotals.map(r=>r.subtotal), backgroundColor: colors}] },
+        options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+      });
 
-      if(document.getElementById('chartOpex')){
-        if(chartOpex) chartOpex.destroy();
-        chartOpex = new Chart(document.getElementById('chartOpex').getContext('2d'),{
-          type:'doughnut',
-          data:{ labels: state.infra.map(i=>i.item), datasets:[{data: state.infra.map(i=>i.cost*12), backgroundColor: colors}] },
-          options:{plugins:{legend:{position:'bottom'}}}
-        });
-      }
+      if(chartOpex) chartOpex.destroy();
+      chartOpex = new Chart(document.getElementById('chartOpex').getContext('2d'),{
+        type:'doughnut',
+        data:{ labels: state.infra.map(i=>i.item), datasets:[{data: state.infra.map(i=>i.cost*12), backgroundColor: colors}] },
+        options:{plugins:{legend:{position:'bottom'}}}
+      });
 
-      if(document.getElementById('chartRetainers')){
-        if(chartRetainers) chartRetainers.destroy();
-        chartRetainers = new Chart(document.getElementById('chartRetainers').getContext('2d'),{
-          type:'bar',
-          data:{labels: state.retainers.map(r=>r.plan), datasets:[{label:`Monthly fee (${state.currency})`, data: rex.map(r=>r.fee), backgroundColor: colors}]},
-          options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
-        });
-      }
+      if(chartRetainers) chartRetainers.destroy();
+      chartRetainers = new Chart(document.getElementById('chartRetainers').getContext('2d'),{
+        type:'bar',
+        data:{labels: state.retainers.map(r=>r.plan), datasets:[{label:`Monthly fee (${state.currency})`, data: rex.map(r=>r.fee), backgroundColor: colors}]},
+        options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+      });
 
-      if(document.getElementById('chartROI')){
-        if(chartROI) chartROI.destroy();
-        chartROI = new Chart(document.getElementById('chartROI').getContext('2d'),{
-          type:'line',
-          data:{labels: ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'],
-                datasets:[{label:`Cumulative savings (${state.currency})`, data: Array.from({length:12}, (_,i)=> (sav.annualCost/12)*(i+1) ), fill:false, tension:.2, borderWidth:3}]},
-          options:{plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}}}
-        });
-      }
+      if(chartROI) chartROI.destroy();
+      chartROI = new Chart(document.getElementById('chartROI').getContext('2d'),{
+        type:'line',
+        data:{labels: Array.from({length:12},(_,i)=>`M${i+1}`),
+              datasets:[{label:`Cumulative savings (${state.currency})`, data: Array.from({length:12}, (_,i)=> (sav.annualCost/12)*(i+1) ), fill:false, tension:.2, borderWidth:3}]},
+        options:{plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}}}
+      });
 
       // Editor JSON
-      if (els.editor) els.editor.value = JSON.stringify(state, null, 2);
-
-      // Paint refs & keep KPI state
-      renderReferences();
-      toggleKPIs(SHOW_KPIS);
+      els.editor.value = JSON.stringify(state, null, 2);
     }
 
-    document.addEventListener('click', (e)=>{
-      if(e.target && e.target.id === 'btnReveal'){ toggleKPIs(true); }
+    document.getElementById('btnApply').addEventListener('click',()=>{
+      try{ state = JSON.parse(els.editor.value); render(); }
+      catch(e){ alert('Invalid JSON: ' + e.message); }
     });
-
-    document.getElementById('btnApply')?.addEventListener('click',()=>{
-      try{
-        const next = JSON.parse(els.editor.value);
-        state = next; render();
-      }catch(e){ alert('Invalid JSON: ' + e.message); }
-    });
-    document.getElementById('btnReset')?.addEventListener('click',()=>{
+    document.getElementById('btnReset').addEventListener('click',()=>{
       state = JSON.parse(JSON.stringify(DEFAULT_DATA)); render();
     });
 
