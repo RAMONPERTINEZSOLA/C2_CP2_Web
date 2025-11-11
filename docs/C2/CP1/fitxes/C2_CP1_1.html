@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>C2_CP1_1 — Sections</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green:#6dbd45; --ink:#222; --muted:#667085;
+      --bg:#f5f7f8; --card:#ffffff; --line:#e6e8eb;
+      --shadow:0 6px 24px rgba(109,189,69,.18); --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0}
+    .container{max-width:1100px;margin:40px auto;padding:0 20px}
+
+    header.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+    .back{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);text-decoration:none;color:var(--ink);font-weight:600}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{height:64px;object-fit:contain}
+
+    h1.title{font-size:26px;margin:10px 0 6px 0;display:flex;align-items:center;gap:10px}
+    .drawer-code{font-size:12px;color:#475467;background:#eef4ff;border:1px solid #d6e4ff;padding:4px 8px;border-radius:999px;font-weight:700;letter-spacing:.3px}
+    .subtitle{color:var(--muted);margin:0 0 14px 0}
+
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    .card h3{margin:0 0 12px 0;font-size:16px}
+    .hint{color:#475467;font-size:13px;margin:6px 2px 12px}
+
+    .imgwrap{border:1px dashed #cdd4d9;background:#fafafa;border-radius:12px;position:relative;overflow:hidden;padding:0}
+    #drawerImg{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;touch-action:manipulation}
+
+    #tooltip{
+      position: fixed; display: none; z-index: 10000;
+      background:#0f1b2f; color:#e8f3ff;
+      border:1px solid #cfe4ff33; border-radius:12px;
+      padding:10px; width:min(320px, 60vw); pointer-events:none;
+      box-shadow:0 12px 32px rgba(0,0,0,.5); text-align:left;
+    }
+    #tooltip strong{font-size:13px}
+    #tooltip img{display:block;margin-top:8px;width:100%;height:auto;border-radius:10px;border:1px solid #ffffff1a;background:#00000050}
+
+    area{cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="bar">
+      <a class="back" href="../index.html">← Back to index</a>
+      <img class="logo" src="../../parcsafe-logo.png" alt="Parcsafe">
+    </header>
+
+    <h1 class="title">Select section <span class="drawer-code">C2_CP1_1</span></h1>
+    <p class="subtitle">Some drawers have multiple compartments. Choose the section to open the final product page.</p>
+
+    <section class="card">
+      <h3>Sections</h3>
+      <p class="hint">Click on the corresponding area. Hover to preview the section.</p>
+
+      <div class="imgwrap">
+        <img id="drawerImg" src="../images/C2_CP1_1.jpg" alt="C2_CP1_1 drawer"
+             usemap="#image-map"
+             onerror="this.onerror=null; this.src='../../images/C2_CP1_1.jpg';" />
+
+        <map name="image-map">
+          <!-- Afegit: href + tooltip handlers a totes les àrees -->
+          <area alt="C2_CP1_1_I_A" title="C2_CP1_1_I_A"
+                href="fitxes/C2_CP1_1_I_A.html"
+                coords="431,1303,474,1028,96,1020,18,1299" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_I_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_I_B" title="C2_CP1_1_I_B"
+                href="fitxes/C2_CP1_1_I_B.html"
+                coords="105,1002,467,1002,501,796,194,789" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_I_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_I_C" title="C2_CP1_1_I_C"
+                href="fitxes/C2_CP1_1_I_C.html"
+                coords="137,760,516,760,550,539,230,546,157,724" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_I_C')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_II_A" title="C2_CP1_1_II_A"
+                href="fitxes/C2_CP1_1_II_A.html"
+                coords="445,1303,850,1308,858,1020,498,1031" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_II_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_II_B" title="C2_CP1_1_II_B"
+                href="fitxes/C2_CP1_1_II_B.html"
+                coords="534,791,867,783,858,997,514,1006" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_II_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_II_C" title="C2_CP1_1_II_C"
+                href="fitxes/C2_CP1_1_II_C.html"
+                coords="541,763,575,543,883,536,870,762" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_II_C')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_III_A" title="C2_CP1_1_III_A"
+                href="fitxes/C2_CP1_1_III_A.html"
+                coords="870,1297,1257,1301,1219,856,892,867" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_III_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_III_B" title="C2_CP1_1_III_B"
+                href="fitxes/C2_CP1_1_III_B.html"
+                coords="892,843,1225,839,1203,546,910,545" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_III_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_IV_A" title="C2_CP1_1_IV_A"
+                href="fitxes/C2_CP1_1_IV_A.html"
+                coords="1285,1303,1686,1306,1594,859,1248,865" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_IV_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_IV_B" title="C2_CP1_1_IV_B"
+                href="fitxes/C2_CP1_1_IV_B.html"
+                coords="1247,841,1594,838,1536,536,1223,541" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_IV_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_V_A" title="C2_CP1_1_V_A"
+                href="fitxes/C2_CP1_1_V_A.html"
+                coords="1711,1306,1621,865,1967,858,2039,1040,2044,1308" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_V_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_1_V_B" title="C2_CP1_1_V_B"
+                href="fitxes/C2_CP1_1_V_B.html"
+                coords="1621,845,1968,830,1873,532,1556,537" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_1_V_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+        </map>
+
+        <!-- Tooltip -->
+        <div id="tooltip">
+          <strong id="tt-code">—</strong>
+          <img id="tt-img" src="" alt="">
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ===== Cache-busting helpers =====
+    function getImgVersion(code){
+      const k = `imgVer_${code}`;
+      const v = localStorage.getItem(k);
+      if (v && /^\d+$/.test(v)) return v;
+      return String(Date.now() % 1e7);
+    }
+    function getThumbSeed(){
+      let s = sessionStorage.getItem('thumbSeed');
+      if (!s) { s = String(Date.now() % 1e7); sessionStorage.setItem('thumbSeed', s); }
+      return s;
+    }
+    function buildThumbCandidates(code){
+      const v = getImgVersion(code);
+      const s = getThumbSeed();
+      const qs = `?v=${encodeURIComponent(v)}&s=${encodeURIComponent(s)}`;
+      return [
+        `img/${code}.jpg${qs}`,
+        `images/${code}.jpg${qs}`,
+        `fitxes/img/${code}.jpg${qs}`,
+        `fitxes/images/${code}.jpg${qs}`,
+        `../img/${code}.jpg${qs}`,
+        `../images/${code}.jpg${qs}`
+      ];
+    }
+    function setImgWithFallback(imgEl, candidates){
+      let i = 0;
+      const tryNext = () => {
+        if (i >= candidates.length) return;
+        imgEl.onerror = () => { i++; tryNext(); };
+        imgEl.src = candidates[i];
+      };
+      tryNext();
+    }
+
+    // ===== Tooltip =====
+    const tt = document.getElementById("tooltip");
+    const ttCode = document.getElementById("tt-code");
+    const ttImg  = document.getElementById("tt-img");
+    let rafId = null, targetX = 0, targetY = 0, curX = 0, curY = 0;
+
+    function showTooltip(evt, code){
+      ttCode.textContent = code;
+      setImgWithFallback(ttImg, buildThumbCandidates(code));
+      targetX = evt.clientX + 16; targetY = evt.clientY + 16;
+      tt.style.display = "block";
+      animateTooltip();
+    }
+    function moveTooltip(evt){ targetX = evt.clientX + 16; targetY = evt.clientY + 16; }
+    function hideTooltip(){ tt.style.display = "none"; if (rafId) cancelAnimationFrame(rafId); rafId = null; }
+    function animateTooltip(){
+      curX += (targetX - curX) * 0.2; curY += (targetY - curY) * 0.2;
+      tt.style.left = curX + "px"; tt.style.top  = curY + "px";
+      rafId = requestAnimationFrame(animateTooltip);
+    }
+
+    // ===== Responsive image-map (RECT i POLY) =====
+    function setupResponsiveMap(imgId, mapName){
+      const img = document.getElementById(imgId);
+      const map = document.querySelector(`map[name="${mapName}"]`);
+      if (!img || !map) return;
+
+      const areas = Array.from(map.querySelectorAll('area'));
+
+      // Desa coords originals tal qual (recte o polígon)
+      areas.forEach(a => {
+        if (!a.dataset.coordsOriginal) a.dataset.coordsOriginal = (a.coords || '');
+      });
+
+      function rescale(){
+        const natW = img.naturalWidth, natH = img.naturalHeight;
+        if (!natW || !natH) return;
+        const curW = img.clientWidth, curH = img.clientHeight;
+        const sx = curW / natW, sy = curH / natH;
+
+        areas.forEach(a => {
+          const orig = (a.dataset.coordsOriginal || '').split(',').map(Number).filter(n => !Number.isNaN(n));
+          if (orig.length < 4) return;
+
+          // RECT (4 números) o POLY (2*N números)
+          const scaled = orig.map((v,i)=> (i%2===0 ? Math.round(v*sx) : Math.round(v*sy)));
+          a.coords = scaled.join(',');
+        });
+      }
+
+      if (img.complete) rescale();
+      img.addEventListener('load', rescale);
+      window.addEventListener('resize', rescale);
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      setupResponsiveMap('drawerImg', 'image-map');
+    });
+  </script>
+</body>
+</html>
