@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>C1_3_III — Parcsafe Drawer</title>
+  <title>C1_3_II — Parcsafe Drawer</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -135,7 +135,7 @@
 
     <h1 class="title">
       Drawer details
-      <span class="drawer-code">C1_3_III</span>
+      <span class="drawer-code">C1_3_II</span>
     </h1>
 
     <div class="meta">
@@ -159,14 +159,14 @@
       <div class="card">
         <h3>Drawer Photo</h3>
         <div class="imgwrap">
-          <img id="drawerImg" src="../images/C1_3_III.jpg" alt="Drawer image C1_3_III"
-               onerror="this.onerror=null; this.src='../../images/C1_3_III.jpg';" />
+          <img id="drawerImg" src="../images/C1_3_II.jpg" alt="Drawer image C1_3_II"
+               onerror="this.onerror=null; this.src='../../images/C1_3_II.jpg';" />
         </div>
         <div class="spacer"></div>
         <div class="row">
           <button class="btn" id="uploadPhotoBtn" type="button">🖼️ Update Drawer Photo</button>
           <button class="btn ghost" id="refreshImgBtn" type="button">Refresh</button>
-          <span class="note">The new image will be renamed to <strong>C1_3_III.jpg</strong> automatically.</span>
+          <span class="note">The new image will be renamed to <strong>C1_3_II.jpg</strong> automatically.</span>
         </div>
         <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display:none" />
       </div>
@@ -175,8 +175,8 @@
         <h3>Cabinet Highlight</h3>
         <div class="imggrid two-cols">
           <figure>
-            <img src="../images/C1_rack_C1_3_III.png" alt="Rack view"
-                 onerror="this.onerror=null; this.src='../../images/C1_rack_C1_3_III.png';">
+            <img src="../images/C1_rack_C1_3_II.png" alt="Rack view"
+                 onerror="this.onerror=null; this.src='../../images/C1_rack_C1_3_II.png';">
           </figure>
         </div>
       </div>
@@ -328,11 +328,11 @@
     }
 
     // --- Constants ---
-    const drawerCode = "C1_3_III";
+    const drawerCode = "C1_3_II";
     const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A/fitxes/C1_3_III.html";
+    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/A/fitxes/C1_3_II.html";
 
     // Sticky mode
     let CHOSEN_MODE = null;
@@ -526,7 +526,7 @@
       // C2_CP2_* → folder C2_CP2
       if (d.startsWith('C2_CP2_')) return `https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/${d}.html`;
 
-      // Captura prefix tipus "C1_3_III" → letters=A, digits=1  → carpeta A
+      // Captura prefix tipus "C1_3_II" → letters=A, digits=1  → carpeta A
       // "C1_5_I" → letters=C, digits=3 → carpeta C1
       const m = d.match(/^([A-Z]+)(\d*)(?:_|$)/);
       if (m){
