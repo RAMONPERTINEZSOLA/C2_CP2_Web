@@ -35,15 +35,11 @@
     .imgwrap{border:1px dashed #cdd4d9;background:#fafafa;border-radius:12px;position:relative;overflow:hidden;padding:0}
     #drawerImg{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;touch-action:manipulation}
 
-    /* Tooltip fix: position:fixed per seguir el cursor */
     #tooltip{
-      position: fixed;
-      display: none;
-      z-index: 10000;
+      position: fixed; display: none; z-index: 10000;
       background:#0f1b2f; color:#e8f3ff;
       border:1px solid #cfe4ff33; border-radius:12px;
-      padding:10px; width:min(320px, 60vw);
-      pointer-events:none;
+      padding:10px; width:min(320px, 60vw); pointer-events:none;
       box-shadow:0 12px 32px rgba(0,0,0,.5); text-align:left;
     }
     #tooltip strong{font-size:13px}
@@ -67,22 +63,61 @@
       <p class="hint">Click on the corresponding area. Hover to preview the section.</p>
 
       <div class="imgwrap">
-        <!-- Base image (natural size known at runtime) -->
         <img id="drawerImg" src="../images/C2_CP1_0.jpg" alt="C2_CP1_0 drawer"
              usemap="#image-map"
              onerror="this.onerror=null; this.src='../../images/C2_CP1_0.jpg';" />
 
         <map name="image-map">
-          <area target="" alt="C2_CP1_0_I_A" title="C2_CP1_0_I_A" href="" coords="0,1321,311,1332,380,972,5,972,4,948,16,1019" shape="poly">
-          <area target="" alt="C2_CP1_0_I_B" title="C2_CP1_0_I_B" href="" coords="7,953,376,939,431,689,89,686" shape="poly">
-          <area target="" alt="C2_CP1_0_I_C" title="C2_CP1_0_I_C" href="" coords="436,664,89,662,143,498,465,501" shape="poly">
-          <area target="" alt="C2_CP1_0_II_A" title="C2_CP1_0_II_A" href="" coords="340,1310,405,973,789,977,765,1324" shape="poly">
-          <area target="" alt="C2_CP1_0_II_B" title="C2_CP1_0_II_B" href="" coords="412,950,794,957,807,693,496,693" shape="poly">
-          <area target="" alt="C2_CP1_0_II_C" title="C2_CP1_0_II_C" href="" coords="469,664,818,668,823,510,494,505" shape="poly">
-          <area target="" alt="C2_CP1_0_III_A" title="C2_CP1_0_III_A" href="" coords="792,1313,1198,1330,1172,695,839,691" shape="poly">
-          <area target="" alt="C2_CP1_0_III_B" title="C2_CP1_0_III_B" href="" coords="839,669,1171,668,1172,505,863,501" shape="poly">
-          <area target="" alt="C2_CP1_0_IV" title="C2_CP1_0_IV" href="" coords="1219,1321,1657,1326,1518,514,1198,516" shape="poly">
-          <area target="" alt="C2_CP1_0_V" title="C2_CP1_0_V" href="" coords="1693,1330,1554,510,1912,516,2044,1015,2044,1348,1956,1348" shape="poly">
+          <!-- Afegit: href + tooltip handlers -->
+          <area alt="C2_CP1_0_I_A" title="C2_CP1_0_I_A"
+                href="fitxes/C2_CP1_0_I_A.html"
+                coords="0,1321,311,1332,380,972,5,972,4,948,16,1019" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_I_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_0_I_B" title="C2_CP1_0_I_B"
+                href="fitxes/C2_CP1_0_I_B.html"
+                coords="7,953,376,939,431,689,89,686" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_I_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_0_I_C" title="C2_CP1_0_I_C"
+                href="fitxes/C2_CP1_0_I_C.html"
+                coords="436,664,89,662,143,498,465,501" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_I_C')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_0_II_A" title="C2_CP1_0_II_A"
+                href="fitxes/C2_CP1_0_II_A.html"
+                coords="340,1310,405,973,789,977,765,1324" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_II_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_0_II_B" title="C2_CP1_0_II_B"
+                href="fitxes/C2_CP1_0_II_B.html"
+                coords="412,950,794,957,807,693,496,693" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_II_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_0_II_C" title="C2_CP1_0_II_C"
+                href="fitxes/C2_CP1_0_II_C.html"
+                coords="469,664,818,668,823,510,494,505" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_II_C')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_0_III_A" title="C2_CP1_0_III_A"
+                href="fitxes/C2_CP1_0_III_A.html"
+                coords="792,1313,1198,1330,1172,695,839,691" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_III_A')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_0_III_B" title="C2_CP1_0_III_B"
+                href="fitxes/C2_CP1_0_III_B.html"
+                coords="839,669,1171,668,1172,505,863,501" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_III_B')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_0_IV" title="C2_CP1_0_IV"
+                href="fitxes/C2_CP1_0_IV.html"
+                coords="1219,1321,1657,1326,1518,514,1198,516" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_IV')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+
+          <area alt="C2_CP1_0_V" title="C2_CP1_0_V"
+                href="fitxes/C2_CP1_0_V.html"
+                coords="1693,1330,1554,510,1912,516,2044,1015,2044,1348,1956,1348" shape="poly"
+                onmouseover="showTooltip(event,'C2_CP1_0_V')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
         </map>
 
         <!-- Tooltip -->
@@ -95,14 +130,12 @@
   </div>
 
   <script>
-    /* ==========================
-       Utils per cache-busting
-       ========================== */
+    // ===== Cache-busting helpers =====
     function getImgVersion(code){
       const k = `imgVer_${code}`;
       const v = localStorage.getItem(k);
       if (v && /^\d+$/.test(v)) return v;
-      return String(Date.now() % 1e7); // fallback curt
+      return String(Date.now() % 1e7);
     }
     function getThumbSeed(){
       let s = sessionStorage.getItem('thumbSeed');
@@ -132,55 +165,28 @@
       tryNext();
     }
 
-    /* ==========================
-       Tooltip (IDs corregits)
-       ========================== */
+    // ===== Tooltip =====
     const tt = document.getElementById("tooltip");
-    const ttCode = document.getElementById("tt-code");  // <-- coincideix amb el DOM
-    const ttImg  = document.getElementById("tt-img");    // <-- coincideix amb el DOM
+    const ttCode = document.getElementById("tt-code");
+    const ttImg  = document.getElementById("tt-img");
     let rafId = null, targetX = 0, targetY = 0, curX = 0, curY = 0;
 
     function showTooltip(evt, code){
       ttCode.textContent = code;
       setImgWithFallback(ttImg, buildThumbCandidates(code));
-      targetX = evt.pageX + 16;
-      targetY = evt.pageY + 16;
+      targetX = evt.clientX + 16; targetY = evt.clientY + 16;
       tt.style.display = "block";
       animateTooltip();
     }
-    function moveTooltip(evt){
-      targetX = evt.pageX + 16;
-      targetY = evt.pageY + 16;
-    }
-    function hideTooltip(){
-      tt.style.display = "none";
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = null;
-    }
+    function moveTooltip(evt){ targetX = evt.clientX + 16; targetY = evt.clientY + 16; }
+    function hideTooltip(){ tt.style.display = "none"; if (rafId) cancelAnimationFrame(rafId); rafId = null; }
     function animateTooltip(){
-      curX += (targetX - curX) * 0.2;
-      curY += (targetY - curY) * 0.2;
-      tt.style.left = curX + "px";
-      tt.style.top  = curY + "px";
+      curX += (targetX - curX) * 0.2; curY += (targetY - curY) * 0.2;
+      tt.style.left = curX + "px"; tt.style.top  = curY + "px";
       rafId = requestAnimationFrame(animateTooltip);
     }
 
-    /* ==========================
-       Image-map responsive & robust
-       - Llegeix data-orig si existeix
-       - Normalitza a left,top,right,bottom
-       - Escala segons naturalWidth/Height
-       ========================== */
-    function normalizeRectCoords(arr){
-      // arr = [x1,y1,x2,y2] en qualsevol ordre → [L,T,R,B]
-      const x1 = Number(arr[0]), y1 = Number(arr[1]), x2 = Number(arr[2]), y2 = Number(arr[3]);
-      const L = Math.min(x1, x2);
-      const T = Math.min(y1, y2);
-      const R = Math.max(x1, x2);
-      const B = Math.max(y1, y2);
-      return [L,T,R,B];
-    }
-
+    // ===== Responsive image-map (RECT i POLY) =====
     function setupResponsiveMap(imgId, mapName){
       const img = document.getElementById(imgId);
       const map = document.querySelector(`map[name="${mapName}"]`);
@@ -188,31 +194,25 @@
 
       const areas = Array.from(map.querySelectorAll('area'));
 
-      // Desa coords originals normalitzades (si hi ha data-orig la fem servir)
+      // Desa coords originals tal qual (recte o polígon)
       areas.forEach(a => {
-        const raw = (a.dataset.orig || a.dataset.coordsOriginal || a.coords || '').split(',').map(Number);
-        if (raw.length === 4 && raw.every(n => !Number.isNaN(n))){
-          const norm = normalizeRectCoords(raw);
-          a.dataset.coordsOriginal = norm.join(',');
-        }
+        if (!a.dataset.coordsOriginal) a.dataset.coordsOriginal = (a.coords || '');
       });
 
       function rescale(){
-        const natW = img.naturalWidth;
-        const natH = img.naturalHeight;
+        const natW = img.naturalWidth, natH = img.naturalHeight;
         if (!natW || !natH) return;
-
-        const curW = img.clientWidth;
-        const curH = img.clientHeight;
-        const scaleX = curW / natW;
-        const scaleY = curH / natH;
+        const curW = img.clientWidth, curH = img.clientHeight;
+        const sx = curW / natW, sy = curH / natH;
 
         areas.forEach(a => {
-          const base = (a.dataset.coordsOriginal || '').split(',').map(Number);
-          if (base.length === 4){
-            const scaled = base.map((v,i)=> (i%2===0 ? Math.round(v*scaleX) : Math.round(v*scaleY)));
-            a.coords = scaled.join(',');
-          }
+          const orig = (a.dataset.coordsOriginal || '').split(',').map(Number).filter(n => !Number.isNaN(n));
+          if (orig.length < 4) return; // res d’escalable
+
+          // RECT: exactament 4 números → [x1,y1,x2,y2]
+          // POLY: 2*N números → [x1,y1,x2,y2,...]
+          const scaled = orig.map((v,i)=> (i%2===0 ? Math.round(v*sx) : Math.round(v*sy)));
+          a.coords = scaled.join(',');
         });
       }
 
@@ -222,7 +222,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', ()=>{
-      // 🔧 ID correcte de la imatge
       setupResponsiveMap('drawerImg', 'image-map');
     });
   </script>
