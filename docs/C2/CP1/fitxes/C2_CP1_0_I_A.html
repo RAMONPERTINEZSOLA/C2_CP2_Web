@@ -338,7 +338,8 @@
     const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/C2_CP1_0_I_A.html";
+    // ✅ Corregit: CP1 (no CP2)
+    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP1/fitxes/C2_CP1_0_I_A.html";
 
     // Sticky mode
     let CHOSEN_MODE = null;
@@ -396,7 +397,11 @@
 
     async function loadCSVFromCandidates() {
       const candidates = [
-        "../../stock.csv","../stock.csv","../../../stock.csv","./stock.csv","/docs/stock.csv",window.location.origin + "/docs/stock.csv",
+        "../../stock.csv","../stock.csv","../../../stock.csv","./stock.csv",
+        // ❗ Afegit: ruta absoluta correcta al repositori de GitHub Pages
+        "https://ramonpertinezsola.github.io/C2_CP2_Web/docs/stock.csv",
+        // Intent relatíu en root (per si es desplega fora de GH Pages)
+        "/docs/stock.csv", window.location.origin + "/docs/stock.csv",
       ];
       for (const url of candidates) {
         try {
@@ -523,6 +528,7 @@
     // --- Map drawerCode → href robust
     function drawerCodeToHref(d){
       if (d.startsWith('C2_CP2_')) return `https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/${d}.html`;
+      if (d.startsWith('C2_CP1_')) return `https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP1/fitxes/${d}.html`; // ✅ Afegit
       const m = d.match(/^([A-Z]+)(\d*)(?:_|$)/);
       if (m){
         const letters = m[1];
@@ -864,7 +870,7 @@
 
       try {
         const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
-        const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
+        const url = `https://stock-api.ramonpertinezsola.github.io/product-duplicates-check?${qs}`;
         const r = await fetch(url);
         if (!r.ok) throw new Error(await r.text());
         const body = await r.json();
@@ -1008,7 +1014,7 @@
 
       try {
         const qs = new URLSearchParams({ productName: name, exclude: drawerCode });
-        const url = `https://stock-api.ramonpertinez.workers.dev/product-duplicates-check?${qs}`;
+        const url = `https://stock-api.ramonpertinezsola.workers.dev/product-duplicates-check?${qs}`;
         const r = await fetch(url);
         if (r.ok) {
           const body = await r.json();
