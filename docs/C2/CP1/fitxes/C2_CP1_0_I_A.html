@@ -324,7 +324,7 @@
   </dialog>
 
   <script>
-     // --- QR lib wait ---
+    // --- QR lib wait ---
     async function ensureQrLib(timeoutMs = 1000) {
       const t0 = performance.now();
       while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
@@ -338,7 +338,34 @@
     const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/C2_CP1_0_I_A.html";
+
+    // ---- Robust path mapping (QR + links) ----
+    function hrefFromDrawer(code) {
+      const up = String(code || '').toUpperCase();
+
+      // C2 series (CP1/CP2)
+      if (up.startsWith('C2_CP1_')) return `C2/CP1/fitxes/${code}.html`;
+      if (up.startsWith('C2_CP2_')) return `C2/CP2/fitxes/${code}.html`;
+
+      // C3
+      if (/^C3_/.test(up)) return `C3/fitxes/${code}.html`;
+
+      // A1, A2, ...
+      if (/^A\d+_/.test(up)) return `A/fitxes/${code}.html`;
+
+      // Other prefixes
+      const m = up.match(/^(C1|C4|C5|D1|D2|E1|E2)_/);
+      if (m) return `${m[1]}/fitxes/${code}.html`;
+
+      // Fallback
+      return `fitxes/${code}.html`;
+    }
+    function buildQrUrl(code) {
+      const base = 'https://ramonpertinezsola.github.io/C2_CP2_Web/';
+      return base + hrefFromDrawer(code);
+    }
+    // Use mapping for QR:
+    const QR_STATIC_VALUE = buildQrUrl(drawerCode);
 
     // Sticky mode
     let CHOSEN_MODE = null;
@@ -434,7 +461,7 @@
       }
       return map;
     }
-    let CODE_NAME_MAP = new Map();  // es recalcula al load
+    let CODE_NAME_MAP = new Map();
     function codeIsAmbiguous(codeLower){
       const set = CODE_NAME_MAP.get(codeLower);
       return !!(set && set.size > 1);
@@ -520,25 +547,17 @@
       return agg;
     }
 
-    // --- Map drawerCode → href robust
+    // --- Map drawerCode → href (ARREGLAT)
     function drawerCodeToHref(d){
-      if (d.startsWith('C2_CP2_')) return `https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/${d}.html`;
-      const m = d.match(/^([A-Z]+)(\d*)(?:_|$)/);
-      if (m){
-        const letters = m[1];
-        const digits  = m[2]||'';
-        if (letters === 'A' || letters === 'B' || letters === 'D' || letters === 'E'){
-          return `https://ramonpertinezsola.github.io/C2_CP2_Web/${letters}/fitxes/${d}.html`;
-        }
-        if (letters === 'C'){
-          const folder = digits ? `C${digits}` : 'C';
-          return `https://ramonpertinezsola.github.io/C2_CP2_Web/${folder}/fitxes/${d}.html`;
-        }
-        const fallback = d.split('_')[0];
-        return `https://ramonpertinezsola.github.io/C2_CP2_Web/${fallback}/fitxes/${d}.html`;
-      }
-      const fb = d.split('_')[0];
-      return `https://ramonpertinezsola.github.io/C2_CP2_Web/${fb}/fitxes/${d}.html`;
+      const up = String(d || '').toUpperCase();
+      if (up.startsWith('C2_CP1_')) return 'https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP1/fitxes/' + d + '.html';
+      if (up.startsWith('C2_CP2_')) return 'https://ramonpertinezsola.github.io/C2_CP2_Web/C2/CP2/fitxes/' + d + '.html';
+      if (/^C3_/.test(up))         return 'https://ramonpertinezsola.github.io/C2_CP2_Web/C3/fitxes/' + d + '.html';
+      if (/^A\d+_/.test(up))       return 'https://ramonpertinezsola.github.io/C2_CP2_Web/A/fitxes/' + d + '.html';
+      const m = up.match(/^(C1|C4|C5|D1|D2|E1|E2)_/);
+      if (m) return 'https://ramonpertinezsola.github.io/C2_CP2_Web/' + m[1] + '/fitxes/' + d + '.html';
+      // fallback
+      return 'https://ramonpertinezsola.github.io/C2_CP2_Web/fitxes/' + d + '.html';
     }
 
     function renderGlobalAndDrawerBadges(agg, currentDrawer){
