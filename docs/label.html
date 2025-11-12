@@ -225,20 +225,13 @@ function generateProductUrl(drawerCode){
   const up = (drawerCode || '').toUpperCase();
 
   // Prefixos amb dues carpetes (afegir-ne més si en tens)
-  const TWO_LEVEL = ['C2_CP2']; // "C2_CP2_…" → "/C2/CP2/fitxes/…"
-  for (const p of TWO_LEVEL) {
-    if (up.startsWith(p + '_')) {
-      const folder = p.replace('_','/');             // "C2/CP2"
-      return `${base}/${folder}/fitxes/${drawerCode}.html`;
-    }
+const TWO_LEVEL = ['C2_CP1', 'C2_CP2']; // "C2_CP1_…" o "C2_CP2_…" → "/C2/CP1/fitxes/…" o "/C2/CP2/fitxes/…"
+for (const p of TWO_LEVEL) {
+  if (up.startsWith(p + '_')) {
+    const folder = p.replace('_','/');             // "C2/CP1" o "C2/CP2"
+    return `${base}/${folder}/fitxes/${drawerCode}.html`;
   }
-  const TWO_LEVEL = ['C2_CP1']; // "C2_CP1_…" → "/C2/CP1/fitxes/…"
-  for (const p of TWO_LEVEL) {
-    if (up.startsWith(p + '_')) {
-      const folder = p.replace('_','/');             // "C2/CP2"
-      return `${base}/${folder}/fitxes/${drawerCode}.html`;
-    }
-  }
+}
 
   // Resta de casos → una sola carpeta
   const prefix = up.split('_')[0];                   // p.ex. "A1", "C3", "D2"…
