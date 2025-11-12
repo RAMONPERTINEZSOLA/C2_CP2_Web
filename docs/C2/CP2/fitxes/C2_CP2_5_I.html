@@ -330,7 +330,34 @@
     const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
     const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
     const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
-    const QR_STATIC_VALUE      = "https://ramonpertinezsola.github.io/C2_CP2_Web/C2_CP2/fitxes/C2_CP2_5_I.html";
+    // --- QR logic (universal path) ---
+function hrefFromDrawer(code) {
+  const up = String(code || '').toUpperCase();
+
+  // C2 sèries
+  if (up.startsWith('C2_CP1_')) return `C2/CP1/fitxes/${code}.html`;
+  if (up.startsWith('C2_CP2_')) return `C2/CP2/fitxes/${code}.html`;
+
+  // C3
+  if (/^C3_/.test(up)) return `C3/fitxes/${code}.html`;
+
+  // A1, A2, ...
+  if (/^A\d+_/.test(up)) return `A/fitxes/${code}.html`;
+
+  // Altres prefixos (C1, C4, C5, D1, D2, E1, E2...)
+  const m = up.match(/^(C1|C4|C5|D1|D2|E1|E2)_/);
+  if (m) return `${m[1]}/fitxes/${code}.html`;
+
+  // Fallback
+  return `fitxes/${code}.html`;
+}
+
+function buildQrUrl(drawerCode) {
+  return `https://ramonpertinezsola.github.io/C2_CP2_Web/` + hrefFromDrawer(drawerCode);
+}
+
+const QR_STATIC_VALUE = buildQrUrl(drawerCode);
+
 
     // Sticky mode
     let CHOSEN_MODE = null;
