@@ -183,7 +183,7 @@ C3_2_VI_B,21,0,20.03-ENT-----10,0,10
 C3_2_VI_C,21, Powder Coated Steel – ENTA Turnstar Gate Arm,20.03-ENT-PCS-10,Support arm from ENTA (Turnstar); typically used in gate or turnstile mechanisms. Constructed from durable powder-coated steel with elongated slot for adjustable mounting. Designed for robust performance in access control systems.,10
 C3_3_I_A,21,how,ccccc,hey mate,10
 C3_3_I_B,21,SBL106TUR Logic Controller,20.03-ENT-SLC-10,SBL106TUR Logic Controller,10
-C3_3_I_C,21,Power Supply 220-110V,20.03-ENT-PSA-10,Power Supply 220-110V,10
+C3_3_I_C,21,ENTA 24v Power Supply with Battery Backup,20.03-ENT-PSA-10,ENTA 24v Power Supply with Battery Backup = Power Supply 220-110V,10
 C3_3_II_A,21,0,20.03-ENT-----10,0,10
 C3_3_II_B,21, 3-Wire Twisted Cable for Flexible LED – Signal Connector,20.03-ENT-3TC-10,Three-core twisted cable (red; white; green) with 3-pin connector; designed for signal transmission to flexible LED modules. The twisted wires reduce interference; ensuring stable LED performance and precise control.,10
 C3_3_II_C,21,0,20.03-ENT-----10,0,10
