@@ -15,7 +15,7 @@ A3_2,21,Boom Gate BL227 4m Grey + Enta Boom Gate Spikemotor + SPIKES 1m,--,Boom 
 A3_3,21,TurnStyle Tripod,--,TurnStyle Tripod,10
 A3_4,9,--,--,--,10
 A4_0,21,Protection Bollard Yellow + Protection Bollard Grey,--,Protection Bollard Yellow + Protection Bollard Grey,10
-A4_1,21,Access Bollard cross Yellow + Standar Hood + Large Hood,--,Access Bollard cross Yellow + Standar Hood:Car Gooseneck Security Column  + Large Hood: Car and Truck Gooseneck Security Column,10
+A4_1,21,Access Bollard cross Yellow + Standar Hood + Large Hood,--,Access Bollard cross Yellow = Car Gooseneck Security Column + Standar Hood = Standard Rain Hood  + Large Hood = Wide Rain Hood,10
 A4_2,21,Access Bollard Dual Yellow,--,Access Bollard Dual Yellow,10
 A4_3,21,Enta Boom Gate 6m Blue,--,Enta Boom Gate 6m Blue,10
 A4_4,21,TurnStyle Tripod,--,TurnStyle Tripod,10
