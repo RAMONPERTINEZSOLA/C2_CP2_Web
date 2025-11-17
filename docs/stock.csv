@@ -195,7 +195,7 @@ C3_3_IV_B,21,VAUTEX VS7A-12,20.03-ENT-VVS-10,12V 7Ah sealed rechargeable lead-ac
 C3_3_V_A,21,Motor 24 BLDC 100W,20.03-ENT-M2B-10,Motor 24 BLDC 100W,10
 C3_3_V_B,600,Power Switch ON - OFF,20.03-ENT-PSO-10,Power Switch ON - OFF,10
 C3_3_V_C,21,Switch Plate,20.03-ENT-SPL-10,Switch Plate,10
-C3_3_VI,21,0,20.03-ENT-----10,0,10
+C3_3_VI,21,Pendulum Leg - Turnstar,20.03-ENT-----10,Pendulum Leg - Turnstar,10
 C3_4_I,55555,0,#SPILL!,0,10
 C3_4_II,21,how,ccccc,hey mate,10
 C3_5_I,21,0,#SPILL!,0,10
