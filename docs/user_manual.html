@@ -232,7 +232,7 @@
       margin-top:-1px;
     }
 
-    /* NEW HERO ILLUSTRATION WITH TWO IMAGES ******************************/
+    /* HERO ILLUSTRATION (TWO IMAGES) ************************************/
     .hero-illustration{
       display:flex;
       flex-direction:column;
@@ -251,7 +251,7 @@
       box-shadow:0 18px 36px rgba(15,23,42,.45);
     }
 
-    /* (styles below from old hero remain unused but harmless, you can delete if you want) */
+    /* Old hero pieces (kept harmless) ***********************************/
     .hero-badge{
       display:inline-flex;
       align-items:center;
@@ -564,6 +564,26 @@
       margin:16px 0 0;
     }
 
+    /* SECTION ILLUSTRATIONS **********************************************/
+    .section-illustration{
+      margin-top:12px;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid var(--border);
+      background:linear-gradient(135deg,rgba(15,23,42,.02),rgba(148,163,184,.08));
+      box-shadow:0 8px 20px rgba(15,23,42,.10);
+    }
+    .section-illustration img{
+      display:block;
+      width:100%;
+      height:auto;
+    }
+    .section-illustration-caption{
+      padding:6px 10px 8px;
+      font-size:11px;
+      color:var(--muted);
+    }
+
     /* THEME SWITCHER *****************************************************/
     .theme-switcher{
       margin-top:18px;
@@ -767,6 +787,13 @@
             When you update something, everyone else will see it the next time they open the page.
           </span>
         </div>
+
+        <div class="section-illustration">
+          <img src="assets/user-manual/stock-overview.png" alt="Overview of warehouse stock on screen" />
+          <div class="section-illustration-caption">
+            Visual overview of the digital stock view for all racks and drawers.
+          </div>
+        </div>
       </section>
 
       <!-- 2. ACCESS -->
@@ -789,30 +816,23 @@
               <li>Use <span class="kbd">Share</span> → <span class="kbd">Add to Home Screen</span>.</li>
               <li>A new icon will appear, just like an app.</li>
             </ul>
-          </div>
-          <div class="screenshot-card">
-            <div class="screenshot-window">
-              <div class="screenshot-toolbar">
-                <div class="dot"></div>
-                <div class="dot yellow"></div>
-                <div class="dot green"></div>
-              </div>
-              <div class="screenshot-body">
-                <div class="screenshot-qr"></div>
-              </div>
-            </div>
-            <div>
-              Example visual: the site opened on a phone, with a QR label pointing to a specific drawer page.
-            </div>
-          </div>
-        </div>
 
-        <div class="callout warn">
-          <span class="icon">🚫</span>
-          <span>
-            Do not share the link outside the company without permission.  
-            The data is internal and meant only for the Parcsafe team.
-          </span>
+            <div class="callout warn">
+              <span class="icon">🚫</span>
+              <span>
+                Do not share the link outside the company without permission.  
+                The data is internal and meant only for the Parcsafe team.
+              </span>
+            </div>
+          </div>
+          <div>
+            <div class="section-illustration">
+              <img src="assets/user-manual/access-devices.png" alt="Accessing the warehouse site from different devices" />
+              <div class="section-illustration-caption">
+                The same warehouse site can be used from your PC, tablet or phone.
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -840,12 +860,12 @@
             </div>
           </div>
           <div>
-            <div class="mini-title">Quick example</div>
-            <ul class="list">
-              <li>You need a spare part stored in <strong>rack A</strong> → open <strong>Rack A</strong>.</li>
-              <li>You know the drawer code is <strong>A1_0</strong> → click on <strong>A1_0</strong>.</li>
-              <li>The drawer page opens with quantities, descriptions and a photo.</li>
-            </ul>
+            <div class="section-illustration">
+              <img src="assets/user-manual/main-menu-racks.png" alt="Main Menu with different racks to choose from" />
+              <div class="section-illustration-caption">
+                Example: selecting Rack A or Rack C2-CP2 from the Main Menu.
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -876,19 +896,12 @@
               <li>A <strong>Save</strong> button (or equivalent) to confirm your changes.</li>
             </ul>
           </div>
-          <div class="screenshot-card">
-            <div class="screenshot-window">
-              <div class="screenshot-toolbar">
-                <div class="dot"></div>
-                <div class="dot yellow"></div>
-                <div class="dot green"></div>
+          <div>
+            <div class="section-illustration">
+              <img src="assets/user-manual/drawer-page.png" alt="Drawer page layout with table and photo" />
+              <div class="section-illustration-caption">
+                Typical drawer page: product table on the left, photo of the real drawer on the right.
               </div>
-              <div class="screenshot-body">
-                <!-- abstract representation of a drawer table -->
-              </div>
-            </div>
-            <div>
-              Visual example: a drawer page with a table of products on the left and a photo of the drawer on the right.
             </div>
           </div>
         </div>
@@ -909,29 +922,41 @@
           The most common action is to update the <strong>quantity</strong> of a product after taking items from the drawer or adding new ones.
         </p>
 
-        <ol class="steps">
-          <li>Open the correct <strong>drawer page</strong>.</li>
-          <li>Find the row of the product you have used or added.</li>
-          <li>Click on the <strong>quantity</strong> field.</li>
-          <li>Type the new quantity (only numbers, no spaces).</li>
-          <li>Click <strong>Save</strong> at the bottom or top of the table.</li>
-          <li>Wait a few seconds and refresh the page once to confirm the change.</li>
-        </ol>
+        <div class="two-col">
+          <div>
+            <ol class="steps">
+              <li>Open the correct <strong>drawer page</strong>.</li>
+              <li>Find the row of the product you have used or added.</li>
+              <li>Click on the <strong>quantity</strong> field.</li>
+              <li>Type the new quantity (only numbers, no spaces).</li>
+              <li>Click <strong>Save</strong> at the bottom or top of the table.</li>
+              <li>Wait a few seconds and refresh the page once to confirm the change.</li>
+            </ol>
 
-        <div class="callout tip">
-          <span class="icon">🔁</span>
-          <span>
-            Habit to remember: <strong>Update → Save → Refresh once</strong>.  
-            This keeps the screen in sync with what everyone else will see.
-          </span>
-        </div>
+            <div class="callout tip">
+              <span class="icon">🔁</span>
+              <span>
+                Habit to remember: <strong>Update → Save → Refresh once</strong>.  
+                This keeps the screen in sync with what everyone else will see.
+              </span>
+            </div>
 
-        <div class="callout warn">
-          <span class="icon">⚠️</span>
-          <span>
-            Avoid using negative numbers or text in the quantity fields.  
-            If you are not sure about the correct number, leave the value as it is and ask a supervisor.
-          </span>
+            <div class="callout warn">
+              <span class="icon">⚠️</span>
+              <span>
+                Avoid using negative numbers or text in the quantity fields.  
+                If you are not sure about the correct number, leave the value as it is and ask a supervisor.
+              </span>
+            </div>
+          </div>
+          <div>
+            <div class="section-illustration">
+              <img src="assets/user-manual/update-quantities.png" alt="User updating a quantity value on screen" />
+              <div class="section-illustration-caption">
+                Updating a quantity field for a product in the drawer table.
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -954,6 +979,15 @@
               These fields are often <strong>shared between drawers</strong>.  
               If the same product appears in different drawers, updating the text here can update it for all locations.
             </p>
+
+            <div class="callout warn">
+              <span class="icon">🧠</span>
+              <span>
+                Before changing a product description, think:  
+                <strong>“Will this text still make sense for everyone else?”</strong>  
+                Try to keep wording consistent and simple.
+              </span>
+            </div>
           </div>
           <div>
             <div class="mini-title">How to edit safely</div>
@@ -964,16 +998,14 @@
               <li>Click <strong>Save</strong>.</li>
               <li>Refresh the page to confirm the change.</li>
             </ol>
-          </div>
-        </div>
 
-        <div class="callout warn">
-          <span class="icon">🧠</span>
-          <span>
-            Before changing a product description, think:  
-            <strong>“Will this text still make sense for everyone else?”</strong>  
-            Try to keep wording consistent and simple.
-          </span>
+            <div class="section-illustration">
+              <img src="assets/user-manual/edit-product-info.png" alt="Editing product name and description fields" />
+              <div class="section-illustration-caption">
+                Example of editing name, code and description for a product.
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1008,10 +1040,17 @@
               <li>Take the picture from the front, so all products are visible.</li>
               <li>Do not photograph confidential documents or screens.</li>
             </ul>
+
+            <div class="section-illustration">
+              <img src="assets/user-manual/upload-photo.png" alt="Taking a photo of the drawer and uploading it" />
+              <div class="section-illustration-caption">
+                Use clear photos taken from the front to help everyone recognise the drawer.
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="callout.warn">
+        <div class="callout warn">
           <span class="icon">🚫</span>
           <span>
             If the photo upload fails, do not try again many times in a row.  
@@ -1037,23 +1076,23 @@
               <li>Tap the notification or link that appears.</li>
               <li>The drawer page will open in your browser.</li>
             </ol>
+
+            <div class="callout tip">
+              <span class="icon">📱</span>
+              <span>
+                Using the QR labels is often <strong>the fastest way</strong> to open the correct page.  
+                It avoids typing the wrong rack or drawer code.
+              </span>
+            </div>
           </div>
           <div>
-            <div class="mini-title">If a QR doesn’t work</div>
-            <ul class="list">
-              <li>Check that your phone has internet connection.</li>
-              <li>Check that the link is complete and not cut or damaged on the sticker.</li>
-              <li>If the page shows “not found”, note the drawer code and inform a supervisor.</li>
-            </ul>
+            <div class="section-illustration">
+              <img src="assets/user-manual/use-qr-labels.png" alt="Scanning a QR label on a drawer with a phone" />
+              <div class="section-illustration-caption">
+                Scan the QR on the drawer to jump directly to the right page.
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div class="callout tip">
-          <span class="icon">📱</span>
-          <span>
-            Using the QR labels is often <strong>the fastest way</strong> to open the correct page.  
-            It avoids typing the wrong rack or drawer code.
-          </span>
         </div>
       </section>
 
@@ -1082,6 +1121,13 @@
             <span>Check you are on the <strong>correct drawer code</strong> before changing anything.</span>
           </li>
         </ul>
+
+        <div class="section-illustration">
+          <img src="assets/user-manual/good-habits.png" alt="Icons representing good habits when updating stock" />
+          <div class="section-illustration-caption">
+            Simple habits (update, save, refresh, double-check) keep the data reliable for everyone.
+          </div>
+        </div>
 
         <div class="callout warn">
           <span class="icon">🚧</span>
@@ -1131,6 +1177,13 @@
             </p>
           </div>
         </div>
+
+        <div class="section-illustration">
+          <img src="assets/user-manual/troubleshooting.png" alt="Troubleshooting screen with alert and checklist" />
+          <div class="section-illustration-caption">
+            Typical error situations and the recommended actions.
+          </div>
+        </div>
       </section>
 
       <!-- 11. FAQ -->
@@ -1174,6 +1227,13 @@
           <div class="faq-a">
             Please update it as soon as you remember.  
             The closer we keep the system to reality, the easier it is for everyone to work smoothly.
+          </div>
+        </div>
+
+        <div class="section-illustration">
+          <img src="assets/user-manual/faq.png" alt="FAQ illustration with question mark and ideas" />
+          <div class="section-illustration-caption">
+            Short answers to the most common questions from everyday users.
           </div>
         </div>
       </section>
