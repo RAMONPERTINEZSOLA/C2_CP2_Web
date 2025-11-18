@@ -448,6 +448,7 @@
       grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
       gap:16px;
       margin-top:10px;
+      align-items:flex-start;
     }
 
     .mini-title{
@@ -780,18 +781,24 @@
           <li>See and improve the <strong>description</strong> of each product.</li>
           <li>Upload and update <strong>photos</strong> of the drawers.</li>
         </ul>
-        <div class="callout tip">
-          <span class="icon">✅</span>
-          <span>
-            Think of it as the <strong>“live notebook” of the warehouse</strong>.  
-            When you update something, everyone else will see it the next time they open the page.
-          </span>
-        </div>
 
-        <div class="section-illustration">
-          <img src="assets/user-manual/stock-overview.png" alt="Overview of warehouse stock on screen" />
-          <div class="section-illustration-caption">
-            Visual overview of the digital stock view for all racks and drawers.
+        <div class="two-col">
+          <div>
+            <div class="callout tip">
+              <span class="icon">✅</span>
+              <span>
+                Think of it as the <strong>“live notebook” of the warehouse</strong>.  
+                When you update something, everyone else will see it the next time they open the page.
+              </span>
+            </div>
+          </div>
+          <div>
+            <div class="section-illustration">
+              <img src="assets/user-manual/stock-overview.png" alt="Overview of warehouse stock on screen" />
+              <div class="section-illustration-caption">
+                Visual overview of the digital stock view for all racks and drawers.
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1103,38 +1110,43 @@
           A few simple habits will keep the data clean and reliable for everyone.
         </p>
 
-        <ul class="checklist">
-          <li>
-            <span class="check-icon">✓</span>
-            <span><strong>Update quantities immediately</strong> after picking or adding items.</span>
-          </li>
-          <li>
-            <span class="check-icon">✓</span>
-            <span>Use <strong>short, consistent descriptions</strong> (for example: “Barrier motor grey 230V” instead of a long sentence).</span>
-          </li>
-          <li>
-            <span class="check-icon">✓</span>
-            <span>Refresh the page once after saving, especially if you plan to show it to someone else.</span>
-          </li>
-          <li>
-            <span class="check-icon">✓</span>
-            <span>Check you are on the <strong>correct drawer code</strong> before changing anything.</span>
-          </li>
-        </ul>
+        <div class="two-col">
+          <div>
+            <ul class="checklist">
+              <li>
+                <span class="check-icon">✓</span>
+                <span><strong>Update quantities immediately</strong> after picking or adding items.</span>
+              </li>
+              <li>
+                <span class="check-icon">✓</span>
+                <span>Use <strong>short, consistent descriptions</strong> (for example: “Barrier motor grey 230V” instead of a long sentence).</span>
+              </li>
+              <li>
+                <span class="check-icon">✓</span>
+                <span>Refresh the page once after saving, especially if you plan to show it to someone else.</span>
+              </li>
+              <li>
+                <span class="check-icon">✓</span>
+                <span>Check you are on the <strong>correct drawer code</strong> before changing anything.</span>
+              </li>
+            </ul>
 
-        <div class="section-illustration">
-          <img src="assets/user-manual/good-habits.png" alt="Icons representing good habits when updating stock" />
-          <div class="section-illustration-caption">
-            Simple habits (update, save, refresh, double-check) keep the data reliable for everyone.
+            <div class="callout warn">
+              <span class="icon">🚧</span>
+              <span>
+                If you are not sure whether you should change the description or the quantity,
+                <strong>ask first</strong>. It is better to leave it as it is than to introduce a mistake.
+              </span>
+            </div>
           </div>
-        </div>
-
-        <div class="callout warn">
-          <span class="icon">🚧</span>
-          <span>
-            If you are not sure whether you should change the description or the quantity,
-            <strong>ask first</strong>. It is better to leave it as it is than to introduce a mistake.
-          </span>
+          <div>
+            <div class="section-illustration">
+              <img src="assets/user-manual/good-habits.png" alt="Icons representing good habits when updating stock" />
+              <div class="section-illustration-caption">
+                Simple habits (update, save, refresh, double-check) keep the data reliable for everyone.
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1163,8 +1175,7 @@
                 → Check your internet connection (Wi-Fi or mobile data).
               </li>
             </ul>
-          </div>
-          <div>
+
             <div class="mini-title">When to ask for help</div>
             <ul class="list">
               <li>You see a “not found” or “error” message repeatedly.</li>
@@ -1176,12 +1187,13 @@
               and send it to the person responsible for the warehouse system.
             </p>
           </div>
-        </div>
-
-        <div class="section-illustration">
-          <img src="assets/user-manual/troubleshooting.png" alt="Troubleshooting screen with alert and checklist" />
-          <div class="section-illustration-caption">
-            Typical error situations and the recommended actions.
+          <div>
+            <div class="section-illustration">
+              <img src="assets/user-manual/troubleshooting.png" alt="Troubleshooting screen with alert and checklist" />
+              <div class="section-illustration-caption">
+                Typical error situations and the recommended actions.
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1190,50 +1202,56 @@
       <section class="section" id="faq">
         <h2><span class="emoji">❓</span> Quick questions & answers (FAQ)</h2>
 
-        <div class="faq-item">
-          <div class="faq-q">Do I need any special software to use this site?</div>
-          <div class="faq-a">
-            No. Any modern browser is enough (Chrome, Edge, Safari, …).  
-            You do not need Excel, GitHub or any other tool.
-          </div>
-        </div>
+        <div class="two-col">
+          <div>
+            <div class="faq-item">
+              <div class="faq-q">Do I need any special software to use this site?</div>
+              <div class="faq-a">
+                No. Any modern browser is enough (Chrome, Edge, Safari, …).  
+                You do not need Excel, GitHub or any other tool.
+              </div>
+            </div>
 
-        <div class="faq-item">
-          <div class="faq-q">Who can see the changes I make?</div>
-          <div class="faq-a">
-            Everyone who uses the warehouse site.  
-            The idea is that <strong>stock is shared and transparent</strong>, so the whole team can rely on the same information.
-          </div>
-        </div>
+            <div class="faq-item">
+              <div class="faq-q">Who can see the changes I make?</div>
+              <div class="faq-a">
+                Everyone who uses the warehouse site.  
+                The idea is that <strong>stock is shared and transparent</strong>, so the whole team can rely on the same information.
+              </div>
+            </div>
 
-        <div class="faq-item">
-          <div class="faq-q">Can I undo a mistake myself?</div>
-          <div class="faq-a">
-            You can manually correct a wrong quantity or description if you notice it immediately.  
-            For bigger errors, contact the person responsible for maintaining the data.
-          </div>
-        </div>
+            <div class="faq-item">
+              <div class="faq-q">Can I undo a mistake myself?</div>
+              <div class="faq-a">
+                You can manually correct a wrong quantity or description if you notice it immediately.  
+                For bigger errors, contact the person responsible for maintaining the data.
+              </div>
+            </div>
 
-        <div class="faq-item">
-          <div class="faq-q">Can I add new products or drawers?</div>
-          <div class="faq-a">
-            Normally, <strong>only supervisors or power users</strong> should add new drawers or completely new products.  
-            If you think something is missing, talk to them first.
-          </div>
-        </div>
+            <div class="faq-item">
+              <div class="faq-q">Can I add new products or drawers?</div>
+              <div class="faq-a">
+                Normally, <strong>only supervisors or power users</strong> should add new drawers or completely new products.  
+                If you think something is missing, talk to them first.
+              </div>
+            </div>
 
-        <div class="faq-item">
-          <div class="faq-q">What if I forget to update the quantity?</div>
-          <div class="faq-a">
-            Please update it as soon as you remember.  
-            The closer we keep the system to reality, the easier it is for everyone to work smoothly.
+            <div class="faq-item">
+              <div class="faq-q">What if I forget to update the quantity?</div>
+              <div class="faq-a">
+                Please update it as soon as you remember.  
+                The closer we keep the system to reality, the easier it is for everyone to work smoothly.
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="section-illustration">
-          <img src="assets/user-manual/faq.png" alt="FAQ illustration with question mark and ideas" />
-          <div class="section-illustration-caption">
-            Short answers to the most common questions from everyday users.
+          <div>
+            <div class="section-illustration">
+              <img src="assets/user-manual/faq.png" alt="FAQ illustration with question mark and ideas" />
+              <div class="section-illustration-caption">
+                Short answers to the most common questions from everyday users.
+              </div>
+            </div>
           </div>
         </div>
       </section>
