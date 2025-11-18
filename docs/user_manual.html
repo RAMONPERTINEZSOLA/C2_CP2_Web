@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="green-tech">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Parcsafe Warehouse — User Guide for the Team</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Poppins font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root{
+      --bg:#f5f7f8;
+      --card:#ffffff;
+      --accent:#6dbd45;
+      --accent-soft:rgba(109,189,69,.14);
+      --accent-strong:#539a33;
+      --ink:#1f2937;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --shadow:0 10px 28px rgba(15,23,42,.08);
+      --danger:#b3261e;
+      --link:#2563eb;
+    }
+
+    /* THEMES *************************************************************/
+    html[data-theme="green-tech"]{
+      --bg:#f5f7f8;
+      --card:#ffffff;
+      --accent:#6dbd45;
+      --accent-soft:rgba(109,189,69,.12);
+      --accent-strong:#4f9a33;
+      --ink:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --shadow:0 10px 30px rgba(109,189,69,.25);
+      --link:#2563eb;
+    }
+    html[data-theme="blue-green"]{
+      --bg:#f5f8ff;
+      --card:#ffffff;
+      --accent:#2563eb;
+      --accent-soft:rgba(37,99,235,.10);
+      --accent-strong:#1d4ed8;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --border:#dbe2f0;
+      --shadow:0 10px 30px rgba(37,99,235,.20);
+      --link:#0ea5e9;
+    }
+    html[data-theme="clean-white"]{
+      --bg:#ffffff;
+      --card:#ffffff;
+      --accent:#111827;
+      --accent-soft:rgba(15,23,42,.04);
+      --accent-strong:#111827;
+      --ink:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --shadow:0 6px 24px rgba(15,23,42,.09);
+      --link:#111827;
+    }
+    html[data-theme="dark-tech"]{
+      --bg:#020617;
+      --card:#0b1120;
+      --accent:#22c55e;
+      --accent-soft:rgba(34,197,94,.24);
+      --accent-strong:#16a34a;
+      --ink:#e5e7eb;
+      --muted:#9ca3af;
+      --border:#1f2937;
+      --shadow:0 18px 40px rgba(15,23,42,.85);
+      --link:#38bdf8;
+    }
+
+    /* LAYOUT *************************************************************/
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--ink);
+      background:radial-gradient(circle at top left,rgba(148,163,184,.25),transparent 55%),
+                 radial-gradient(circle at bottom right,rgba(34,197,94,.16),transparent 50%),
+                 var(--bg);
+    }
+    a{color:var(--link); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .layout{
+      display:flex;
+      min-height:100vh;
+    }
+
+    nav.sidebar{
+      width:260px;
+      padding:24px 18px;
+      border-right:1px solid var(--border);
+      background:linear-gradient(180deg,rgba(15,23,42,.06),transparent),
+                 rgba(15,23,42,.02);
+      position:sticky;
+      top:0;
+      align-self:flex-start;
+      max-height:100vh;
+      overflow:auto;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .brand-logo{
+      width:150px; height:auto;
+      border-radius:10px;
+      background:var(--card);
+      box-shadow:var(--shadow);
+      padding:8px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      color:var(--accent-strong);
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+    .brand-tagline{
+      font-size:12px;
+      color:var(--muted);
+      max-width:150px;
+    }
+
+    .toc-title{
+      font-size:12px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:var(--muted);
+      margin:18px 0 6px;
+    }
+    .toc a{
+      display:block;
+      padding:8px 10px;
+      border-radius:10px;
+      text-decoration:none;
+      color:var(--ink);
+      font-size:13px;
+      margin:2px 0;
+      transition:.15s;
+    }
+    .toc a:hover{
+      background:var(--accent-soft);
+    }
+    .toc a.active{
+      background:var(--accent);
+      color:#ffffff;
+    }
+
+    main{
+      flex:1;
+      padding:32px 40px 40px;
+      max-width:960px;
+      margin:0 auto;
+    }
+
+    .hero{
+      background:radial-gradient(circle at top left,rgba(148,163,184,.30),transparent 60%),
+                 radial-gradient(circle at bottom right,rgba(34,197,94,.25),transparent 55%),
+                 var(--card);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:26px 26px 24px;
+      display:grid;
+      grid-template-columns:2.1fr 1.8fr;
+      gap:24px;
+      margin-bottom:26px;
+      border:1px solid rgba(148,163,184,.18);
+    }
+
+    .hero-eyebrow{
+      font-size:12px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:600;
+      margin-bottom:6px;
+    }
+    .hero h1{
+      margin:0;
+      font-size:26px;
+      color:var(--ink);
+    }
+    .hero-subtitle{
+      margin:10px 0 16px;
+      font-size:14px;
+      color:var(--muted);
+      max-width:420px;
+    }
+
+    .hero-tags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:14px;
+    }
+    .tag{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.50);
+      color:var(--muted);
+      background:rgba(255,255,255,.6);
+      backdrop-filter:blur(8px);
+    }
+
+    .hero-note{
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      align-items:flex-start;
+      gap:6px;
+      margin-top:6px;
+    }
+    .hero-note span.icon{
+      font-size:16px;
+      margin-top:-1px;
+    }
+
+    .hero-illustration{
+      position:relative;
+      min-height:170px;
+      border-radius:18px;
+      background:radial-gradient(circle at top,rgba(255,255,255,.9),transparent 60%),
+                 linear-gradient(145deg,rgba(15,23,42,.95),rgba(15,23,42,.7));
+      overflow:hidden;
+      padding:16px 16px 18px;
+      color:#e5e7eb;
+      box-shadow:0 18px 45px rgba(15,23,42,.76);
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:11px;
+      padding:4px 9px;
+      border-radius:999px;
+      background:rgba(15,23,42,.85);
+      border:1px solid rgba(148,163,184,.6);
+      margin-bottom:8px;
+    }
+    .hero-badge span{
+      font-size:12px;
+    }
+
+    .rack-layout{
+      position:absolute;
+      inset:40px 12px 14px 12px;
+      display:grid;
+      grid-template-columns:1.7fr 1.3fr;
+      gap:8px;
+    }
+    .rack{
+      background:linear-gradient(145deg,rgba(15,23,42,.7),rgba(15,23,42,.95));
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.45);
+      padding:8px 9px;
+      display:grid;
+      grid-template-rows:repeat(4,1fr);
+      gap:6px;
+    }
+    .rack-row{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:5px;
+    }
+    .drawer{
+      border-radius:7px;
+      background:linear-gradient(120deg,rgba(34,197,94,.28),rgba(16,185,129,.1));
+      border:1px solid rgba(34,197,94,.7);
+      box-shadow:0 0 0 1px rgba(8,47,73,.2);
+      position:relative;
+    }
+    .drawer-label{
+      position:absolute;
+      left:4px; bottom:3px;
+      font-size:8px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:rgba(15,23,42,.9);
+      padding:1px 4px;
+      border-radius:999px;
+      background:rgba(226,232,240,.95);
+    }
+
+    .hero-dashboard{
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.6);
+      background:linear-gradient(145deg,rgba(15,23,42,.75),rgba(15,23,42,.95));
+      padding:8px 9px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .hero-dashboard-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:11px;
+      color:#cbd5f5;
+    }
+    .hero-pill{
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      font-size:10px;
+    }
+    .hero-metrics{
+      display:grid;
+      grid-template-columns:1.1fr 1fr;
+      gap:8px;
+      font-size:10px;
+    }
+    .hero-metric-card{
+      padding:6px 7px;
+      border-radius:10px;
+      background:radial-gradient(circle at top left,rgba(34,197,94,.18),transparent 60%),
+                 rgba(15,23,42,.9);
+      border:1px solid rgba(34,197,94,.45);
+    }
+    .hero-metric-label{
+      font-size:9px;
+      color:#a5b4fc;
+      margin-bottom:2px;
+    }
+    .hero-metric-value{
+      font-size:13px;
+      font-weight:600;
+      color:#e5e7eb;
+    }
+    .hero-meter{
+      height:4px;
+      border-radius:999px;
+      background:rgba(15,23,42,.85);
+      overflow:hidden;
+      margin-top:4px;
+    }
+    .hero-meter-fill{
+      height:100%;
+      width:68%;
+      border-radius:999px;
+      background:linear-gradient(90deg,#22c55e,#a3e635);
+    }
+
+    .section{
+      background:var(--card);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      padding:22px 24px;
+      margin-bottom:22px;
+      border:1px solid rgba(148,163,184,.20);
+    }
+    .section h2{
+      margin:0 0 8px;
+      font-size:20px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:var(--ink);
+    }
+    .section h2 span.emoji{
+      font-size:20px;
+    }
+    .section p{
+      font-size:14px;
+      color:var(--muted);
+      margin:4px 0 10px;
+    }
+    .section strong{color:var(--ink);}
+
+    .pill-list{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:8px 0 4px;
+    }
+    .pill{
+      font-size:12px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:var(--ink);
+      border:1px solid rgba(148,163,184,.4);
+    }
+
+    ol.steps, ul.list{
+      margin:10px 0 4px 18px;
+      padding:0;
+      font-size:14px;
+      color:var(--ink);
+    }
+    ol.steps li, ul.list li{
+      margin:4px 0;
+      line-height:1.55;
+    }
+
+    .callout{
+      border-radius:14px;
+      padding:10px 12px;
+      margin-top:10px;
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+      font-size:13px;
+    }
+    .callout.tip{
+      background:var(--accent-soft);
+      border:1px solid rgba(34,197,94,.35);
+      color:var(--ink);
+    }
+    .callout.warn{
+      background:rgba(248,250,252,.9);
+      border:1px solid rgba(248,113,113,.45);
+      color:var(--ink);
+    }
+    .callout .icon{
+      font-size:18px;
+      margin-top:-1px;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+      gap:16px;
+      margin-top:10px;
+    }
+
+    .mini-title{
+      font-size:13px;
+      font-weight:600;
+      margin:4px 0 4px;
+      color:var(--ink);
+    }
+    .kbd{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:6px;
+      padding:2px 6px;
+      border:1px solid var(--border);
+      border-bottom-width:2px;
+      font-size:11px;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background:rgba(255,255,255,.8);
+      color:var(--ink);
+    }
+
+    .screenshot-card{
+      border-radius:14px;
+      border:1px dashed rgba(148,163,184,.7);
+      background:linear-gradient(135deg,rgba(15,23,42,.03),rgba(148,163,184,.08));
+      padding:10px 10px 12px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .screenshot-window{
+      border-radius:10px;
+      background:var(--card);
+      border:1px solid var(--border);
+      padding:8px;
+      margin-bottom:6px;
+      box-shadow:0 4px 8px rgba(15,23,42,.05);
+    }
+    .screenshot-toolbar{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      margin-bottom:6px;
+    }
+    .dot{
+      width:7px; height:7px; border-radius:999px;
+      background:#f97373;
+    }
+    .dot.yellow{background:#facc15;}
+    .dot.green{background:#22c55e;}
+    .screenshot-body{
+      height:72px;
+      border-radius:6px;
+      background:linear-gradient(90deg,rgba(148,163,184,.16),transparent 40%,rgba(34,197,94,.18));
+      position:relative;
+      overflow:hidden;
+    }
+    .screenshot-qr{
+      position:absolute;
+      right:10px; top:10px;
+      width:26px; height:26px;
+      border-radius:4px;
+      border:2px solid rgba(15,23,42,.8);
+      box-shadow:0 0 0 2px rgba(255,255,255,.9);
+      background:
+        linear-gradient(90deg,transparent 45%,rgba(15,23,42,.8) 45%,rgba(15,23,42,.8) 55%,transparent 55%),
+        linear-gradient(0deg,transparent 45%,rgba(15,23,42,.8) 45%,rgba(15,23,42,.8) 55%,transparent 55%);
+    }
+
+    .checklist{
+      margin:10px 0 0;
+      padding:0;
+      list-style:none;
+      font-size:14px;
+    }
+    .checklist li{
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+      margin:4px 0;
+      color:var(--ink);
+    }
+    .check-icon{
+      width:18px; height:18px;
+      border-radius:999px;
+      border:1px solid rgba(34,197,94,.8);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      color:rgba(22,163,74,1);
+      background:rgba(220,252,231,.9);
+      margin-top:1px;
+    }
+
+    .faq-item{
+      margin-top:8px;
+    }
+    .faq-q{
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:2px;
+      color:var(--ink);
+    }
+    .faq-a{
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .footer{
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+      margin:16px 0 0;
+    }
+
+    /* THEME SWITCHER *****************************************************/
+    .theme-switcher{
+      margin-top:18px;
+      padding:12px 14px;
+      border-radius:16px;
+      background:rgba(15,23,42,.02);
+      border:1px solid rgba(148,163,184,.45);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .theme-buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .theme-btn{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      padding:4px 10px;
+      font-size:11px;
+      background:rgba(255,255,255,.9);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .theme-btn span.swatch{
+      width:14px; height:14px;
+      border-radius:50%;
+      border:1px solid rgba(15,23,42,.25);
+      background:linear-gradient(135deg,#22c55e,#15803d);
+    }
+    .theme-btn.blue span.swatch{
+      background:linear-gradient(135deg,#2563eb,#38bdf8);
+    }
+    .theme-btn.white span.swatch{
+      background:linear-gradient(135deg,#ffffff,#e5e7eb);
+    }
+    .theme-btn.dark span.swatch{
+      background:linear-gradient(135deg,#020617,#0f172a);
+    }
+    .theme-btn.active{
+      border-color:var(--accent-strong);
+      box-shadow:0 0 0 1px rgba(34,197,94,.45);
+    }
+
+    .theme-switcher-inline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(255,255,255,.8);
+      font-size:11px;
+      margin-bottom:12px;
+    }
+    .theme-switcher-inline .theme-buttons{
+      gap:6px;
+    }
+
+    @media (max-width:980px){
+      nav.sidebar{display:none;}
+      main{max-width:100%; padding:22px 16px 26px;}
+      .hero{
+        grid-template-columns:1fr;
+        padding:20px 18px 18px;
+      }
+      .rack-layout{
+        inset:42px 10px 12px 10px;
+      }
+    }
+    @media (max-width:600px){
+      .section{padding:18px 16px;}
+      .two-col{grid-template-columns:1fr;}
+      .hero-illustration{min-height:190px;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <!-- SIDEBAR (desktop only) -->
+    <nav class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">PARCSAFE</div>
+        <div class="brand-tagline">
+          Warehouse stock, always up to date — directly from your browser.
+        </div>
+      </div>
+
+      <div class="toc-title">IN THIS GUIDE</div>
+      <div class="toc">
+        <a href="#intro">1. What is this web app?</a>
+        <a href="#access">2. How to access the site</a>
+        <a href="#menu">3. Main Menu & racks</a>
+        <a href="#drawer">4. Drawer pages</a>
+        <a href="#edit-stock">5. Updating stock quantities</a>
+        <a href="#edit-product">6. Editing product information</a>
+        <a href="#photos">7. Adding / changing photos</a>
+        <a href="#qr">8. Using the QR labels</a>
+        <a href="#best-practices">9. Good habits (recommended)</a>
+        <a href="#troubleshooting">10. If something looks wrong</a>
+        <a href="#faq">11. Quick questions & answers</a>
+      </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+
+      <!-- Small theme switcher at top -->
+      <div class="theme-switcher-inline" id="theme-top">
+        <span>View this guide in the style you prefer:</span>
+        <div class="theme-buttons">
+          <button class="theme-btn active" data-theme="green-tech">
+            <span class="swatch"></span> Green&nbsp;Tech
+          </button>
+          <button class="theme-btn blue" data-theme="blue-green">
+            <span class="swatch"></span> Blue-Green
+          </button>
+          <button class="theme-btn white" data-theme="clean-white">
+            <span class="swatch"></span> Clean&nbsp;White
+          </button>
+          <button class="theme-btn dark" data-theme="dark-tech">
+            <span class="swatch"></span> Dark&nbsp;Tech
+          </button>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <section class="hero" id="intro">
+        <div>
+          <div class="hero-eyebrow">PARCSAFE WAREHOUSE — USER GUIDE</div>
+          <h1>Parcsafe Warehouse — User Guide for the Team</h1>
+          <p class="hero-subtitle">
+            Fast, clear, and built to help you work better — without complications.  
+            This page explains how to use the warehouse web app to check and update stock, step by step.
+          </p>
+          <div class="hero-tags">
+            <span class="tag">No coding required</span>
+            <span class="tag">Works on phone, tablet & PC</span>
+            <span class="tag">Shared for the whole team</span>
+          </div>
+          <ul class="checklist">
+            <li><span class="check-icon">✓</span>Open the right drawer from the Main Menu.</li>
+            <li><span class="check-icon">✓</span>Update quantities after you pick or add items.</li>
+            <li><span class="check-icon">✓</span>Use the photos and descriptions to avoid confusion.</li>
+          </ul>
+          <div class="hero-note">
+            <span class="icon">ℹ️</span>
+            <span>
+              This guide is written for <strong>everyday users of the warehouse</strong>, not developers.  
+              If you can browse the internet, you can use this system.
+            </span>
+          </div>
+        </div>
+
+        <!-- Illustration "generated" layout -->
+        <div class="hero-illustration" aria-hidden="true">
+          <div class="hero-badge">
+            <span>📦 Smart Rack View</span>
+            <span>Live stock overview</span>
+          </div>
+          <div class="rack-layout">
+            <div class="rack">
+              <div class="rack-row">
+                <div class="drawer"><div class="drawer-label">A1_0</div></div>
+                <div class="drawer"><div class="drawer-label">A1_1</div></div>
+                <div class="drawer"><div class="drawer-label">A1_2</div></div>
+              </div>
+              <div class="rack-row">
+                <div class="drawer"><div class="drawer-label">A2_0</div></div>
+                <div class="drawer"><div class="drawer-label">A2_1</div></div>
+                <div class="drawer"><div class="drawer-label">A2_2</div></div>
+              </div>
+              <div class="rack-row">
+                <div class="drawer"><div class="drawer-label">C2_CP2_0</div></div>
+                <div class="drawer"><div class="drawer-label">C2_CP2_1</div></div>
+                <div class="drawer"><div class="drawer-label">C2_CP2_2</div></div>
+              </div>
+              <div class="rack-row">
+                <div class="drawer"><div class="drawer-label">C3_4_I</div></div>
+                <div class="drawer"><div class="drawer-label">C3_5_I</div></div>
+                <div class="drawer"><div class="drawer-label">C3_6_I</div></div>
+              </div>
+            </div>
+            <div class="hero-dashboard">
+              <div class="hero-dashboard-header">
+                <span>Warehouse overview</span>
+                <span class="hero-pill">Team-visible updates</span>
+              </div>
+              <div class="hero-metrics">
+                <div class="hero-metric-card">
+                  <div class="hero-metric-label">Updated drawers today</div>
+                  <div class="hero-metric-value">24</div>
+                  <div class="hero-meter"><div class="hero-meter-fill"></div></div>
+                </div>
+                <div class="hero-metric-card">
+                  <div class="hero-metric-label">Low-stock alerts</div>
+                  <div class="hero-metric-value">5</div>
+                  <div class="hero-meter">
+                    <div class="hero-meter-fill" style="width:32%; background:linear-gradient(90deg,#f97316,#facc15);"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="hero-dashboard-header" style="font-size:10px;">
+                <span>Every change you save is visible for everyone using the site.</span>
+                <span>✔ No spreadsheets, ✔ No USB drives</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1. WHAT IS THIS WEB APP? -->
+      <section class="section">
+        <h2><span class="emoji">📦</span> What is this web app?</h2>
+        <p>
+          The Parcsafe Warehouse site is a <strong>digital view of our physical stock</strong>.  
+          It is organised by <strong>racks</strong> (A, C2-CP2, C3, C4, …) and by <strong>drawers</strong> inside each rack.
+        </p>
+        <p>
+          From this site, you can:
+        </p>
+        <ul class="list">
+          <li>Open a drawer and see what is stored there.</li>
+          <li>Check the current <strong>quantity</strong> of each product.</li>
+          <li>See and improve the <strong>description</strong> of each product.</li>
+          <li>Upload and update <strong>photos</strong> of the drawers.</li>
+        </ul>
+        <div class="callout tip">
+          <span class="icon">✅</span>
+          <span>
+            Think of it as the <strong>“live notebook” of the warehouse</strong>.  
+            When you update something, everyone else will see it the next time they open the page.
+          </span>
+        </div>
+      </section>
+
+      <!-- 2. ACCESS -->
+      <section class="section" id="access">
+        <h2><span class="emoji">🌐</span> How to access the site</h2>
+        <p>
+          You can open the warehouse site from a <strong>PC, tablet or phone</strong>.
+        </p>
+        <ol class="steps">
+          <li>Open your internet browser (Chrome, Edge, Safari, …).</li>
+          <li>Enter the Parcsafe Warehouse URL provided by the company.</li>
+          <li>Save it as a <strong>bookmark</strong> or on your <strong>home screen</strong> for quick access.</li>
+        </ol>
+
+        <div class="two-col">
+          <div>
+            <div class="mini-title">On your phone (shortcut)</div>
+            <ul class="list">
+              <li>Open the site in your mobile browser.</li>
+              <li>Use <span class="kbd">Share</span> → <span class="kbd">Add to Home Screen</span>.</li>
+              <li>A new icon will appear, just like an app.</li>
+            </ul>
+          </div>
+          <div class="screenshot-card">
+            <div class="screenshot-window">
+              <div class="screenshot-toolbar">
+                <div class="dot"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+              </div>
+              <div class="screenshot-body">
+                <div class="screenshot-qr"></div>
+              </div>
+            </div>
+            <div>
+              Example visual: the site opened on a phone, with a QR label pointing to a specific drawer page.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <span class="icon">🚫</span>
+          <span>
+            Do not share the link outside the company without permission.  
+            The data is internal and meant only for the Parcsafe team.
+          </span>
+        </div>
+      </section>
+
+      <!-- 3. MAIN MENU -->
+      <section class="section" id="menu">
+        <h2><span class="emoji">🧭</span> Main Menu & racks</h2>
+        <p>
+          After opening the site, you will see the <strong>Main Menu</strong>.  
+          This page lets you choose the <strong>rack</strong> you want to work with.
+        </p>
+
+        <div class="two-col">
+          <div>
+            <div class="mini-title">What you will see</div>
+            <ul class="list">
+              <li>A list or grid of racks: <strong>A, B, C2-CP2, C3, …</strong></li>
+              <li>Each rack opens its own set of drawers (A1_0, A1_1, C3_5_I, …).</li>
+              <li>Buttons or links to return to the Main Menu at any time.</li>
+            </ul>
+            <div class="callout tip">
+              <span class="icon">💡</span>
+              <span>
+                If you feel lost, go back to the <strong>Main Menu</strong> and start again from the correct rack.
+              </span>
+            </div>
+          </div>
+          <div>
+            <div class="mini-title">Quick example</div>
+            <ul class="list">
+              <li>You need a spare part stored in <strong>rack A</strong> → open <strong>Rack A</strong>.</li>
+              <li>You know the drawer code is <strong>A1_0</strong> → click on <strong>A1_0</strong>.</li>
+              <li>The drawer page opens with quantities, descriptions and a photo.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. DRAWER PAGE -->
+      <section class="section" id="drawer">
+        <h2><span class="emoji">🗄️</span> Drawer pages: what you see</h2>
+        <p>
+          Each <strong>drawer page</strong> represents one physical drawer in the warehouse.
+          The content on this page describes <strong>what is inside that drawer</strong>.
+        </p>
+
+        <div class="two-col">
+          <div>
+            <div class="mini-title">Key elements on the page</div>
+            <ul class="list">
+              <li><strong>Drawer code</strong> (top): e.g. <span class="kbd">A1_0</span> or <span class="kbd">C3_5_I</span>.</li>
+              <li><strong>Table of products</strong> with:
+                <ul class="list">
+                  <li>Product name</li>
+                  <li>Product code</li>
+                  <li>Description</li>
+                  <li><strong>Quantity</strong> (editable)</li>
+                  <li>Optional minimum stock value</li>
+                </ul>
+              </li>
+              <li><strong>Photo area</strong> with the current image of the drawer.</li>
+              <li>A <strong>Save</strong> button (or equivalent) to confirm your changes.</li>
+            </ul>
+          </div>
+          <div class="screenshot-card">
+            <div class="screenshot-window">
+              <div class="screenshot-toolbar">
+                <div class="dot"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+              </div>
+              <div class="screenshot-body">
+                <!-- abstract representation of a drawer table -->
+              </div>
+            </div>
+            <div>
+              Visual example: a drawer page with a table of products on the left and a photo of the drawer on the right.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout tip">
+          <span class="icon">👀</span>
+          <span>
+            Always double-check the <strong>drawer code</strong> at the top of the page  
+            to be sure you are editing the same drawer you have physically opened.
+          </span>
+        </div>
+      </section>
+
+      <!-- 5. EDIT STOCK -->
+      <section class="section" id="edit-stock">
+        <h2><span class="emoji">✏️</span> Updating stock quantities</h2>
+        <p>
+          The most common action is to update the <strong>quantity</strong> of a product after taking items from the drawer or adding new ones.
+        </p>
+
+        <ol class="steps">
+          <li>Open the correct <strong>drawer page</strong>.</li>
+          <li>Find the row of the product you have used or added.</li>
+          <li>Click on the <strong>quantity</strong> field.</li>
+          <li>Type the new quantity (only numbers, no spaces).</li>
+          <li>Click <strong>Save</strong> at the bottom or top of the table.</li>
+          <li>Wait a few seconds and refresh the page once to confirm the change.</li>
+        </ol>
+
+        <div class="callout tip">
+          <span class="icon">🔁</span>
+          <span>
+            Habit to remember: <strong>Update → Save → Refresh once</strong>.  
+            This keeps the screen in sync with what everyone else will see.
+          </span>
+        </div>
+
+        <div class="callout warn">
+          <span class="icon">⚠️</span>
+          <span>
+            Avoid using negative numbers or text in the quantity fields.  
+            If you are not sure about the correct number, leave the value as it is and ask a supervisor.
+          </span>
+        </div>
+      </section>
+
+      <!-- 6. EDIT PRODUCT INFO -->
+      <section class="section" id="edit-product">
+        <h2><span class="emoji">🏷️</span> Editing product information (name, code, description)</h2>
+        <p>
+          You can also improve the way products are described, so the entire team understands what is stored in each drawer.
+        </p>
+
+        <div class="two-col">
+          <div>
+            <div class="mini-title">What you can change</div>
+            <ul class="list">
+              <li><strong>Product name</strong> — clear and short.</li>
+              <li><strong>Product code</strong> — supplier or internal reference.</li>
+              <li><strong>Description</strong> — extra details that help you identify it quickly.</li>
+            </ul>
+            <p>
+              These fields are often <strong>shared between drawers</strong>.  
+              If the same product appears in different drawers, updating the text here can update it for all locations.
+            </p>
+          </div>
+          <div>
+            <div class="mini-title">How to edit safely</div>
+            <ol class="steps">
+              <li>Check you have selected the correct product row.</li>
+              <li>Click inside the <strong>name</strong>, <strong>code</strong> or <strong>description</strong> cell.</li>
+              <li>Type the new text (avoid long paragraphs).</li>
+              <li>Click <strong>Save</strong>.</li>
+              <li>Refresh the page to confirm the change.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <span class="icon">🧠</span>
+          <span>
+            Before changing a product description, think:  
+            <strong>“Will this text still make sense for everyone else?”</strong>  
+            Try to keep wording consistent and simple.
+          </span>
+        </div>
+      </section>
+
+      <!-- 7. PHOTOS -->
+      <section class="section" id="photos">
+        <h2><span class="emoji">📸</span> Adding or changing drawer photos</h2>
+        <p>
+          Photos make it much easier to quickly recognise the content of a drawer.  
+          You can upload a new picture when:
+        </p>
+        <ul class="list">
+          <li>The layout of the drawer has changed significantly.</li>
+          <li>The current photo is blurry, dark or outdated.</li>
+        </ul>
+
+        <div class="two-col">
+          <div>
+            <div class="mini-title">How to upload a new photo</div>
+            <ol class="steps">
+              <li>Open the correct drawer page.</li>
+              <li>Find the <strong>photo section</strong> or current image.</li>
+              <li>Use the <strong>Upload</strong> or <strong>Change photo</strong> button.</li>
+              <li>Select the image from your device (preferably JPG, medium size).</li>
+              <li>Wait until the upload finishes.</li>
+              <li>Refresh the page after a short moment to see the new photo.</li>
+            </ol>
+          </div>
+          <div>
+            <div class="mini-title">Good photo practices</div>
+            <ul class="list">
+              <li>Avoid very large files (photos around <strong>0.7–1 MB</strong> are ideal).</li>
+              <li>Take the picture from the front, so all products are visible.</li>
+              <li>Do not photograph confidential documents or screens.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <span class="icon">🚫</span>
+          <span>
+            If the photo upload fails, do not try again many times in a row.  
+            Check your Wi-Fi or network, and try once more with a smaller image.
+          </span>
+        </div>
+      </section>
+
+      <!-- 8. QR LABELS -->
+      <section class="section" id="qr">
+        <h2><span class="emoji">🔗</span> Using the QR labels on the drawers</h2>
+        <p>
+          Many drawers may have a <strong>QR sticker</strong>.  
+          Scanning this QR with your phone sends you directly to the correct drawer page in the web app.
+        </p>
+
+        <div class="two-col">
+          <div>
+            <div class="mini-title">How to use a QR</div>
+            <ol class="steps">
+              <li>Open the camera on your phone (or a QR app if needed).</li>
+              <li>Point it at the QR label on the drawer.</li>
+              <li>Tap the notification or link that appears.</li>
+              <li>The drawer page will open in your browser.</li>
+            </ol>
+          </div>
+          <div>
+            <div class="mini-title">If a QR doesn’t work</div>
+            <ul class="list">
+              <li>Check that your phone has internet connection.</li>
+              <li>Check that the link is complete and not cut or damaged on the sticker.</li>
+              <li>If the page shows “not found”, note the drawer code and inform a supervisor.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout tip">
+          <span class="icon">📱</span>
+          <span>
+            Using the QR labels is often <strong>the fastest way</strong> to open the correct page.  
+            It avoids typing the wrong rack or drawer code.
+          </span>
+        </div>
+      </section>
+
+      <!-- 9. BEST PRACTICES -->
+      <section class="section" id="best-practices">
+        <h2><span class="emoji">✅</span> Good habits when using the system</h2>
+        <p>
+          A few simple habits will keep the data clean and reliable for everyone.
+        </p>
+
+        <ul class="checklist">
+          <li>
+            <span class="check-icon">✓</span>
+            <span><strong>Update quantities immediately</strong> after picking or adding items.</span>
+          </li>
+          <li>
+            <span class="check-icon">✓</span>
+            <span>Use <strong>short, consistent descriptions</strong> (for example: “Barrier motor grey 230V” instead of a long sentence).</span>
+          </li>
+          <li>
+            <span class="check-icon">✓</span>
+            <span>Refresh the page once after saving, especially if you plan to show it to someone else.</span>
+          </li>
+          <li>
+            <span class="check-icon">✓</span>
+            <span>Check you are on the <strong>correct drawer code</strong> before changing anything.</span>
+          </li>
+        </ul>
+
+        <div class="callout warn">
+          <span class="icon">🚧</span>
+          <span>
+            If you are not sure whether you should change the description or the quantity,
+            <strong>ask first</strong>. It is better to leave it as it is than to introduce a mistake.
+          </span>
+        </div>
+      </section>
+
+      <!-- 10. TROUBLESHOOTING -->
+      <section class="section" id="troubleshooting">
+        <h2><span class="emoji">🩺</span> If something looks wrong (Troubleshooting)</h2>
+        <p>
+          Here are typical situations you might see, and what you can do.
+        </p>
+
+        <div class="two-col">
+          <div>
+            <div class="mini-title">Common situations</div>
+            <ul class="list">
+              <li>
+                <strong>You changed a quantity but still see the old value.</strong><br />
+                → Wait a few seconds and press <span class="kbd">Refresh</span>.  
+                If it still does not change, inform a supervisor.
+              </li>
+              <li>
+                <strong>The page looks broken or incomplete.</strong><br />
+                → Try closing the tab and opening it again from the Main Menu or QR.
+              </li>
+              <li>
+                <strong>The site is very slow or does not load.</strong><br />
+                → Check your internet connection (Wi-Fi or mobile data).
+              </li>
+            </ul>
+          </div>
+          <div>
+            <div class="mini-title">When to ask for help</div>
+            <ul class="list">
+              <li>You see a “not found” or “error” message repeatedly.</li>
+              <li>You suspect the data on screen does not match the real stock.</li>
+              <li>You think a product may be duplicated or wrongly named.</li>
+            </ul>
+            <p style="font-size:13px; color:var(--muted);">
+              In these cases, note the <strong>rack</strong>, <strong>drawer code</strong> and a short explanation  
+              and send it to the person responsible for the warehouse system.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11. FAQ -->
+      <section class="section" id="faq">
+        <h2><span class="emoji">❓</span> Quick questions & answers (FAQ)</h2>
+
+        <div class="faq-item">
+          <div class="faq-q">Do I need any special software to use this site?</div>
+          <div class="faq-a">
+            No. Any modern browser is enough (Chrome, Edge, Safari, …).  
+            You do not need Excel, GitHub or any other tool.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Who can see the changes I make?</div>
+          <div class="faq-a">
+            Everyone who uses the warehouse site.  
+            The idea is that <strong>stock is shared and transparent</strong>, so the whole team can rely on the same information.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Can I undo a mistake myself?</div>
+          <div class="faq-a">
+            You can manually correct a wrong quantity or description if you notice it immediately.  
+            For bigger errors, contact the person responsible for maintaining the data.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Can I add new products or drawers?</div>
+          <div class="faq-a">
+            Normally, <strong>only supervisors or power users</strong> should add new drawers or completely new products.  
+            If you think something is missing, talk to them first.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">What if I forget to update the quantity?</div>
+          <div class="faq-a">
+            Please update it as soon as you remember.  
+            The closer we keep the system to reality, the easier it is for everyone to work smoothly.
+          </div>
+        </div>
+      </section>
+
+      <!-- THEME SWITCHER BOTTOM -->
+      <div class="theme-switcher" id="theme-bottom">
+        <div><strong>Choose how you want to view this guide</strong></div>
+        <p>
+          This only changes the <strong>visual theme of this manual</strong>, to match your preference or your screen.
+          The content stays exactly the same.
+        </p>
+        <div class="theme-buttons">
+          <button class="theme-btn active" data-theme="green-tech">
+            <span class="swatch"></span> Green Tech (default)
+          </button>
+          <button class="theme-btn blue" data-theme="blue-green">
+            <span class="swatch"></span> Blue-Green Dashboard
+          </button>
+          <button class="theme-btn white" data-theme="clean-white">
+            <span class="swatch"></span> Clean White Manual
+          </button>
+          <button class="theme-btn dark" data-theme="dark-tech">
+            <span class="swatch"></span> Dark Tech Mode
+          </button>
+        </div>
+      </div>
+
+      <div class="footer">
+        © 2025 Parcsafe — Warehouse User Guide · Internal use only
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Simple TOC highlight (desktop)
+    document.addEventListener('DOMContentLoaded', () => {
+      const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+      const sections = tocLinks
+        .map(a => document.querySelector(a.getAttribute('href')))
+        .filter(Boolean);
+
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const id = '#' + entry.target.id;
+              tocLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === id);
+              });
+            }
+          });
+        }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+
+        sections.forEach(section => io.observe(section));
+      }
+
+      // Theme switching
+      const themeButtons = Array.from(document.querySelectorAll('.theme-btn'));
+      function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        themeButtons.forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.theme === theme);
+        });
+      }
+      themeButtons.forEach(btn => {
+        btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+      });
+    });
+  </script>
+</body>
+</html>
