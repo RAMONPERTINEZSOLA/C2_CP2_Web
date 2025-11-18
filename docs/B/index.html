@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rack B — Parcsafe Drawer Panel</title>
+  <title>Rack B — Parcsafe Multi-Drawer</title>
 
-  <!-- Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -15,624 +14,1119 @@
 
   <style>
     :root{
-      --green:#6dbd45;
-      --green-2:#5aa83a;
-      --ink:#222;
-      --muted:#667085;
-      --bg:#f5f7f8;
-      --card:#ffffff;
-      --line:#e6e8eb;
-      --shadow:0 10px 30px rgba(109,189,69,.15);
-      --radius:18px;
+      --green:#6dbd45; --green-2:#5aa83a; --ink:#222; --muted:#667085;
+      --bg:#f5f7f8; --card:#ffffff; --line:#e6e8eb; --danger:#b3261e;
+      --brand-shadow:0 6px 24px rgba(109,189,69,.18); --radius:16px;
     }
-
     *{box-sizing:border-box;margin:0;padding:0}
-
     body{
       font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-      padding:24px;
+      background:var(--bg);color:var(--ink);
+    }
+    .container{max-width:1200px;margin:40px auto;padding:0 20px}
+
+    header.bar{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:16px;margin-bottom:20px;flex-wrap:wrap;
+    }
+    .back{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 14px;
+      border-radius:999px;border:1px solid var(--line);background:var(--card);
+      text-decoration:none;color:var(--ink);font-weight:600;
+    }
+    .logo{height:64px;object-fit:contain}
+    .brand{display:flex;align-items:center;gap:10px}
+
+    h1.title{
+      font-size:26px;margin:10px 0 6px 0;
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    }
+    .badge{
+      font-size:12px;color:#475467;background:#eef4ff;border:1px solid #d6e4ff;
+      padding:4px 8px;border-radius:999px;font-weight:700;letter-spacing:.3px;
     }
 
-    .page{
-      max-width:1200px;
-      margin:0 auto;
-    }
+    .meta-global{font-size:13px;color:var(--muted);margin-bottom:16px;}
+    .meta-global strong{color:var(--ink);}
 
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:24px;
-      gap:16px;
-      flex-wrap:wrap;
-    }
-
-    header h1{
-      font-size:24px;
-      font-weight:700;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    header h1 span.badge{
-      font-size:12px;
-      padding:3px 10px;
-      border-radius:999px;
-      background:#e7f5e8;
-      color:var(--green-2);
-      font-weight:600;
-    }
-
-    .sub{
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .rack-meta{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      flex-wrap:wrap;
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .rack-meta span{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:4px 10px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid var(--line);
-    }
-
-    .rack-meta span strong{
-      color:var(--ink);
-      font-weight:600;
-    }
-
-    .cards-grid{
+    .drawer-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-      gap:18px;
+      gap:20px;
     }
 
-    .drawer-card{
-      background:var(--card);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:16px 16px 14px;
-      border:1px solid rgba(0,0,0,.02);
-      display:flex;
-      flex-direction:column;
-      gap:10px;
+    .drawer-block{
+      background:var(--card);border:1px solid var(--line);
+      border-radius:var(--radius);padding:16px;box-shadow:var(--brand-shadow);
+      display:flex;flex-direction:column;gap:12px;
     }
 
     .drawer-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:4px;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:10px;flex-wrap:wrap;
     }
-
-    .drawer-header .code{
-      font-size:18px;
-      font-weight:700;
-      display:flex;
-      align-items:center;
-      gap:8px;
+    .drawer-header-left{
+      display:flex;align-items:center;gap:8px;flex-wrap:wrap;
     }
-
-    .drawer-header .code span.dot{
-      width:9px;
-      height:9px;
-      border-radius:999px;
-      background:var(--green-2);
-      box-shadow:0 0 0 3px rgba(90,168,58,.18);
+    .drawer-code-pill{
+      font-size:12px;color:#475467;background:#eef4ff;border:1px solid #d6e4ff;
+      padding:4px 8px;border-radius:999px;font-weight:700;letter-spacing:.3px;
     }
-
-    .drawer-header .hint{
-      font-size:11px;
-      color:var(--muted);
-      text-align:right;
+    .drawer-title-small{
+      font-size:14px;font-weight:600;
     }
-
-    .img-box{
-      border-radius:12px;
-      border:1px dashed var(--line);
-      background:#fafbfc;
-      padding:8px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:120px;
-      overflow:hidden;
-      position:relative;
-    }
-
-    .img-box img{
-      max-width:100%;
-      max-height:160px;
-      object-fit:contain;
-    }
-
-    .img-box span.placeholder{
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    .img-actions{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-top:4px;
-    }
-
-    .img-actions label{
-      font-size:11px;
-      color:var(--muted);
+    .drawer-header-actions{
+      display:flex;gap:8px;flex-wrap:wrap;
     }
 
     .btn{
-      border:none;
-      border-radius:999px;
-      padding:7px 14px;
+      border:none;border-radius:12px;padding:6px 10px;
+      font-weight:600;cursor:pointer;font-size:12px;
+      display:inline-flex;align-items:center;gap:6px;
+      background:var(--green);color:#fff;box-shadow:var(--brand-shadow);
+    }
+    .btn:hover{background:var(--green-2);}
+    .btn.secondary{background:#98a2b3;box-shadow:none;}
+    .btn.ghost{
+      background:#fff;color:var(--ink);border:1px solid var(--line);
+      box-shadow:none;
+    }
+
+    .cards{
+      display:grid;grid-template-columns:1fr 1fr;gap:16px;
+    }
+    @media (max-width:900px){
+      .cards{grid-template-columns:1fr;}
+    }
+
+    .card{
+      background:var(--card);border-radius:var(--radius);
+    }
+    .card h3{margin:0 0 8px 0;font-size:14px;}
+    .card-inner{padding:10px 0;}
+
+    .imgwrap{
+      border:1px dashed #cdd4d9;background:#fafafa;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      min-height:180px;overflow:hidden;
+    }
+    .imgwrap img{max-width:100%;height:auto;display:block;}
+
+    .imggrid{display:grid;gap:10px;}
+    .imggrid figure{
+      margin:0;border:1px dashed #cdd4d9;background:#fafafa;
+      border-radius:12px;overflow:hidden;
+    }
+    .imggrid figure img{display:block;width:100%;height:auto;object-fit:contain;}
+
+    .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .note{font-size:11px;color:var(--muted);}
+
+    .description-box{
+      border-radius:var(--radius);border:1px solid var(--line);
+      padding:10px;margin-top:4px;font-size:13px;line-height:1.5;
+      min-height:60px;background:#fafafa;
+    }
+
+    .stock-display{
+      font-size:22px;font-weight:700;margin-top:8px;
+    }
+
+    .stock-ui{
+      margin-top:8px;padding:10px;border:1px solid var(--line);
+      border-radius:var(--radius);background:var(--card);
+    }
+    .stock-ui .pill{
+      padding:6px 10px;border-radius:999px;background:#eef2f6;
+      border:1px solid #dde3ea;font-variant-numeric:tabular-nums;
       font-size:12px;
-      font-weight:600;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      white-space:nowrap;
     }
-
-    .btn-primary{
-      background:var(--green);
-      color:#fff;
-    }
-
-    .btn-primary:hover{
-      background:var(--green-2);
-    }
-
-    .btn-ghost{
-      background:transparent;
-      color:var(--muted);
-      border:1px solid var(--line);
-    }
-
-    .btn-ghost:hover{
-      background:#f3f4f6;
-    }
-
-    .fields{
-      display:grid;
-      grid-template-columns:1.2fr 0.9fr;
-      gap:10px;
-      margin-top:6px;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-      font-size:11px;
-    }
-
-    .field label{
-      font-weight:600;
-      color:var(--muted);
-    }
-
-    .field input,
-    .field textarea{
-      border-radius:10px;
-      border:1px solid var(--line);
-      padding:6px 8px;
+    .stock-ui input[type="number"]{
+      width:90px;padding:6px 8px;border:1px solid #c9cfd6;border-radius:8px;
       font-size:12px;
-      font-family:inherit;
-      resize:vertical;
-      min-height:32px;
+    }
+    .stock-ui .warn{
+      margin-top:8px;padding:8px 10px;border-radius:10px;background:#ffe3e3;
+      color:var(--danger);font-weight:700;display:none;border:1px solid #f3b5b5;
+      font-size:12px;
+    }
+    .stock-ui .warn.pulse{
+      display:block;animation:pulse 1s infinite;
+    }
+    .stock-ui .warn.pulse::before{
+      content:"❗❗";margin-right:8px;display:inline-block;animation:wiggle .8s infinite;
+    }
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(220,53,69,.35)}
+      70%{box-shadow:0 0 0 10px rgba(220,53,69,0)}
+      100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}
+    }
+    @keyframes wiggle{
+      0%{transform:translateY(0)}
+      50%{transform:translateY(-2px)}
+      100%{transform:translateY(0)}
     }
 
-    .field input:focus,
-    .field textarea:focus{
-      outline:2px solid rgba(109,189,69,.35);
-      border-color:var(--green-2);
+    #toast{
+      position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+      background-color:#198754;color:white;padding:10px 20px;border-radius:10px;
+      font-weight:700;display:none;animation:fade 3s ease forwards;z-index:1000;
+    }
+    @keyframes fade{
+      0%{opacity:0;transform:translate(-50%,10px)}
+      10%{opacity:1;transform:translate(-50%,0)}
+      90%{opacity:1;transform:translate(-50%,0)}
+      100%{opacity:0;transform:translate(-50%,10px)}
     }
 
-    .field-row{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:6px;
-      margin-top:4px;
+    dialog.modal{
+      border:none;border-radius:22px;padding:0;max-width:480px;width:96%;
+      box-shadow:0 24px 80px rgba(16,24,40,.35);
+      background:linear-gradient(180deg,#fff,#f9fbfa);
+    }
+    dialog.modal::backdrop{
+      background:rgba(10,12,14,.45);backdrop-filter:blur(3px)
+    }
+    .modal .hd{
+      padding:18px 20px;border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;
+      background:#f0f7ec;
+    }
+    .modal .hd strong{font-size:16px}
+    .close-x{
+      background:transparent;border:none;font-size:22px;cursor:pointer;line-height:1;
+    }
+    .modal .bd{padding:18px 20px;display:flex;flex-direction:column;gap:12px;}
+    .fld{display:flex;flex-direction:column;gap:6px}
+    .fld label{
+      font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;
+      letter-spacing:.4px;
+    }
+    .fld input,.fld textarea{
+      padding:10px 12px;border-radius:12px;border:1px solid #d0d5dd;
+      background:#fff;font-family:inherit;font-size:14px;outline:none;
+    }
+    .fld textarea{min-height:90px;resize:vertical;}
+    .fld input:focus,.fld textarea:focus{
+      border-color:#b7df9f;box-shadow:0 0 0 3px rgba(109,189,69,.18)
+    }
+    .modal .ft{
+      padding:14px 20px;border-top:1px solid var(--line);
+      display:flex;gap:10px;justify-content:flex-end;background:#fff;
+      border-bottom-left-radius:22px;border-bottom-right-radius:22px;
     }
 
-    .field-row .field{
-      min-width:0;
+    /* QR modal canvas */
+    #qrCanvas{
+      max-width:260px;width:100%;height:auto;
+      border:1px dashed #d0d5d0;border-radius:12px;background:#fff;
     }
 
-    .footer-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:6px;
-      margin-top:6px;
+    /* Post-save banner */
+    #postSaveBanner{
+      position:fixed;inset:auto 20px 20px 20px;
+      background:#0f1b2f;color:#e8f3ff;border:1px solid #cfe4ff33;
+      border-radius:14px;padding:10px 12px;box-shadow:0 12px 40px rgba(0,0,0,.35);
+      display:none;z-index:2000;font-size:13px;
     }
-
-    .status-pill{
-      font-size:11px;
-      padding:4px 9px;
-      border-radius:999px;
-      background:#f3f4f6;
-      color:var(--muted);
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-    }
-
-    .status-pill span.dot{
-      width:7px;
-      height:7px;
-      border-radius:999px;
-      background:#d1d5db;
-    }
-
-    .status-pill.low{
-      background:#fff4f2;
-      color:#d94841;
-    }
-
-    .status-pill.low span.dot{
-      background:#e03131;
-    }
-
-    .status-pill.ok{
-      background:#e8f7ee;
-      color:#2f9e44;
-    }
-
-    .status-pill.ok span.dot{
-      background:#2f9e44;
-    }
-
-    small.helper{
-      font-size:10px;
-      color:var(--muted);
-    }
-
-    input[type="file"]{
-      font-size:11px;
-      max-width:150px;
-    }
-
-    @media (max-width:720px){
-      .fields{
-        grid-template-columns:1fr;
-      }
-      .field-row{
-        grid-template-columns:repeat(2,1fr);
-      }
+    #postSaveBanner .row{justify-content:space-between}
+    #postSaveBanner .counter{font-variant-numeric:tabular-nums;font-weight:700}
+    #postSaveBanner button{
+      background:#ffffff;color:#0f1b2f;border:1px solid #cfe4ff66;
+      border-radius:10px;padding:6px 10px;font-weight:700;cursor:pointer;font-size:12px;
     }
   </style>
+
+  <!-- jsPDF + QR lib -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script type="module">
+    import * as m from 'https://cdn.jsdelivr.net/npm/nayuki-qr-code-generator@1.8.0/index.js';
+    const lib = (m && m.QrCode) ? m : (m && m.default && m.default.QrCode) ? m.default : m;
+    window.qrcodegen = lib;
+  </script>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <div>
-        <h1>
-          Rack B
-          <span class="badge">Multi-drawer editor</span>
-        </h1>
-        <p class="sub">
-          Edita directament tots els calaixos B (B1–B4) en una sola pantalla:
-          producte, descripció, stock, mínim i imatge.
-        </p>
-      </div>
-      <div class="rack-meta">
-        <span><strong>RACK</strong> B</span>
-        <span><strong>Drawers</strong> B1 · B2 · B3 · B4</span>
+  <div class="container">
+    <header class="bar">
+      <a class="back" href="../index.html">← Back to index</a>
+      <div class="brand">
+        <img class="logo" id="logo" alt="Parcsafe">
       </div>
     </header>
 
-    <section class="cards-grid" id="rackBCards">
-      <!-- Les targetes es generen per JS -->
+    <h1 class="title">
+      Rack B — Multi-drawer view
+      <span class="badge">B1_0 · B2_0 · B3_0 · B4_0</span>
+    </h1>
+    <p class="meta-global">
+      Edita en una sola pàgina tots els calaixos del <strong>Rack B</strong>:
+      nom de producte, codi, descripció, foto i stock. Tot queda sincronitzat amb <code>stock.csv</code>
+      i amb el mateix backend que la resta de drawers.
+    </p>
+
+    <section class="drawer-grid">
+
+      <!-- Drawer B1_0 -->
+      <article class="drawer-block" data-drawer="B1_0">
+        <div class="drawer-header">
+          <div class="drawer-header-left">
+            <span class="drawer-code-pill">B1_0</span>
+            <span class="drawer-title-small" data-role="product-name-label">Product Name: loading...</span>
+          </div>
+          <div class="drawer-header-actions">
+            <button class="btn secondary" data-role="edit-info">✏️ Edit</button>
+            <button class="btn ghost" data-role="qr">📎 QR</button>
+          </div>
+        </div>
+        <div class="row" style="font-size:12px;color:var(--muted);">
+          <span data-role="product-code-label"><strong>Code:</strong> loading...</span>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <h3>Drawer Photo</h3>
+            <div class="card-inner">
+              <div class="imgwrap">
+                <img data-role="drawer-img"
+                     src="../images/B1_0.jpg"
+                     alt="Drawer image B1_0"
+                     onerror="this.onerror=null; this.src='../../images/B1_0.jpg';" />
+              </div>
+              <div class="row" style="margin-top:8px;">
+                <button class="btn" data-role="upload-photo">🖼️ Update Photo</button>
+                <button class="btn ghost" data-role="refresh-img">Refresh</button>
+                <span class="note">The new image will be renamed to <strong>B1_0.jpg</strong> automatically.</span>
+              </div>
+              <input type="file" accept="image/png,image/jpeg" data-role="file-input" style="display:none" />
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Cabinet Highlight</h3>
+            <div class="card-inner">
+              <div class="imggrid">
+                <figure>
+                  <img src="../images/B_rack_B1_0.jpg"
+                       alt="Rack view B1_0"
+                       onerror="this.onerror=null; this.src='../../images/B_rack_B1_0.jpg';">
+                </figure>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-size:14px;margin-top:8px;">Description</h3>
+          <div class="description-box" data-role="description-text">loading...</div>
+        </div>
+
+        <div class="stock-display" data-role="stock-display">Loading stock...</div>
+
+        <div class="stock-ui" data-role="stock-ui">
+          <div class="row">
+            <span class="pill">Current: <strong data-role="curQty">–</strong></span>
+            <span class="pill">Change: <strong data-role="delta">0</strong></span>
+            <span class="pill">New: <strong data-role="newQty">–</strong></span>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <button type="button" class="btn" data-role="minus">−1</button>
+            <button type="button" class="btn" data-role="plus">+1</button>
+            <label style="font-size:12px;">
+              Exact:
+              <input type="number" min="0" step="1" data-role="exact" />
+            </label>
+            <button type="button" class="btn secondary" data-role="reset">Reset</button>
+            <button type="button" class="btn" data-role="save-stock">Save</button>
+          </div>
+          <div class="warn" data-role="minWarn">LOW STOCK — minimum 10</div>
+        </div>
+      </article>
+
+      <!-- Drawer B2_0 -->
+      <article class="drawer-block" data-drawer="B2_0">
+        <div class="drawer-header">
+          <div class="drawer-header-left">
+            <span class="drawer-code-pill">B2_0</span>
+            <span class="drawer-title-small" data-role="product-name-label">Product Name: loading...</span>
+          </div>
+          <div class="drawer-header-actions">
+            <button class="btn secondary" data-role="edit-info">✏️ Edit</button>
+            <button class="btn ghost" data-role="qr">📎 QR</button>
+          </div>
+        </div>
+        <div class="row" style="font-size:12px;color:var(--muted);">
+          <span data-role="product-code-label"><strong>Code:</strong> loading...</span>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <h3>Drawer Photo</h3>
+            <div class="card-inner">
+              <div class="imgwrap">
+                <img data-role="drawer-img"
+                     src="../images/B2_0.jpg"
+                     alt="Drawer image B2_0"
+                     onerror="this.onerror=null; this.src='../../images/B2_0.jpg';" />
+              </div>
+              <div class="row" style="margin-top:8px;">
+                <button class="btn" data-role="upload-photo">🖼️ Update Photo</button>
+                <button class="btn ghost" data-role="refresh-img">Refresh</button>
+                <span class="note">The new image will be renamed to <strong>B2_0.jpg</strong> automatically.</span>
+              </div>
+              <input type="file" accept="image/png,image/jpeg" data-role="file-input" style="display:none" />
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Cabinet Highlight</h3>
+            <div class="card-inner">
+              <div class="imggrid">
+                <figure>
+                  <img src="../images/B_rack_B2_0.jpg"
+                       alt="Rack view B2_0"
+                       onerror="this.onerror=null; this.src='../../images/B_rack_B2_0.jpg';">
+                </figure>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-size:14px;margin-top:8px;">Description</h3>
+          <div class="description-box" data-role="description-text">loading...</div>
+        </div>
+
+        <div class="stock-display" data-role="stock-display">Loading stock...</div>
+
+        <div class="stock-ui" data-role="stock-ui">
+          <div class="row">
+            <span class="pill">Current: <strong data-role="curQty">–</strong></span>
+            <span class="pill">Change: <strong data-role="delta">0</strong></span>
+            <span class="pill">New: <strong data-role="newQty">–</strong></span>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <button type="button" class="btn" data-role="minus">−1</button>
+            <button type="button" class="btn" data-role="plus">+1</button>
+            <label style="font-size:12px;">
+              Exact:
+              <input type="number" min="0" step="1" data-role="exact" />
+            </label>
+            <button type="button" class="btn secondary" data-role="reset">Reset</button>
+            <button type="button" class="btn" data-role="save-stock">Save</button>
+          </div>
+          <div class="warn" data-role="minWarn">LOW STOCK — minimum 10</div>
+        </div>
+      </article>
+
+      <!-- Drawer B3_0 -->
+      <article class="drawer-block" data-drawer="B3_0">
+        <div class="drawer-header">
+          <div class="drawer-header-left">
+            <span class="drawer-code-pill">B3_0</span>
+            <span class="drawer-title-small" data-role="product-name-label">Product Name: loading...</span>
+          </div>
+          <div class="drawer-header-actions">
+            <button class="btn secondary" data-role="edit-info">✏️ Edit</button>
+            <button class="btn ghost" data-role="qr">📎 QR</button>
+          </div>
+        </div>
+        <div class="row" style="font-size:12px;color:var(--muted);">
+          <span data-role="product-code-label"><strong>Code:</strong> loading...</span>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <h3>Drawer Photo</h3>
+            <div class="card-inner">
+              <div class="imgwrap">
+                <img data-role="drawer-img"
+                     src="../images/B3_0.jpg"
+                     alt="Drawer image B3_0"
+                     onerror="this.onerror=null; this.src='../../images/B3_0.jpg';" />
+              </div>
+              <div class="row" style="margin-top:8px;">
+                <button class="btn" data-role="upload-photo">🖼️ Update Photo</button>
+                <button class="btn ghost" data-role="refresh-img">Refresh</button>
+                <span class="note">The new image will be renamed to <strong>B3_0.jpg</strong> automatically.</span>
+              </div>
+              <input type="file" accept="image/png,image/jpeg" data-role="file-input" style="display:none" />
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Cabinet Highlight</h3>
+            <div class="card-inner">
+              <div class="imggrid">
+                <figure>
+                  <img src="../images/B_rack_B3_0.jpg"
+                       alt="Rack view B3_0"
+                       onerror="this.onerror=null; this.src='../../images/B_rack_B3_0.jpg';">
+                </figure>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-size:14px;margin-top:8px;">Description</h3>
+          <div class="description-box" data-role="description-text">loading...</div>
+        </div>
+
+        <div class="stock-display" data-role="stock-display">Loading stock...</div>
+
+        <div class="stock-ui" data-role="stock-ui">
+          <div class="row">
+            <span class="pill">Current: <strong data-role="curQty">–</strong></span>
+            <span class="pill">Change: <strong data-role="delta">0</strong></span>
+            <span class="pill">New: <strong data-role="newQty">–</strong></span>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <button type="button" class="btn" data-role="minus">−1</button>
+            <button type="button" class="btn" data-role="plus">+1</button>
+            <label style="font-size:12px;">
+              Exact:
+              <input type="number" min="0" step="1" data-role="exact" />
+            </label>
+            <button type="button" class="btn secondary" data-role="reset">Reset</button>
+            <button type="button" class="btn" data-role="save-stock">Save</button>
+          </div>
+          <div class="warn" data-role="minWarn">LOW STOCK — minimum 10</div>
+        </div>
+      </article>
+
+      <!-- Drawer B4_0 -->
+      <article class="drawer-block" data-drawer="B4_0">
+        <div class="drawer-header">
+          <div class="drawer-header-left">
+            <span class="drawer-code-pill">B4_0</span>
+            <span class="drawer-title-small" data-role="product-name-label">Product Name: loading...</span>
+          </div>
+          <div class="drawer-header-actions">
+            <button class="btn secondary" data-role="edit-info">✏️ Edit</button>
+            <button class="btn ghost" data-role="qr">📎 QR</button>
+          </div>
+        </div>
+        <div class="row" style="font-size:12px;color:var(--muted);">
+          <span data-role="product-code-label"><strong>Code:</strong> loading...</span>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <h3>Drawer Photo</h3>
+            <div class="card-inner">
+              <div class="imgwrap">
+                <img data-role="drawer-img"
+                     src="../images/B4_0.jpg"
+                     alt="Drawer image B4_0"
+                     onerror="this.onerror=null; this.src='../../images/B4_0.jpg';" />
+              </div>
+              <div class="row" style="margin-top:8px;">
+                <button class="btn" data-role="upload-photo">🖼️ Update Photo</button>
+                <button class="btn ghost" data-role="refresh-img">Refresh</button>
+                <span class="note">The new image will be renamed to <strong>B4_0.jpg</strong> automatically.</span>
+              </div>
+              <input type="file" accept="image/png,image/jpeg" data-role="file-input" style="display:none" />
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Cabinet Highlight</h3>
+            <div class="card-inner">
+              <div class="imggrid">
+                <figure>
+                  <img src="../images/B_rack_B4_0.jpg"
+                       alt="Rack view B4_0"
+                       onerror="this.onerror=null; this.src='../../images/B_rack_B4_0.jpg';">
+                </figure>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-size:14px;margin-top:8px;">Description</h3>
+          <div class="description-box" data-role="description-text">loading...</div>
+        </div>
+
+        <div class="stock-display" data-role="stock-display">Loading stock...</div>
+
+        <div class="stock-ui" data-role="stock-ui">
+          <div class="row">
+            <span class="pill">Current: <strong data-role="curQty">–</strong></span>
+            <span class="pill">Change: <strong data-role="delta">0</strong></span>
+            <span class="pill">New: <strong data-role="newQty">–</strong></span>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <button type="button" class="btn" data-role="minus">−1</button>
+            <button type="button" class="btn" data-role="plus">+1</button>
+            <label style="font-size:12px;">
+              Exact:
+              <input type="number" min="0" step="1" data-role="exact" />
+            </label>
+            <button type="button" class="btn secondary" data-role="reset">Reset</button>
+            <button type="button" class="btn" data-role="save-stock">Save</button>
+          </div>
+          <div class="warn" data-role="minWarn">LOW STOCK — minimum 10</div>
+        </div>
+      </article>
+
     </section>
+
+    <div id="toast"></div>
   </div>
 
+  <!-- Post-save banner -->
+  <div id="postSaveBanner" role="status" aria-live="polite">
+    <div class="row">
+      <div>
+        <strong>Change saved.</strong>
+        Please wait about <span class="counter" id="psbCounter">60</span>s and then refresh the page to see it everywhere.
+      </div>
+      <div class="row">
+        <button id="psbRefreshBtn" type="button">Refresh now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit info (shared per drawer) -->
+  <dialog class="modal" id="editModal">
+    <form method="dialog" id="editForm">
+      <div class="hd">
+        <strong>Edit product info</strong>
+        <button class="close-x" value="cancel" aria-label="Close" type="button">✕</button>
+      </div>
+      <div class="bd">
+        <div class="fld">
+          <label for="fldName">Product Name</label>
+          <input id="fldName" type="text" required />
+        </div>
+        <div class="fld">
+          <label for="fldCode">Product Code</label>
+          <input id="fldCode" type="text" required />
+        </div>
+        <div class="fld">
+          <label for="fldDesc">Description</label>
+          <textarea id="fldDesc" required></textarea>
+        </div>
+      </div>
+      <div class="ft">
+        <button class="btn ghost" value="cancel" type="button">Cancel</button>
+        <button class="btn" id="saveInfoBtn" type="button">Save changes</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- QR modal (shared) -->
+  <dialog class="modal" id="qrModal">
+    <div class="hd">
+      <strong>Product QR</strong>
+      <button class="close-x" value="cancel" aria-label="Close" id="qrClose" type="button">✕</button>
+    </div>
+    <div class="bd" style="align-items:center;">
+      <canvas id="qrCanvas" width="1024" height="1024"></canvas>
+      <div class="note" id="qrUrlNote" style="text-align:center;word-break:break-all;margin-top:10px;"></div>
+    </div>
+    <div class="ft">
+      <button class="btn ghost" id="copyLinkBtn" type="button">URL Link</button>
+      <button class="btn ghost" id="dlPngBtn" type="button">Download PNG</button>
+      <button class="btn" id="dlPdfBtn" type="button">Download PDF</button>
+    </div>
+  </dialog>
+
   <script>
-    // 👇 CONFIGURACIÓ BÀSICA
-    // Canvia aquí si els teus codis de drawer són B1_0, B2_0, etc.
-    const DRAWERS = ["B1", "B2", "B3", "B4"];
+    const DRAWERS = ["B1_0","B2_0","B3_0","B4_0"];
 
-    // Si tens un endpoint o worker per llegir / escriure dades, posa-ho aquí
-    // (ara mateix només deixo els punts marcats com a TODO)
-    const STOCK_CSV_URL = "docs/stock.csv"; // ajusta el path si cal
+    const STOCK_API            = "https://stock-api.ramonpertinez.workers.dev/stock/item";
+    const UPLOAD_ENDPOINT      = "https://stock-api.ramonpertinez.workers.dev/upload-image";
+    const UPDATE_INFO_ENDPOINT = "https://stock-api.ramonpertinez.workers.dev/update-item-info";
 
-    // ------------------------------
-    // UTILITATS CSV (lectura simple)
-    // ------------------------------
-    function parseCsv(text) {
-      const lines = text.trim().split(/\r?\n/);
-      const headers = lines[0].split("\t"); // → TAB (com al teu exemple)
-      return lines.slice(1).map(line => {
-        const cols = line.split("\t");
-        const obj = {};
-        headers.forEach((h, i) => obj[h] = cols[i] ?? "");
-        return obj;
+    // --------- LOGO ----------
+    (function loadLogo(){
+      const logo = document.getElementById('logo');
+      if (!logo) return;
+      const candidates = [
+        "../../PARCsafe-[369]-BP-2022.png",
+        "../PARCsafe-[369]-BP-2022.png",
+        "../../../PARCsafe-[369]-BP-2022.png",
+        "../../parcsafe-logo.png",
+        "../parcsafe-logo.png",
+        "../../../parcsafe-logo.png"
+      ];
+      let i = 0;
+      const tryNext = () => {
+        if (i >= candidates.length){ logo.remove(); return; }
+        logo.onerror = () => { i++; tryNext(); };
+        logo.src = candidates[i++];
+      };
+      tryNext();
+    })();
+
+    // --------- TOAST ----------
+    const toast = document.getElementById("toast");
+    function showToast(msg, color="#198754"){
+      toast.textContent = msg;
+      toast.style.backgroundColor = color;
+      toast.style.display = "block";
+      setTimeout(()=> toast.style.display="none", 2600);
+    }
+
+    // --------- POST-SAVE BANNER ----------
+    const psb = document.getElementById('postSaveBanner');
+    const psbCounter = document.getElementById('psbCounter');
+    const psbRefreshBtn = document.getElementById('psbRefreshBtn');
+    psbRefreshBtn.addEventListener('click', ()=> location.reload());
+    let psbTimer = null;
+    function showPostSaveBanner(seconds = 60){
+      clearInterval(psbTimer);
+      psbCounter.textContent = String(seconds);
+      psb.style.display = 'block';
+      psbTimer = setInterval(() => {
+        let v = parseInt(psbCounter.textContent || '0', 10);
+        v = Math.max(0, v - 1);
+        psbCounter.textContent = String(v);
+        if (v <= 0){ clearInterval(psbTimer); }
+      }, 1000);
+    }
+
+    // --------- CSV LOAD ----------
+    let ALL_DATA = [];
+    const drawerRows = {}; // drawerCode -> row
+
+    async function loadCSVFromCandidates() {
+      const candidates = [
+        "../../stock.csv","../stock.csv","../../../stock.csv","./stock.csv",
+        "/docs/stock.csv", window.location.origin + "/docs/stock.csv",
+      ];
+      for (const url of candidates) {
+        try {
+          const res = await fetch(url + "?t=" + Date.now());
+          if (res.ok) {
+            const txt = await res.text();
+            if (txt.includes("drawerCode")) { return txt; }
+          }
+        } catch (_) {}
+      }
+      throw new Error("stock.csv not found via any path");
+    }
+
+    function parseCSV(txt){
+      const rows = txt.trim().split(/\r?\n/);
+      const headers = rows[0].split(",").map(h => h.trim());
+      return rows.slice(1).map(r => {
+        const vals = r.split(",");
+        return headers.reduce((o, h, i) => {
+          o[h] = vals[i] ? vals[i].trim() : "";
+          return o;
+        }, {});
       });
     }
 
-    function csvRowToMapByDrawer(rows) {
-      const map = {};
-      for (const row of rows) {
-        if (!row.drawerCode) continue;
-        map[row.drawerCode.trim()] = row;
+    // --------- QR HELPERS ----------
+    async function ensureQrLib(timeoutMs = 1000) {
+      const t0 = performance.now();
+      while (!(window.qrcodegen && window.qrcodegen.QrCode)) {
+        if (performance.now() - t0 > timeoutMs) throw new Error("QR lib not ready");
+        await new Promise(r => setTimeout(r, 20));
       }
-      return map;
     }
 
-    // ------------------------------
-    // GENERACIÓ HTML
-    // ------------------------------
-    const rackBCards = document.getElementById("rackBCards");
+    function hrefFromDrawer(code) {
+      const up = String(code || '').toUpperCase();
 
-    function createDrawerCard(drawerCode) {
-      const card = document.createElement("article");
-      card.className = "drawer-card";
-      card.dataset.drawer = drawerCode;
+      // C2 sèries
+      if (up.startsWith('C2_CP1_')) return `C2/CP1/fitxes/${code}.html`;
+      if (up.startsWith('C2_CP2_')) return `C2/CP2/fitxes/${code}.html`;
 
-      card.innerHTML = `
-        <div class="drawer-header">
-          <div class="code">
-            <span class="dot"></span>
-            <span>${drawerCode}</span>
-          </div>
-          <div class="hint">
-            Inline editor<br><small>Stock & product</small>
-          </div>
-        </div>
+      // C3
+      if (/^C3_/.test(up)) return `C3/fitxes/${code}.html`;
 
-        <div class="img-box" data-role="image-box">
-          <span class="placeholder">No image uploaded for ${drawerCode}</span>
-        </div>
+      // A1, A2, B1, B2...
+      if (/^[AB]\d+_/.test(up)) {
+        const letter = up[0]; // A o B
+        return `${letter}/fitxes/${code}.html`;
+      }
 
-        <div class="img-actions">
-          <label>
-            <small>Upload image</small><br>
-            <input type="file" accept="image/*" data-role="file-input">
-          </label>
+      // Altres prefixos (C1, C4, C5, D1, D2, E1, E2...)
+      const m = up.match(/^(C1|C4|C5|D1|D2|E1|E2)_/);
+      if (m) return `${m[1]}/fitxes/${code}.html`;
 
-          <button class="btn btn-ghost" data-role="reset-image">
-            ↺ Reset image
-          </button>
-        </div>
+      return `fitxes/${code}.html`;
+    }
 
-        <div class="fields">
-          <div class="field">
-            <label>Product name</label>
-            <input type="text" data-role="product-name" placeholder="Product name">
-          </div>
-          <div class="field">
-            <label>Product code</label>
-            <input type="text" data-role="product-code" placeholder="Internal ref.">
-          </div>
-        </div>
+    function buildQrUrl(drawerCode) {
+      return `https://ramonpertinezsola.github.io/C2_CP2_Web/` + hrefFromDrawer(drawerCode);
+    }
 
-        <div class="field" style="margin-top:6px;">
-          <label>Description</label>
-          <textarea rows="2" data-role="description" placeholder="Short product description"></textarea>
-        </div>
-
-        <div class="field-row">
-          <div class="field">
-            <label>Stock qty</label>
-            <input type="number" min="0" data-role="stock-qty" placeholder="0">
-          </div>
-          <div class="field">
-            <label>Min. stock</label>
-            <input type="number" min="0" data-role="min-stock" placeholder="0">
-          </div>
-          <div class="field">
-            <label>Location (optional)</label>
-            <input type="text" data-role="location" placeholder="e.g. top shelf">
-          </div>
-        </div>
-
-        <div class="footer-row">
-          <div class="status-pill" data-role="status-pill">
-            <span class="dot"></span>
-            <span class="label">No data loaded</span>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-ghost" data-role="cancel">
-              Cancel
-            </button>
-            <button class="btn btn-primary" data-role="save">
-              💾 Save ${drawerCode}
-            </button>
-          </div>
-        </div>
-
-        <small class="helper">
-          Els canvis s'apliquen només a aquest calaix. Revisa stock i mínim abans de guardar.
-        </small>
-      `;
-
-      // listeners d’imatge
-      const fileInput = card.querySelector('[data-role="file-input"]');
-      const imageBox  = card.querySelector('[data-role="image-box"]');
-      const resetBtn  = card.querySelector('[data-role="reset-image"]');
-
-      fileInput.addEventListener("change", () => {
-        const file = fileInput.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-          imageBox.innerHTML = `<img src="${e.target.result}" alt="${drawerCode} image" />`;
+    const LOGO_CANDIDATES = ["../../parcsafe-logo.png","../parcsafe-logo.png","../../../parcsafe-logo.png"];
+    let qrLogoPromise;
+    function loadQrLogo() {
+      if (qrLogoPromise) return qrLogoPromise;
+      qrLogoPromise = new Promise((resolve) => {
+        let i = 0;
+        const tryNext = () => {
+          if (i >= LOGO_CANDIDATES.length) return resolve(null);
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => { i++; tryNext(); };
+          img.src = LOGO_CANDIDATES[i];
         };
-        reader.readAsDataURL(file);
+        tryNext();
       });
-
-      resetBtn.addEventListener("click", () => {
-        fileInput.value = "";
-        imageBox.innerHTML = `<span class="placeholder">No image uploaded for ${drawerCode}</span>`;
-      });
-
-      // botons Save / Cancel
-      const saveBtn   = card.querySelector('[data-role="save"]');
-      const cancelBtn = card.querySelector('[data-role="cancel"]');
-
-      saveBtn.addEventListener("click", () => handleSave(card));
-      cancelBtn.addEventListener("click", () => handleCancel(card));
-
-      return card;
+      return qrLogoPromise;
     }
 
-    // afegeix totes les targetes
-    DRAWERS.forEach(code => {
-      rackBCards.appendChild(createDrawerCard(code));
-    });
+    async function drawQR(qrCanvas, url){
+      const size = 1024;
+      const ctx = qrCanvas.getContext('2d');
+      qrCanvas.width = size; qrCanvas.height = size;
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,size,size);
 
-    // ------------------------------
-    // CARREGAR DADES DES DE CSV
-    // ------------------------------
-    let drawerDataMap = {}; // { drawerCode → row }
+      const ecc = qrcodegen.QrCode.Ecc.HIGH || qrcodegen.QrCode.Ecc.H;
+      const qr  = qrcodegen.QrCode.encodeText(url, ecc);
+      const modules = qr.size, border = 2;
+      const ppm = Math.floor(size / (modules + border*2));
+      const qrPix = ppm * (modules + border*2);
+      const offset = Math.floor((size - qrPix)/2);
 
-    async function loadStockCsv() {
-      try {
-        const res = await fetch(STOCK_CSV_URL);
-        if (!res.ok) throw new Error("CSV not found");
-        const text = await res.text();
-        const rows = parseCsv(text);
-        drawerDataMap = csvRowToMapByDrawer(rows);
-        applyDataToCards();
-      } catch (err) {
-        console.error("Error loading CSV:", err);
+      ctx.fillStyle = '#000000';
+      for(let y=0;y<modules;y++){
+        for(let x=0;x<modules;x++){
+          if(qr.getModule(x,y)){
+            const px = offset + (x+border)*ppm;
+            const py = offset + (y+border)*ppm;
+            ctx.fillRect(px,py,ppm,ppm);
+          }
+        }
+      }
+
+      const logoImg = await loadQrLogo();
+      if (logoImg) {
+        const logoBox = Math.floor(size * 0.22);
+        const cx = size/2, cy = size/2;
+        const r = Math.floor(logoBox/2) + 14;
+        ctx.save();
+        ctx.fillStyle = '#FFF';
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+
+        const pad = 18;
+        const w = logoBox - pad*2;
+        const h = logoBox - pad*2;
+        const aspect = logoImg.width / logoImg.height;
+        let drawW = w, drawH = w / aspect;
+        if (drawH > h) { drawH = h; drawW = h * aspect; }
+        ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
       }
     }
 
-    function applyDataToCards() {
-      const cards = document.querySelectorAll(".drawer-card");
-      cards.forEach(card => {
-        const code = card.dataset.drawer;
-        const row  = drawerDataMap[code];
+    // --------- STOCK UI PER BLOC ----------
+    function initStockUIForBlock(block, drawerCode, initialQty, minStock) {
+      const stockDisplay = block.querySelector('[data-role="stock-display"]');
+      const curEl   = block.querySelector('[data-role="curQty"]');
+      const deltaEl = block.querySelector('[data-role="delta"]');
+      const newEl   = block.querySelector('[data-role="newQty"]');
+      const minus   = block.querySelector('[data-role="minus"]');
+      const plus    = block.querySelector('[data-role="plus"]');
+      const exact   = block.querySelector('[data-role="exact"]');
+      const reset   = block.querySelector('[data-role="reset"]');
+      const saveBtn = block.querySelector('[data-role="save-stock"]');
+      const warn    = block.querySelector('[data-role="minWarn"]');
 
-        const nameInput  = card.querySelector('[data-role="product-name"]');
-        const codeInput  = card.querySelector('[data-role="product-code"]');
-        const descInput  = card.querySelector('[data-role="description"]');
-        const qtyInput   = card.querySelector('[data-role="stock-qty"]');
-        const minInput   = card.querySelector('[data-role="min-stock"]');
-        const locInput   = card.querySelector('[data-role="location"]');
-        const statusPill = card.querySelector('[data-role="status-pill"]');
+      let cur = initialQty;
+      let delta = 0;
 
-        if (row) {
-          nameInput.value = row.productName || "";
-          codeInput.value = row.productCode || "";
-          descInput.value = row.description || "";
-          qtyInput.value  = row.stockQty || "";
-          minInput.value  = row.minStock || "";
-          locInput.value  = row.location || "";
+      function refresh(){
+        curEl.textContent = cur;
+        deltaEl.textContent = delta > 0 ? '+' + delta : delta;
+        const nv = cur + delta;
+        newEl.textContent = nv;
+        if (exact) exact.value = nv;
+        if (stockDisplay) stockDisplay.textContent = '📦 STOCK: ' + nv;
 
-          updateStatusPill(statusPill, qtyInput.value, minInput.value);
-        } else {
-          statusPill.classList.remove("ok","low");
-          statusPill.querySelector(".dot").style.backgroundColor = "#d1d5db";
-          statusPill.querySelector(".label").textContent = "Drawer not found in CSV";
+        if (nv < minStock) { warn.classList.add('pulse'); warn.style.display='block'; }
+        else { warn.classList.remove('pulse'); warn.style.display='none'; }
+      }
+
+      minus.addEventListener('click', ()=>{ delta -= 1; refresh(); });
+      plus.addEventListener('click',  ()=>{ delta += 1; refresh(); });
+      exact.addEventListener('input', ()=> {
+        const v = parseInt(exact.value,10);
+        if(!isNaN(v)){ delta = v - cur; refresh(); }
+      });
+      reset.addEventListener('click', ()=>{ delta = 0; refresh(); });
+
+      saveBtn.addEventListener('click', async ()=> {
+        const newVal = cur + delta;
+        if(!confirm(`Are you sure you want to update stock of ${drawerCode} to ${newVal}?`)) return;
+        try{
+          const r = await fetch(STOCK_API, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ drawerCode, newQty: newVal })
+          });
+          if (!r.ok) throw new Error(await r.text());
+          cur = newVal; delta = 0;
+          refresh();
+          showToast(`✔️ Stock updated for ${drawerCode}`);
+          showPostSaveBanner(60);
+          if (drawerRows[drawerCode]) drawerRows[drawerCode].stockQty = String(newVal);
+        }catch(e){
+          console.error(e);
+          showToast('❌ Error updating stock', '#b3261e');
+        }
+      });
+
+      refresh();
+    }
+
+    // --------- IMAGE UPLOAD PER BLOC ----------
+    function initImageHandlersForBlock(block, drawerCode) {
+      const img       = block.querySelector('[data-role="drawer-img"]');
+      const uploadBtn = block.querySelector('[data-role="upload-photo"]');
+      const refreshBtn= block.querySelector('[data-role="refresh-img"]');
+      const fileInput = block.querySelector('[data-role="file-input"]');
+
+      function refreshImageCacheBust(){
+        const base = img.getAttribute('src').split('?')[0];
+        img.src = base + '?v=' + Date.now();
+      }
+
+      uploadBtn.addEventListener('click', ()=> fileInput.click());
+      refreshBtn.addEventListener('click', ()=> refreshImageCacheBust());
+
+      fileInput.addEventListener('change', async (e)=>{
+        const file = e.target.files?.[0];
+        if(!file) return;
+        if(!/image\/jpe?g|image\/png/i.test(file.type)){
+          showToast('Accepted: JPG or PNG', '#b3261e');
+          return;
+        }
+        if(file.size > 8*1024*1024){
+          showToast('Max 8MB image', '#b3261e');
+          return;
+        }
+
+        const fd = new FormData();
+        fd.append('image', file);
+        fd.append('drawerCode', drawerCode);
+
+        try{
+          const r = await fetch(UPLOAD_ENDPOINT, { method:'POST', body: fd });
+          if(!r.ok) throw new Error(await r.text());
+          showToast(`✔️ Image updated for ${drawerCode}`);
+          refreshImageCacheBust();
+          showPostSaveBanner(60);
+        }catch(err){
+          console.error(err);
+          showToast('❌ Error uploading image', '#b3261e');
+        }finally{
+          fileInput.value = '';
         }
       });
     }
 
-    function updateStatusPill(pill, qty, min) {
-      const q = Number(qty || 0);
-      const m = Number(min || 0);
+    // --------- EDIT INFO MODAL (COMPARTIT) ----------
+    const editModal = document.getElementById('editModal');
+    const fldName   = document.getElementById('fldName');
+    const fldCode   = document.getElementById('fldCode');
+    const fldDesc   = document.getElementById('fldDesc');
+    const saveInfoBtn = document.getElementById('saveInfoBtn');
 
-      pill.classList.remove("ok","low");
-      if (!m && !q) {
-        pill.querySelector(".dot").style.backgroundColor = "#d1d5db";
-        pill.querySelector(".label").textContent = "No thresholds set";
+    let currentInfoDrawer = null;
+
+    function openEditModalForDrawer(drawerCode){
+      currentInfoDrawer = drawerCode;
+      const row = drawerRows[drawerCode];
+      fldName.value = row?.productName || "";
+      fldCode.value = row?.productCode || "";
+      fldDesc.value = row?.description || "";
+      try { editModal.showModal(); } catch { editModal.setAttribute('open',''); }
+    }
+
+    document.querySelector('#editModal .close-x').addEventListener('click', ()=>{
+      editModal.close();
+    });
+    document.querySelector('#editModal .btn.ghost').addEventListener('click', ()=>{
+      editModal.close();
+    });
+    document.getElementById('editForm').addEventListener('submit', e => e.preventDefault());
+
+    saveInfoBtn.addEventListener('click', async ()=>{
+      if (!currentInfoDrawer) { editModal.close(); return; }
+      const name = fldName.value.trim();
+      const code = fldCode.value.trim();
+      const desc = fldDesc.value.trim();
+      if (!name || !code || !desc){
+        showToast('Please fill all fields', '#b3261e');
+        return;
+      }
+      const payload = {
+        drawerCode: currentInfoDrawer,
+        productName: name,
+        productCode: code,
+        description: desc
+      };
+
+      try{
+        const r = await fetch(UPDATE_INFO_ENDPOINT, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!r.ok) throw new Error(await r.text());
+
+        // Update DOM
+        const block = document.querySelector(`.drawer-block[data-drawer="${currentInfoDrawer}"]`);
+        if (block){
+          const nameLabel = block.querySelector('[data-role="product-name-label"]');
+          const codeLabel = block.querySelector('[data-role="product-code-label"]');
+          const descBox   = block.querySelector('[data-role="description-text"]');
+          if (nameLabel) nameLabel.textContent = "Product Name: " + name;
+          if (codeLabel) codeLabel.innerHTML = "<strong>Code:</strong> " + code;
+          if (descBox)   descBox.textContent = desc;
+        }
+
+        if (drawerRows[currentInfoDrawer]) {
+          drawerRows[currentInfoDrawer].productName = name;
+          drawerRows[currentInfoDrawer].productCode = code;
+          drawerRows[currentInfoDrawer].description = desc;
+        }
+
+        showToast(`✔️ Product info updated for ${currentInfoDrawer}`);
+        showPostSaveBanner(60);
+        editModal.close();
+      }catch(e){
+        console.error(e);
+        showToast('❌ Error updating info', '#b3261e');
+      }
+    });
+
+    // --------- QR MODAL COMPARTIT ----------
+    const qrModal = document.getElementById('qrModal');
+    const qrClose = document.getElementById('qrClose');
+    const qrCanvas = document.getElementById('qrCanvas');
+    const qrUrlNote = document.getElementById('qrUrlNote');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    const dlPngBtn = document.getElementById('dlPngBtn');
+    const dlPdfBtn = document.getElementById('dlPdfBtn');
+
+    let currentQrDrawer = null;
+    let currentQrUrl = null;
+
+    function openQrModalForDrawer(drawerCode){
+      currentQrDrawer = drawerCode;
+      currentQrUrl = buildQrUrl(drawerCode);
+      qrUrlNote.textContent = currentQrUrl;
+      try { qrModal.showModal(); } catch { qrModal.setAttribute('open',''); }
+      (async ()=>{
+        await new Promise(r => requestAnimationFrame(r));
+        await ensureQrLib();
+        await drawQR(qrCanvas, currentQrUrl);
+      })();
+    }
+
+    qrClose.addEventListener('click', ()=> qrModal.close());
+    qrModal.addEventListener('click', (e)=>{
+      const r = qrModal.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (!inside) qrModal.close();
+    });
+
+    copyLinkBtn.addEventListener('click', async ()=>{
+      if (!currentQrUrl) return;
+      try{
+        await navigator.clipboard.writeText(currentQrUrl);
+        showToast('🔗 Link copied');
+      }catch{
+        const ta=document.createElement('textarea');
+        ta.value=currentQrUrl; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); ta.remove();
+        showToast('🔗 Link copied');
+      }
+    });
+
+    dlPngBtn.addEventListener('click', ()=>{
+      if (!currentQrDrawer) return;
+      const a = document.createElement('a');
+      a.href = qrCanvas.toDataURL('image/png');
+      a.download = `${currentQrDrawer}_QR.png`;
+      a.click();
+    });
+
+    dlPdfBtn.addEventListener('click', ()=>{
+      if (!currentQrDrawer || !currentQrUrl) return;
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit:'mm', format:'A4' });
+      const png = qrCanvas.toDataURL('image/png');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const box = pageW - margin*2;
+      pdf.addImage(png, 'PNG', margin, margin, box, box);
+      pdf.setFontSize(11);
+      pdf.text(currentQrUrl, margin, pageH - margin/2);
+      pdf.save(`${currentQrDrawer}_QR.pdf`);
+    });
+
+    // --------- INIT PER BLOC ----------
+    function initDrawerBlock(drawerCode, row){
+      const block = document.querySelector(`.drawer-block[data-drawer="${drawerCode}"]`);
+      if (!block) return;
+
+      const nameLabel = block.querySelector('[data-role="product-name-label"]');
+      const codeLabel = block.querySelector('[data-role="product-code-label"]');
+      const descBox   = block.querySelector('[data-role="description-text"]');
+      const stockDisplay = block.querySelector('[data-role="stock-display"]');
+
+      if (!row){
+        if (nameLabel) nameLabel.textContent = "Product Name: (not found in CSV)";
+        if (codeLabel) codeLabel.innerHTML = "<strong>Code:</strong> —";
+        if (descBox)   descBox.textContent = "This drawer code was not found in stock.csv.";
+        if (stockDisplay) stockDisplay.textContent = "❌ Error loading stock";
         return;
       }
 
-      if (q <= m && m > 0) {
-        pill.classList.add("low");
-        pill.querySelector(".label").textContent = "LOW stock";
-      } else {
-        pill.classList.add("ok");
-        pill.querySelector(".label").textContent = "Stock OK";
+      const name = row.productName || "";
+      const code = row.productCode || "";
+      const desc = row.description || "";
+      const qty  = parseInt(row.stockQty || "0", 10);
+      const min  = parseInt(row.minStock || "10", 10);
+
+      if (nameLabel) nameLabel.textContent = "Product Name: " + name;
+      if (codeLabel) codeLabel.innerHTML = "<strong>Code:</strong> " + code;
+      if (descBox)   descBox.textContent = desc;
+      if (stockDisplay) stockDisplay.textContent = "📦 STOCK: " + qty;
+      const warn = block.querySelector('[data-role="minWarn"]');
+      if (warn) warn.textContent = `LOW STOCK — minimum ${min}`;
+
+      initStockUIForBlock(block, drawerCode, qty, min);
+      initImageHandlersForBlock(block, drawerCode);
+
+      // Botons Edit + QR
+      const editBtn = block.querySelector('[data-role="edit-info"]');
+      const qrBtn   = block.querySelector('[data-role="qr"]');
+      if (editBtn) editBtn.addEventListener('click', ()=> openEditModalForDrawer(drawerCode));
+      if (qrBtn)   qrBtn.addEventListener('click', ()=> openQrModalForDrawer(drawerCode));
+    }
+
+    // --------- BOOTSTRAP ----------
+    (async function bootstrap(){
+      try{
+        const csvText = await loadCSVFromCandidates();
+        ALL_DATA = parseCSV(csvText);
+
+        DRAWERS.forEach(code => {
+          const row = ALL_DATA.find(r => (r.drawerCode || "").trim() === code);
+          drawerRows[code] = row || null;
+          initDrawerBlock(code, row || null);
+        });
+
+      }catch(e){
+        console.error(e);
+        showToast('❌ Error loading stock.csv', '#b3261e');
       }
-    }
-
-    // ------------------------------
-    // GUARDAR / CANCEL·LAR
-    // ------------------------------
-    function collectCardData(card) {
-      const drawerCode = card.dataset.drawer;
-      const name   = card.querySelector('[data-role="product-name"]').value.trim();
-      const pcode  = card.querySelector('[data-role="product-code"]').value.trim();
-      const desc   = card.querySelector('[data-role="description"]').value.trim();
-      const qty    = card.querySelector('[data-role="stock-qty"]').value.trim();
-      const min    = card.querySelector('[data-role="min-stock"]').value.trim();
-      const loc    = card.querySelector('[data-role="location"]').value.trim();
-
-      return {
-        drawerCode,
-        productName: name,
-        productCode: pcode,
-        description: desc,
-        stockQty: qty,
-        minStock: min,
-        location: loc
-        // si vols guardar també la imatge, pots afegir aquí un camp imageData (Base64)
-      };
-    }
-
-    async function handleSave(card) {
-      const data = collectCardData(card);
-      const statusPill = card.querySelector('[data-role="status-pill"]');
-      const qtyInput   = card.querySelector('[data-role="stock-qty"]');
-      const minInput   = card.querySelector('[data-role="min-stock"]');
-
-      // TODO: substitueix aquest console.log pel teu fetch cap al worker / API
-      console.log("SAVE drawer", data.drawerCode, data);
-
-      // Exemple de pseudo-crida:
-      // await fetch("https://EL-TEU-WORKER/update-drawer", {
-      //   method: "POST",
-      //   headers: { "Content-Type":"application/json" },
-      //   body: JSON.stringify(data)
-      // });
-
-      updateStatusPill(statusPill, qtyInput.value, minInput.value);
-    }
-
-    function handleCancel(card) {
-      const code = card.dataset.drawer;
-      const row  = drawerDataMap[code];
-      if (!row) return;
-
-      card.querySelector('[data-role="product-name"]').value = row.productName || "";
-      card.querySelector('[data-role="product-code"]').value = row.productCode || "";
-      card.querySelector('[data-role="description"]').value  = row.description || "";
-      card.querySelector('[data-role="stock-qty"]').value    = row.stockQty || "";
-      card.querySelector('[data-role="min-stock"]').value    = row.minStock || "";
-      card.querySelector('[data-role="location"]').value     = row.location || "";
-
-      const statusPill = card.querySelector('[data-role="status-pill"]');
-      updateStatusPill(statusPill, row.stockQty, row.minStock);
-    }
-
-    // ------------------------------
-    // INIT
-    // ------------------------------
-    loadStockCsv();
+    })();
   </script>
 </body>
 </html>
-
