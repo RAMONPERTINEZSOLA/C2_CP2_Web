@@ -580,6 +580,70 @@
     return lines.join("\n");
   }
 
+    // ===== EXISTING PRODUCTS HELPERS (like Rack A) =====
+  function normalizeName(s) {
+    return String(s || "")
+      .normalize("NFKC")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  }
+
+  // Llista única de productes per NOM, amb comptador
+  function uniqueProductNamesFromData(data) {
+    const map = new Map(); // key normalitzat -> { display, n }
+    for (const r of data || []) {
+      const raw = (r.productName || "").trim();
+      if (!raw) continue;
+      const key = normalizeName(raw);
+      const prev = map.get(key) || { display: raw, n: 0 };
+      prev.n += 1;
+      map.set(key, prev);
+    }
+    return [...map.values()].sort((a, b) => b.n - a.n);
+  }
+
+  // Donat un nom, tria el codi i la descripció més freqüents
+  function canonicalByProductName(name) {
+    const key = normalizeName(name);
+    const rows = (window.ALL_DATA || []).filter(
+      (r) => normalizeName(r.productName || "") === key
+    );
+    if (!rows.length) {
+      return {
+        productName: name.trim(),
+        productCode: "",
+        description: "",
+      };
+    }
+    const codes = rows.map((r) => r.productCode || "");
+    const descs = rows.map((r) => r.description || "");
+
+    function modeNonEmpty(arr) {
+      const m = new Map();
+      for (const v of arr) {
+        const s = String(v || "").trim();
+        if (!s) continue;
+        m.set(s, (m.get(s) || 0) + 1);
+      }
+      let best = "";
+      let bestN = 0;
+      for (const [val, n] of m.entries()) {
+        if (n > bestN) {
+          best = val;
+          bestN = n;
+        }
+      }
+      return best;
+    }
+
+    return {
+      productName: name.trim(),
+      productCode: modeNonEmpty(codes) || "",
+      description: modeNonEmpty(descs) || "",
+    };
+  }
+
   async function updateMinStockForDrawer(drawerCode, newMin) {
     const rows = window.ALL_DATA || [];
     let found = false;
@@ -765,19 +829,102 @@
 
   let currentInfoDrawer = null;
 
+  // Existing picker (created dynamically)
+  let existingPickerWrap = null;
+  let existingSelect = null;
+  let existingPickerInit = false;
+
+  function ensureExistingPicker() {
+    if (existingPickerInit) return;
+    existingPickerInit = true;
+
+    const bd = editModal.querySelector(".bd");
+    const modeFld = fldMode.closest(".fld");
+
+    existingPickerWrap = document.createElement("div");
+    existingPickerWrap.className = "fld";
+    existingPickerWrap.id = "existingPickerWrap";
+    existingPickerWrap.style.display = "none";
+    existingPickerWrap.innerHTML = `
+      <label for="fldExistingSelect">Existing product (by name)</label>
+      <select id="fldExistingSelect">
+        <option value="">— Select an existing product —</option>
+      </select>
+      <p class="note">
+        When you link to an existing product, the <strong>name, code and description</strong>
+        will be reused from the canonical definition in <code>stock.csv</code>.
+      </p>
+    `;
+
+    // Inserim just després del camp "Update mode"
+    bd.insertBefore(existingPickerWrap, modeFld.nextSibling);
+
+    existingSelect = existingPickerWrap.querySelector("#fldExistingSelect");
+    existingSelect.addEventListener("change", () => {
+      const val = (existingSelect.value || "").trim();
+      if (!val) return;
+      const canon = canonicalByProductName(val);
+      fldName.value = canon.productName || "";
+      fldCode.value = canon.productCode || "";
+      fldDesc.value = canon.description || "";
+    });
+  }
+
+  function populateExistingOptions(currentName) {
+    ensureExistingPicker();
+    if (!existingSelect) return;
+
+    const items = uniqueProductNamesFromData(window.ALL_DATA || []);
+    existingSelect.innerHTML =
+      '<option value="">— Select an existing product —</option>';
+
+    for (const it of items) {
+      const opt = document.createElement("option");
+      opt.value = it.display;
+      opt.textContent = `${it.display} (${it.n})`;
+      existingSelect.appendChild(opt);
+    }
+
+    // intentem preseleccionar el nom actual del drawer
+    if (currentName) {
+      const targetKey = normalizeName(currentName);
+      for (const opt of existingSelect.options) {
+        if (normalizeName(opt.value) === targetKey) {
+          existingSelect.value = opt.value;
+          break;
+        }
+      }
+    }
+  }
+
   function openEditModalForDrawer(drawerCode, row) {
     currentInfoDrawer = drawerCode;
-    fldName.value = row?.productName || "";
+    const name = row?.productName || "";
+    fldName.value = name;
     fldCode.value = row?.productCode || "";
     fldDesc.value = row?.description || "";
     fldMinStock.value = row?.minStock || "";
-    fldMode.value = "NEW";
+    fldMode.value = "NEW"; // per defecte, NEW
+
+    ensureExistingPicker();
+    if (existingPickerWrap) existingPickerWrap.style.display = "none";
 
     try {
       editModal.showModal();
     } catch {
       editModal.setAttribute("open", "");
     }
+
+    // Si l’usuari canvia a EXISTING, mostrem el selector i el popul·lem
+    fldMode.onchange = () => {
+      const mode = (fldMode.value || "NEW").toUpperCase();
+      if (mode === "EXISTING") {
+        populateExistingOptions(name);
+        if (existingPickerWrap) existingPickerWrap.style.display = "";
+      } else if (existingPickerWrap) {
+        existingPickerWrap.style.display = "none";
+      }
+    };
   }
 
   // Close handlers
@@ -843,9 +990,9 @@
     }
 
     const drawerCode = currentInfoDrawer;
-    const name = fldName.value.trim();
-    const code = fldCode.value.trim();
-    const desc = fldDesc.value.trim();
+    let name = fldName.value.trim();
+    let code = fldCode.value.trim();
+    let desc = fldDesc.value.trim();
     const mode = (fldMode.value || "NEW").toUpperCase();
 
     const minStr = fldMinStock.value.trim();
@@ -875,6 +1022,46 @@
         return;
       }
     }
+
+        // Validation per mode
+    if (mode === "DESC_ONLY") {
+      if (!desc && minVal === null) {
+        showToast(
+          "For DESCRIPTION ONLY mode, please update description and/or minimum stock",
+          "#b3261e"
+        );
+        return;
+      }
+    } else if (mode === "EXISTING") {
+      // Cal triar un producte existent de la llista
+      ensureExistingPicker();
+      if (!existingSelect) {
+        showToast("Existing product picker not ready", "#b3261e");
+        return;
+      }
+      const chosen = (existingSelect.value || "").trim();
+      if (!chosen) {
+        showToast("Please select an existing product from the list", "#b3261e");
+        return;
+      }
+      const canon = canonicalByProductName(chosen);
+      name = canon.productName || chosen;
+      code = canon.productCode || "";
+      desc = canon.description || "";
+
+      fldName.value = name;
+      fldCode.value = code;
+      fldDesc.value = desc;
+    } else {
+      // NEW
+      if (!name) {
+        showToast("Product name is required in NEW/EXISTING mode", "#b3261e");
+        return;
+      }
+    }
+
+    // Build payload for worker
+    let payload;
 
     // Build payload for worker
     let payload;
