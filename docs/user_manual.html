@@ -232,16 +232,22 @@
       margin-top:-1px;
     }
 
-    .hero-illustration{
-      position:relative;
-      min-height:170px;
-      border-radius:18px;
-      background:radial-gradient(circle at top,rgba(255,255,255,.9),transparent 60%),
-                 linear-gradient(145deg,rgba(15,23,42,.95),rgba(15,23,42,.7));
-      overflow:hidden;
-      padding:16px 16px 18px;
-      color:#e5e7eb;
-      box-shadow:0 18px 45px rgba(15,23,42,.76);
+        .hero-illustration{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    align-self:stretch;
+    border-radius:18px;
+    background:transparent;
+    padding:0;
+    box-shadow:none;
+    }
+
+    .hero-img{
+    width:100%;
+    display:block;
+    border-radius:18px;
+    box-shadow:0 18px 36px rgba(15,23,42,.45);
     }
 
     .hero-badge{
@@ -633,10 +639,14 @@
       }
     }
     @media (max-width:600px){
-      .section{padding:18px 16px;}
-      .two-col{grid-template-columns:1fr;}
-      .hero-illustration{min-height:190px;}
+  .section{padding:18px 16px;}
+  .two-col{grid-template-columns:1fr;}
+  .hero-illustration{
+    min-height:auto;
+    margin-top:12px;
+      }
     }
+
   </style>
 </head>
 
@@ -690,32 +700,66 @@
       </div>
 
       <!-- HERO -->
-      <section class="hero" id="intro">
+        <section class="hero" id="intro">
         <div>
-          <div class="hero-eyebrow">PARCSAFE WAREHOUSE — USER GUIDE</div>
-          <h1>Parcsafe Warehouse — User Guide for the Team</h1>
-          <p class="hero-subtitle">
+            <div class="hero-eyebrow">PARCSAFE WAREHOUSE — USER GUIDE</div>
+            <h1>Parcsafe Warehouse — User Guide for the Team</h1>
+            <p class="hero-subtitle">
             Fast, clear, and built to help you work better — without complications.  
             This page explains how to use the warehouse web app to check and update stock, step by step.
-          </p>
-          <div class="hero-tags">
+            </p>
+
+            <div class="hero-tags">
             <span class="tag">No coding required</span>
             <span class="tag">Works on phone, tablet & PC</span>
             <span class="tag">Shared for the whole team</span>
-          </div>
-          <ul class="checklist">
+            </div>
+
+            <ul class="checklist">
             <li><span class="check-icon">✓</span>Open the right drawer from the Main Menu.</li>
             <li><span class="check-icon">✓</span>Update quantities after you pick or add items.</li>
             <li><span class="check-icon">✓</span>Use the photos and descriptions to avoid confusion.</li>
-          </ul>
-          <div class="hero-note">
+            </ul>
+
+            <div class="hero-note">
             <span class="icon">ℹ️</span>
             <span>
-              This guide is written for <strong>everyday users of the warehouse</strong>, not developers.  
-              If you can browse the internet, you can use this system.
+                This guide is written for <strong>everyday users of the warehouse</strong>, not developers.  
+                If you can browse the internet, you can use this system.
             </span>
-          </div>
+            </div>
         </div>
+
+    <!-- RIGHT SIDE: TWO IMAGES -->
+        <div class="hero-illustration">
+            <!-- Image 1 -->
+            <img 
+            src="assets/user-manual/hero-warehouse-dashboard.png"
+            alt="Warehouse dashboard illustration"
+            class="hero-img"
+            style="
+                width:100%;
+                border-radius:16px;
+                margin-bottom:18px;
+                box-shadow:0 16px 32px rgba(0,0,0,.25);
+            "
+            />
+
+            <!-- Image 2 -->
+            <img 
+            src="assets/user-manual/qr-drawer.png"
+            alt="QR on drawer illustration"
+            class="hero-img"
+            style="
+                width:100%;
+                border-radius:16px;
+                box-shadow:0 16px 32px rgba(0,0,0,.25);
+            "
+            />
+        </div>
+
+        </section>
+
 
         <!-- Illustration "generated" layout -->
         <div class="hero-illustration" aria-hidden="true">
