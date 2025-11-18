@@ -1,1 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rack B — Parcsafe Drawer Panel</title>
+
+  <!-- Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    :root{
+      --green:#6dbd45;
+      --green-2:#5aa83a;
+      --ink:#222;
+      --muted:#667085;
+      --bg:#f5f7f8;
+      --card:#ffffff;
+      --line:#e6e8eb;
+      --shadow:0 10px 30px rgba(109,189,69,.15);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+
+    body{
+      font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      padding:24px;
+    }
+
+    .page{
+      max-width:1200px;
+      margin:0 auto;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:24px;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    header h1{
+      font-size:24px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    header h1 span.badge{
+      font-size:12px;
+      padding:3px 10px;
+      border-radius:999px;
+      background:#e7f5e8;
+      color:var(--green-2);
+      font-weight:600;
+    }
+
+    .sub{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .rack-meta{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .rack-meta span{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+    }
+
+    .rack-meta span strong{
+      color:var(--ink);
+      font-weight:600;
+    }
+
+    .cards-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:18px;
+    }
+
+    .drawer-card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px 16px 14px;
+      border:1px solid rgba(0,0,0,.02);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .drawer-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:4px;
+    }
+
+    .drawer-header .code{
+      font-size:18px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .drawer-header .code span.dot{
+      width:9px;
+      height:9px;
+      border-radius:999px;
+      background:var(--green-2);
+      box-shadow:0 0 0 3px rgba(90,168,58,.18);
+    }
+
+    .drawer-header .hint{
+      font-size:11px;
+      color:var(--muted);
+      text-align:right;
+    }
+
+    .img-box{
+      border-radius:12px;
+      border:1px dashed var(--line);
+      background:#fafbfc;
+      padding:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:120px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .img-box img{
+      max-width:100%;
+      max-height:160px;
+      object-fit:contain;
+    }
+
+    .img-box span.placeholder{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .img-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-top:4px;
+    }
+
+    .img-actions label{
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:7px 14px;
+      font-size:12px;
+      font-weight:600;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      white-space:nowrap;
+    }
+
+    .btn-primary{
+      background:var(--green);
+      color:#fff;
+    }
+
+    .btn-primary:hover{
+      background:var(--green-2);
+    }
+
+    .btn-ghost{
+      background:transparent;
+      color:var(--muted);
+      border:1px solid var(--line);
+    }
+
+    .btn-ghost:hover{
+      background:#f3f4f6;
+    }
+
+    .fields{
+      display:grid;
+      grid-template-columns:1.2fr 0.9fr;
+      gap:10px;
+      margin-top:6px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+      font-size:11px;
+    }
+
+    .field label{
+      font-weight:600;
+      color:var(--muted);
+    }
+
+    .field input,
+    .field textarea{
+      border-radius:10px;
+      border:1px solid var(--line);
+      padding:6px 8px;
+      font-size:12px;
+      font-family:inherit;
+      resize:vertical;
+      min-height:32px;
+    }
+
+    .field input:focus,
+    .field textarea:focus{
+      outline:2px solid rgba(109,189,69,.35);
+      border-color:var(--green-2);
+    }
+
+    .field-row{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:6px;
+      margin-top:4px;
+    }
+
+    .field-row .field{
+      min-width:0;
+    }
+
+    .footer-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:6px;
+      margin-top:6px;
+    }
+
+    .status-pill{
+      font-size:11px;
+      padding:4px 9px;
+      border-radius:999px;
+      background:#f3f4f6;
+      color:var(--muted);
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .status-pill span.dot{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:#d1d5db;
+    }
+
+    .status-pill.low{
+      background:#fff4f2;
+      color:#d94841;
+    }
+
+    .status-pill.low span.dot{
+      background:#e03131;
+    }
+
+    .status-pill.ok{
+      background:#e8f7ee;
+      color:#2f9e44;
+    }
+
+    .status-pill.ok span.dot{
+      background:#2f9e44;
+    }
+
+    small.helper{
+      font-size:10px;
+      color:var(--muted);
+    }
+
+    input[type="file"]{
+      font-size:11px;
+      max-width:150px;
+    }
+
+    @media (max-width:720px){
+      .fields{
+        grid-template-columns:1fr;
+      }
+      .field-row{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <h1>
+          Rack B
+          <span class="badge">Multi-drawer editor</span>
+        </h1>
+        <p class="sub">
+          Edita directament tots els calaixos B (B1–B4) en una sola pantalla:
+          producte, descripció, stock, mínim i imatge.
+        </p>
+      </div>
+      <div class="rack-meta">
+        <span><strong>RACK</strong> B</span>
+        <span><strong>Drawers</strong> B1 · B2 · B3 · B4</span>
+      </div>
+    </header>
+
+    <section class="cards-grid" id="rackBCards">
+      <!-- Les targetes es generen per JS -->
+    </section>
+  </div>
+
+  <script>
+    // 👇 CONFIGURACIÓ BÀSICA
+    // Canvia aquí si els teus codis de drawer són B1_0, B2_0, etc.
+    const DRAWERS = ["B1", "B2", "B3", "B4"];
+
+    // Si tens un endpoint o worker per llegir / escriure dades, posa-ho aquí
+    // (ara mateix només deixo els punts marcats com a TODO)
+    const STOCK_CSV_URL = "docs/stock.csv"; // ajusta el path si cal
+
+    // ------------------------------
+    // UTILITATS CSV (lectura simple)
+    // ------------------------------
+    function parseCsv(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const headers = lines[0].split("\t"); // → TAB (com al teu exemple)
+      return lines.slice(1).map(line => {
+        const cols = line.split("\t");
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = cols[i] ?? "");
+        return obj;
+      });
+    }
+
+    function csvRowToMapByDrawer(rows) {
+      const map = {};
+      for (const row of rows) {
+        if (!row.drawerCode) continue;
+        map[row.drawerCode.trim()] = row;
+      }
+      return map;
+    }
+
+    // ------------------------------
+    // GENERACIÓ HTML
+    // ------------------------------
+    const rackBCards = document.getElementById("rackBCards");
+
+    function createDrawerCard(drawerCode) {
+      const card = document.createElement("article");
+      card.className = "drawer-card";
+      card.dataset.drawer = drawerCode;
+
+      card.innerHTML = `
+        <div class="drawer-header">
+          <div class="code">
+            <span class="dot"></span>
+            <span>${drawerCode}</span>
+          </div>
+          <div class="hint">
+            Inline editor<br><small>Stock & product</small>
+          </div>
+        </div>
+
+        <div class="img-box" data-role="image-box">
+          <span class="placeholder">No image uploaded for ${drawerCode}</span>
+        </div>
+
+        <div class="img-actions">
+          <label>
+            <small>Upload image</small><br>
+            <input type="file" accept="image/*" data-role="file-input">
+          </label>
+
+          <button class="btn btn-ghost" data-role="reset-image">
+            ↺ Reset image
+          </button>
+        </div>
+
+        <div class="fields">
+          <div class="field">
+            <label>Product name</label>
+            <input type="text" data-role="product-name" placeholder="Product name">
+          </div>
+          <div class="field">
+            <label>Product code</label>
+            <input type="text" data-role="product-code" placeholder="Internal ref.">
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:6px;">
+          <label>Description</label>
+          <textarea rows="2" data-role="description" placeholder="Short product description"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Stock qty</label>
+            <input type="number" min="0" data-role="stock-qty" placeholder="0">
+          </div>
+          <div class="field">
+            <label>Min. stock</label>
+            <input type="number" min="0" data-role="min-stock" placeholder="0">
+          </div>
+          <div class="field">
+            <label>Location (optional)</label>
+            <input type="text" data-role="location" placeholder="e.g. top shelf">
+          </div>
+        </div>
+
+        <div class="footer-row">
+          <div class="status-pill" data-role="status-pill">
+            <span class="dot"></span>
+            <span class="label">No data loaded</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-ghost" data-role="cancel">
+              Cancel
+            </button>
+            <button class="btn btn-primary" data-role="save">
+              💾 Save ${drawerCode}
+            </button>
+          </div>
+        </div>
+
+        <small class="helper">
+          Els canvis s'apliquen només a aquest calaix. Revisa stock i mínim abans de guardar.
+        </small>
+      `;
+
+      // listeners d’imatge
+      const fileInput = card.querySelector('[data-role="file-input"]');
+      const imageBox  = card.querySelector('[data-role="image-box"]');
+      const resetBtn  = card.querySelector('[data-role="reset-image"]');
+
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          imageBox.innerHTML = `<img src="${e.target.result}" alt="${drawerCode} image" />`;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      resetBtn.addEventListener("click", () => {
+        fileInput.value = "";
+        imageBox.innerHTML = `<span class="placeholder">No image uploaded for ${drawerCode}</span>`;
+      });
+
+      // botons Save / Cancel
+      const saveBtn   = card.querySelector('[data-role="save"]');
+      const cancelBtn = card.querySelector('[data-role="cancel"]');
+
+      saveBtn.addEventListener("click", () => handleSave(card));
+      cancelBtn.addEventListener("click", () => handleCancel(card));
+
+      return card;
+    }
+
+    // afegeix totes les targetes
+    DRAWERS.forEach(code => {
+      rackBCards.appendChild(createDrawerCard(code));
+    });
+
+    // ------------------------------
+    // CARREGAR DADES DES DE CSV
+    // ------------------------------
+    let drawerDataMap = {}; // { drawerCode → row }
+
+    async function loadStockCsv() {
+      try {
+        const res = await fetch(STOCK_CSV_URL);
+        if (!res.ok) throw new Error("CSV not found");
+        const text = await res.text();
+        const rows = parseCsv(text);
+        drawerDataMap = csvRowToMapByDrawer(rows);
+        applyDataToCards();
+      } catch (err) {
+        console.error("Error loading CSV:", err);
+      }
+    }
+
+    function applyDataToCards() {
+      const cards = document.querySelectorAll(".drawer-card");
+      cards.forEach(card => {
+        const code = card.dataset.drawer;
+        const row  = drawerDataMap[code];
+
+        const nameInput  = card.querySelector('[data-role="product-name"]');
+        const codeInput  = card.querySelector('[data-role="product-code"]');
+        const descInput  = card.querySelector('[data-role="description"]');
+        const qtyInput   = card.querySelector('[data-role="stock-qty"]');
+        const minInput   = card.querySelector('[data-role="min-stock"]');
+        const locInput   = card.querySelector('[data-role="location"]');
+        const statusPill = card.querySelector('[data-role="status-pill"]');
+
+        if (row) {
+          nameInput.value = row.productName || "";
+          codeInput.value = row.productCode || "";
+          descInput.value = row.description || "";
+          qtyInput.value  = row.stockQty || "";
+          minInput.value  = row.minStock || "";
+          locInput.value  = row.location || "";
+
+          updateStatusPill(statusPill, qtyInput.value, minInput.value);
+        } else {
+          statusPill.classList.remove("ok","low");
+          statusPill.querySelector(".dot").style.backgroundColor = "#d1d5db";
+          statusPill.querySelector(".label").textContent = "Drawer not found in CSV";
+        }
+      });
+    }
+
+    function updateStatusPill(pill, qty, min) {
+      const q = Number(qty || 0);
+      const m = Number(min || 0);
+
+      pill.classList.remove("ok","low");
+      if (!m && !q) {
+        pill.querySelector(".dot").style.backgroundColor = "#d1d5db";
+        pill.querySelector(".label").textContent = "No thresholds set";
+        return;
+      }
+
+      if (q <= m && m > 0) {
+        pill.classList.add("low");
+        pill.querySelector(".label").textContent = "LOW stock";
+      } else {
+        pill.classList.add("ok");
+        pill.querySelector(".label").textContent = "Stock OK";
+      }
+    }
+
+    // ------------------------------
+    // GUARDAR / CANCEL·LAR
+    // ------------------------------
+    function collectCardData(card) {
+      const drawerCode = card.dataset.drawer;
+      const name   = card.querySelector('[data-role="product-name"]').value.trim();
+      const pcode  = card.querySelector('[data-role="product-code"]').value.trim();
+      const desc   = card.querySelector('[data-role="description"]').value.trim();
+      const qty    = card.querySelector('[data-role="stock-qty"]').value.trim();
+      const min    = card.querySelector('[data-role="min-stock"]').value.trim();
+      const loc    = card.querySelector('[data-role="location"]').value.trim();
+
+      return {
+        drawerCode,
+        productName: name,
+        productCode: pcode,
+        description: desc,
+        stockQty: qty,
+        minStock: min,
+        location: loc
+        // si vols guardar també la imatge, pots afegir aquí un camp imageData (Base64)
+      };
+    }
+
+    async function handleSave(card) {
+      const data = collectCardData(card);
+      const statusPill = card.querySelector('[data-role="status-pill"]');
+      const qtyInput   = card.querySelector('[data-role="stock-qty"]');
+      const minInput   = card.querySelector('[data-role="min-stock"]');
+
+      // TODO: substitueix aquest console.log pel teu fetch cap al worker / API
+      console.log("SAVE drawer", data.drawerCode, data);
+
+      // Exemple de pseudo-crida:
+      // await fetch("https://EL-TEU-WORKER/update-drawer", {
+      //   method: "POST",
+      //   headers: { "Content-Type":"application/json" },
+      //   body: JSON.stringify(data)
+      // });
+
+      updateStatusPill(statusPill, qtyInput.value, minInput.value);
+    }
+
+    function handleCancel(card) {
+      const code = card.dataset.drawer;
+      const row  = drawerDataMap[code];
+      if (!row) return;
+
+      card.querySelector('[data-role="product-name"]').value = row.productName || "";
+      card.querySelector('[data-role="product-code"]').value = row.productCode || "";
+      card.querySelector('[data-role="description"]').value  = row.description || "";
+      card.querySelector('[data-role="stock-qty"]').value    = row.stockQty || "";
+      card.querySelector('[data-role="min-stock"]').value    = row.minStock || "";
+      card.querySelector('[data-role="location"]').value     = row.location || "";
+
+      const statusPill = card.querySelector('[data-role="status-pill"]');
+      updateStatusPill(statusPill, row.stockQty, row.minStock);
+    }
+
+    // ------------------------------
+    // INIT
+    // ------------------------------
+    loadStockCsv();
+  </script>
+</body>
+</html>
 
