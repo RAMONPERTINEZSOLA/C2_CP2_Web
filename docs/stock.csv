@@ -22,7 +22,7 @@ A4_4,21,TurnStyle Tripod,--,TurnStyle Tripod,10
 A5_0,21,LBA Boom Arm Led Reflector + Automatic System Boom Arm Led 3.8m oval + Automatic System Boom Arm NO Led 4m oval + Traffic Master Boom Arm Rod 4m + Enta Boom Arm 4m,--,LBA Boom Arm Led Reflector + Automatic System Boom Arm Led 3.8m oval + Automatic System Boom Arm NO Led 4m oval + Traffic Master Boom Arm Rod 4m + Enta Boom Arm 4m,10
 A5_1,21,--,--,--,10
 A5_2,21,--,--,--,10
-B1_A,21,how,ccccc,hey mate,10
+B1_A,21,--,--,--,10
 B1_B,21,--,--,--,10
 B1_C,21,--,--,--,10
 B1_D,21,--,--,--,10
@@ -204,12 +204,12 @@ C3_2_V_B,21,0,20.03-ENT-----10,0,10
 C3_2_V_C,21,Adjustable Steel Mounting Bracket with Threaded Rod,20.03-ENT-ASM-10,Galvanized steel mounting plate with slotted holes for flexible alignment. Includes pre-installed threaded rod and hex bolt; ideal for adjustable installations in structural or electrical systems.,10
 C3_2_VI_A,21,30x8 Rubber Buffer,20.03-ENT-3RB-10,30x8 Rubber Buffer,10
 C3_2_VI_B,21,0,20.03-ENT-----10,0,10
-C3_2_VI_C,21, Powder Coated Steel – ENTA Turnstar Gate Arm,20.03-ENT-PCS-10,Support arm from ENTA (Turnstar); typically used in gate or turnstile mechanisms. Constructed from durable powder-coated steel with elongated slot for adjustable mounting. Designed for robust performance in access control systems.,10
+C3_2_VI_C,21,Powder Coated Steel – ENTA Turnstar Gate Arm,20.03-ENT-PCS-10,Support arm from ENTA (Turnstar); typically used in gate or turnstile mechanisms. Constructed from durable powder-coated steel with elongated slot for adjustable mounting. Designed for robust performance in access control systems.,10
 C3_3_I_A,21,how,ccccc,hey mate,10
 C3_3_I_B,21,SBL106TUR Logic Controller,20.03-ENT-SLC-10,SBL106TUR Logic Controller,10
 C3_3_I_C,21,ENTA 24v Power Supply with Battery Backup,20.03-ENT-PSA-10,ENTA 24v Power Supply with Battery Backup = Power Supply 220-110V,10
 C3_3_II_A,21,0,20.03-ENT-----10,0,10
-C3_3_II_B,21, 3-Wire Twisted Cable for Flexible LED – Signal Connector,20.03-ENT-3TC-10,Three-core twisted cable (red; white; green) with 3-pin connector; designed for signal transmission to flexible LED modules. The twisted wires reduce interference; ensuring stable LED performance and precise control.,10
+C3_3_II_B,21,3-Wire Twisted Cable for Flexible LED – Signal Connector,20.03-ENT-3TC-10,Three-core twisted cable (red; white; green) with 3-pin connector; designed for signal transmission to flexible LED modules. The twisted wires reduce interference; ensuring stable LED performance and precise control.,10
 C3_3_II_C,21,0,20.03-ENT-----10,0,10
 C3_3_III_A,21,0,20.03-ENT-----10,0,10
 C3_3_III_B,21,0,20.03-ENT-----10,0,10
@@ -401,7 +401,7 @@ E2_3_I_B,21,Falcon Camera for Car Counting,3.01-PGS-FCC-10,460835 Falcon Camera 
 E2_3_II_A,21,0,3.01-PGS-----10,0,10
 E2_3_II_B,21,Basic RGB Display w/3 Digits + C/A  - 125mm,3.01-PGS-BRD-10,460666 Basic RGB Display w/3 Digits + C/A  - 125mm,10
 E2_3_III,21,0,3.01-PGS-----10,0,10
-E2_3_IV,21,Sensor Cable 3m lengths Connectors - ,3.01-PGS-SC3-10,460115 PGS Sensor Cable Connectors - 3m lengths,10
+E2_3_IV,21,Sensor Cable 3m lengths Connectors -,3.01-PGS-SC3-10,460115 PGS Sensor Cable Connectors - 3m lengths,10
 E2_3_V_A,21,MR4 Module (Circontrol),3.01-PGS-MMO-10,Multi-relay module from Circontrol used for controlling parking guidance systems. It supports communication with host and reader devices via RS485 and provides 4 relay outputs for system integration. The device is DIN-rail mountable and includes pluggable terminals for easy wiring. Commonly used in vehicle counting; signaling; and automated control applications within smart parking infrastructure.,10
 E2_3_V_B,21,TCP3RS Signal Convertor & Gateway,3.01-PGS-TSC-10,460803 TCP3RS Signal Convertor & Gateway,10
 E2_3_VI,21,PGS Power Supply 240-48,3.01-ELE-PPB-10,200526 Power Supply 240-48,10
