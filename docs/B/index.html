@@ -705,13 +705,22 @@
         QR HELPERS
   =============================== */
   function hrefFromDrawer(code) {
-    const up = String(code || "").toUpperCase();
-    if (/^[AB]\d+_/.test(up)) {
-      const letter = up[0]; // A or B
-      return `${letter}/fitxes/${code}.html`;
-    }
-    return `fitxes/${code}.html`;
+  const up = String(code || "").toUpperCase();
+
+  // 🔹 Tots els drawers Bx_* apunten al Rack B
+  if (/^B\d+_/.test(up)) {
+    return "B/index.html";
   }
+
+  // 🔹 Mantens la lògica antiga per Rack A
+  if (/^A\d+_/.test(up)) {
+    return `A/fitxes/${code}.html`;
+  }
+
+  // 🔹 Resta de casos (altres racks) → com abans
+  return `fitxes/${code}.html`;
+}
+
 
   function buildQrUrl(drawerCode) {
     return (
