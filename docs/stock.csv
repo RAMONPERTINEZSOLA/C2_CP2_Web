@@ -22,6 +22,30 @@ A4_4,21,TurnStyle Tripod,--,TurnStyle Tripod,10
 A5_0,21,LBA Boom Arm Led Reflector + Automatic System Boom Arm Led 3.8m oval + Automatic System Boom Arm NO Led 4m oval + Traffic Master Boom Arm Rod 4m + Enta Boom Arm 4m,--,LBA Boom Arm Led Reflector + Automatic System Boom Arm Led 3.8m oval + Automatic System Boom Arm NO Led 4m oval + Traffic Master Boom Arm Rod 4m + Enta Boom Arm 4m,10
 A5_1,21,--,--,--,10
 A5_2,21,--,--,--,10
+B1_A,21,--,--,--,10
+B1_B,21,--,--,--,10
+B1_C,21,--,--,--,10
+B1_D,21,--,--,--,10
+B1_E,21,--,--,--,10
+B1_F,21,--,--,--,10
+B2_A,21,--,--,--,10
+B2_B,21,--,--,--,10
+B2_C,21,--,--,--,10
+B2_D,21,--,--,--,10
+B2_E,21,--,--,--,10
+B2_F,21,--,--,--,10
+B3_A,21,--,--,--,10
+B3_B,21,--,--,--,10
+B3_C,21,--,--,--,10
+B3_D,21,--,--,--,10
+B3_E,21,--,--,--,10
+B3_F,21,--,--,--,10
+B4_A,21,--,--,--,10
+B4_B,21,--,--,--,10
+B4_C,21,--,--,--,10
+B4_D,21,--,--,--,10
+B4_E,21,--,--,--,10
+B4_F,21,--,--,--,10
 B1_0,21,Skirt Set Horizontal 4m + Skirt Set Horizontal 3m + Skirt Set Horizontal 4m + Velocity articulated arm kit,--,Skirt Set Horizontal 4m + Skirt Set Horizontal 3m + Skirt Set Horizontal 4m + Velocity articulated arm kit,10
 B2,22,LBA Oval Boom Arm 7m + Automatic System Boom Arm Led 6m,--,LBA Oval Boom Arm 7m + Automatic System Boom Arm Led 6m,11
 B3,23,Enta Boom Arm 6m + Enta Led Reflector 6m,--,Enta Boom Arm 6m + Enta Led Reflector 6m,12
@@ -438,5 +462,3 @@ F_VIC_1,21,--,--,--,10
 F_VIC_2,21,--,--,--,10
 F_VIC_3,21,--,--,--,10
 F_VIC_4,21,--,--,--,10
-B1_A,0,,,,0
-B1_B,0,,,,0
