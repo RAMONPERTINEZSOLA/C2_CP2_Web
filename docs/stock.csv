@@ -22,7 +22,7 @@ A4_4,21,TurnStyle Tripod,--,TurnStyle Tripod,10
 A5_0,21,LBA Boom Arm Led Reflector + Automatic System Boom Arm Led 3.8m oval + Automatic System Boom Arm NO Led 4m oval + Traffic Master Boom Arm Rod 4m + Enta Boom Arm 4m,--,LBA Boom Arm Led Reflector + Automatic System Boom Arm Led 3.8m oval + Automatic System Boom Arm NO Led 4m oval + Traffic Master Boom Arm Rod 4m + Enta Boom Arm 4m,10
 A5_1,21,--,--,--,10
 A5_2,21,--,--,--,10
-B1_A,21,--,--,--,10
+B1_A,21,TEST55,--,--,10
 B1_B,0,,,,0
 B1_C,0,,,,0
 B1_D,0,,,,0
