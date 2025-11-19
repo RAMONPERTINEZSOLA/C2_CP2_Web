@@ -23,7 +23,7 @@ A5_0,21,LBA Boom Arm Led Reflector + Automatic System Boom Arm Led 3.8m oval + A
 A5_1,21,--,--,--,10
 A5_2,21,--,--,--,10
 B1_A,21,--,--,--,10
-B1_B,21,--,--,--,10
+B1_B,0,,,,0
 B1_C,0,,,,0
 B1_D,21,--,--,--,10
 B1_E,0,,,,0
