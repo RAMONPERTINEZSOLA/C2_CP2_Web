@@ -977,6 +977,7 @@
     return { finalName, finalCode, finalDesc };
   }
 
+     // NEW VERSION: write directly to stock.csv (no update-item-info worker)
   saveInfoBtn.addEventListener("click", async () => {
     if (!currentInfoDrawer) {
       editModal.close();
@@ -1000,7 +1001,7 @@
       minVal = n;
     }
 
-    // Validation per mode
+    // --- Validation by mode ---
     if (mode === "DESC_ONLY") {
       if (!desc && minVal === null) {
         showToast(
@@ -1037,35 +1038,48 @@
       }
     }
 
-    // Build payload for worker
-    let payload;
-    if (mode === "DESC_ONLY") {
-      payload = {
-        drawerCode,
-        mode: "DESC_ONLY",
-        description: desc,
-      };
-    } else {
-      payload = {
-        drawerCode,
-        mode,
-        productName: name,
-        productCode: code,
-        description: desc,
-      };
-    }
-
     try {
-      // 1) Update product info (name / code / desc) via worker
-      const { finalName, finalCode, finalDesc } =
-        await applyUpdateInfo(payload, mode, name, code, desc);
-
-      // 2) Optional: update minStock via /stock/file if provided
-      if (minVal !== null) {
-        await updateMinStockForDrawer(drawerCode, minVal);
+      // 1) Update ALL_DATA in memory
+      let row = window.ALL_DATA.find(
+        (r) => (r.drawerCode || "").trim() === drawerCode
+      );
+      if (!row) {
+        // create new line if it didn't exist yet
+        row = {
+          drawerCode,
+          stockQty: "0",
+          productName: "",
+          productCode: "",
+          description: "",
+          minStock: "10",
+        };
+        window.ALL_DATA.push(row);
       }
 
-      // 3) Update UI + ALL_DATA cache
+      if (mode !== "DESC_ONLY") {
+        row.productName = name;
+        row.productCode = code;
+      }
+      if (mode !== "NEW" || desc) {
+        row.description = desc;
+      }
+      if (minVal !== null) {
+        row.minStock = String(minVal);
+      }
+
+      // 2) Send full CSV to worker
+      const csvText = buildCsvFromAllData();
+      const res = await fetch(STOCK_FILE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: csvText,
+      });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || !j.ok) {
+        throw new Error(j.error || "Failed to update product info in CSV");
+      }
+
+      // 3) Update UI
       const block = document.querySelector(
         `.drawer-block[data-drawer="${drawerCode}"]`
       );
@@ -1082,32 +1096,30 @@
         const warn = block.querySelector('[data-role="minWarn"]');
 
         if (nameLabel)
-          nameLabel.textContent = "Product name: " + finalName;
-        if (codeLabel)
-          codeLabel.innerHTML = "<strong>Code:</strong> " + finalCode;
-        if (descBox) descBox.textContent = finalDesc;
+          nameLabel.textContent =
+            row.productName
+              ? "Product name: " + row.productName
+              : "Empty drawer — click Add product";
 
-        if (warn && minVal !== null) {
-          warn.dataset.minStock = String(minVal);
-          warn.textContent = "LOW STOCK — minimum " + minVal;
+        if (codeLabel)
+          codeLabel.innerHTML =
+            "<strong>Code:</strong> " + (row.productCode || "—");
+
+        if (descBox) descBox.textContent = row.description || "";
+
+        if (warn && row.minStock) {
+          warn.dataset.minStock = String(row.minStock);
+          warn.textContent = "LOW STOCK — minimum " + row.minStock;
         }
 
         // If it was an empty drawer, mark it as non-empty and expand
-        block.classList.remove("empty");
-        block.dataset.empty = "0";
-        block.classList.remove("collapsed");
-        const toggle = block.querySelector('[data-role="toggle-body"]');
-        if (toggle) toggle.textContent = "▾";
-      }
-
-      const row = window.ALL_DATA.find(
-        (r) => (r.drawerCode || "").trim() === drawerCode
-      );
-      if (row) {
-        row.productName = finalName;
-        row.productCode = finalCode;
-        row.description = finalDesc;
-        if (minVal !== null) row.minStock = String(minVal);
+        if (row.productName || row.productCode || row.description) {
+          block.classList.remove("empty");
+          block.dataset.empty = "0";
+          block.classList.remove("collapsed");
+          const toggle = block.querySelector('[data-role="toggle-body"]');
+          if (toggle) toggle.textContent = "▾";
+        }
       }
 
       showToast(`✔️ Info updated for ${drawerCode}`);
@@ -1121,6 +1133,7 @@
       );
     }
   });
+
 
   /* ==============================
         QR MODAL
