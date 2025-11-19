@@ -72,15 +72,7 @@
     #tooltip strong{font-size:13px}
     #tooltip img{display:block;margin-top:8px;width:100%;height:auto;border-radius:10px;border:1px solid #ffffff1a;background:#00000050}
 
-    .footer{
-    max-width:1100px;
-    margin:18px auto 48px;
-    color:var(--muted);
-    font-size:12px;
-    padding:0 16px;
-    text-align:center;
-    }
-
+    .footer{max-width:1100px;margin:18px auto 48px;color:var(--muted);font-size:12px;padding:0 16px;text-align:center}
 
     @media (max-width:640px){
       .title{font-size:18px}
@@ -131,19 +123,14 @@
 
           <map name="image-map">
             <!-- E1_* -->
-            <area alt="E1_1_I"  title="E1_1_I"  href="fitxes/E1_1_I.html"  coords="527,499,886,330" shape="rect"
-                  onmouseover="showTooltip(event,'E1_1_I')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
-            <area alt="E1_1_II" title="E1_1_II" href="fitxes/E1_1_II.html" coords="143,502,519,329" shape="rect"
-                  onmouseover="showTooltip(event,'E1_1_II')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
-            <area alt="E1_2_I"  title="E1_2_I"  href="fitxes/E1_2_I.html"  coords="518,296,884,116" shape="rect"
-                  onmouseover="showTooltip(event,'E1_2_I')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
-            <area alt="E1_2_II" title="E1_2_II" href="fitxes/E1_2_II.html" coords="144,297,515,115" shape="rect"
-                  onmouseover="showTooltip(event,'E1_2_II')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
-            <area alt="E1_3_I"  title="E1_3_I"  href="fitxes/E1_3_I.html"  coords="515,83,883,4" shape="rect"
-                  onmouseover="showTooltip(event,'E1_3_I')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
-            <area alt="E1_3_II" title="E1_3_II" href="fitxes/E1_3_II.html" coords="145,82,512,5" shape="rect"
-                  onmouseover="showTooltip(event,'E1_3_II')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="E1_1_I"  title="E1_1_I"  href="fitxes/E1_1_I.html"  coords="527,499,886,330" shape="rect" onmouseover="showTooltip(event,'E1_1_I')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="E1_1_II" title="E1_1_II" href="fitxes/E1_1_II.html" coords="143,502,519,329" shape="rect"  onmouseover="showTooltip(event,'E1_1_II')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="E1_2_I"  title="E1_2_I"  href="fitxes/E1_2_I.html"  coords="518,296,884,116" shape="rect" onmouseover="showTooltip(event,'E1_2_I')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="E1_2_II" title="E1_2_II" href="fitxes/E1_2_II.html" coords="144,297,515,115" shape="rect"  onmouseover="showTooltip(event,'E1_2_II')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="E1_3_I"  title="E1_3_I"  href="fitxes/E1_3_I.html"  coords="515,83,883,4" shape="rect" onmouseover="showTooltip(event,'E1_3_I')"  onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
+            <area alt="E1_3_II" title="E1_3_II" href="fitxes/E1_3_II.html" coords="145,82,512,5" shape="rect"  onmouseover="showTooltip(event,'E1_3_II')" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()">
           </map>
+      
         </div>
       </section>
 
@@ -213,9 +200,7 @@
         alert("Please enter a valid code (e.g. E1_3_I).");
       }
     }
-    document.getElementById("searchBox").addEventListener("keypress", e => {
-      if (e.key === "Enter") goToDrawer();
-    });
+    document.getElementById("searchBox").addEventListener("keypress", e => { if (e.key === "Enter") goToDrawer(); });
 
     // ===== Tooltip =====
     const tt = document.getElementById("tooltip");
@@ -230,19 +215,11 @@
       tt.style.display = "block";
       animateTooltip();
     }
-    function moveTooltip(evt){
-      targetX = evt.pageX + 16; targetY = evt.pageY + 16;
-    }
-    function hideTooltip(){
-      tt.style.display = "none";
-      cancelAnimationFrame(rafId);
-      rafId = null;
-    }
+    function moveTooltip(evt){ targetX = evt.pageX + 16; targetY = evt.pageY + 16; }
+    function hideTooltip(){ tt.style.display = "none"; cancelAnimationFrame(rafId); rafId = null; }
     function animateTooltip(){
-      curX += (targetX - curX) * 0.2;
-      curY += (targetY - curY) * 0.2;
-      tt.style.left = curX + "px";
-      tt.style.top  = curY + "px";
+      curX += (targetX - curX) * 0.2; curY += (targetY - curY) * 0.2;
+      tt.style.left = curX + "px"; tt.style.top = curY + "px";
       rafId = requestAnimationFrame(animateTooltip);
     }
 
@@ -273,11 +250,7 @@
       document.getElementById('btnRefreshThumbs')?.addEventListener('click', ()=>{
         bumpThumbSeed();
         const toast = document.getElementById('toast');
-        if (toast){
-          toast.textContent = '🔄 Thumbnails refreshed';
-          toast.style.display = 'block';
-          setTimeout(()=> toast.style.display='none', 1800);
-        }
+        if (toast){ toast.textContent = '🔄 Thumbnails refreshed'; toast.style.display = 'block'; setTimeout(()=> toast.style.display='none', 1800); }
       });
     });
   </script>
