@@ -206,6 +206,19 @@
       <div class="warn" id="minWarn">LOW STOCK — minimum 10</div>
     </div>
 
+    <!-- Minimum Stock UI (added) -->
+    <div class="stock-ui" id="minStockUI" style="margin-top:20px">
+      <h3 style="margin-top:0">Minimum Stock</h3>
+      <div class="row">
+        <span class="pill">Current Min: <strong id="curMin">–</strong></span>
+        <label>New Min: <input id="minInput" type="number" min="0" step="1" /></label>
+        <button class="secondary" id="resetMinBtn" type="button">Reset</button>
+        <button class="save" id="saveMinBtn" type="button">Save Min</button>
+      </div>
+      <div class="note">This is the minimum allowed stock before showing LOW STOCK warning.</div>
+    </div>
+
+
     <div id="toast"></div>
   </div>
 
@@ -609,6 +622,7 @@
         document.getElementById("stock-display").innerText = "📦 STOCK: " + (CURRENT.stockQty || "0");
         document.getElementById("minWarn").textContent = `LOW STOCK — minimum ${MIN_STOCK}`;
         initStockUI(parseInt(CURRENT.stockQty || "0", 10), MIN_STOCK);
+        initMinStockUI(MIN_STOCK);
 
         // Global + Drawer counters (usant objecte {key,type})
         const productKeyObj = getProductKeyFromRow(CURRENT);
@@ -672,7 +686,64 @@
       refresh();
     }
 
-    // --- Drawer image (JPEG only) ---
+    
+    // --- MIN STOCK UI (added) ---
+    function initMinStockUI(initialMin) {
+      const curMin = document.getElementById('curMin');
+      const minInput = document.getElementById('minInput');
+      const resetMinBtn = document.getElementById('resetMinBtn');
+      const saveMinBtn = document.getElementById('saveMinBtn');
+
+      if (!curMin || !minInput || !resetMinBtn || !saveMinBtn) return;
+
+      curMin.textContent = initialMin;
+      minInput.value = initialMin;
+
+      resetMinBtn.addEventListener('click', () => {
+        minInput.value = initialMin;
+      });
+
+      saveMinBtn.addEventListener('click', async () => {
+        const newMin = parseInt(minInput.value, 10);
+        if (isNaN(newMin) || newMin < 0) {
+          showToast('❌ Invalid minimum stock', '#b3261e');
+          return;
+        }
+
+        if (!confirm(`Are you sure you want to update the minimum stock to ${newMin}?`)) return;
+
+        try {
+          const payload = {
+            drawerCode,
+            productName: CURRENT?.productName || '',
+            productCode: CURRENT?.productCode || '',
+            description: CURRENT?.description || '',
+            minStock: newMin,
+            mode: 'MIN_ONLY',
+            propagateAll: false
+          };
+
+          const res = await postUpdateInfo(payload);
+          if (!res.ok) {
+            console.error('Error updating minStock');
+            showToast('❌ Error updating minimum stock', '#b3261e');
+            return;
+          }
+
+          curMin.textContent = newMin;
+          const warn = document.getElementById('minWarn');
+          if (warn) warn.textContent = `LOW STOCK — minimum ${newMin}`;
+
+          showToast('✔️ Minimum stock updated');
+          showPostSaveBanner(60);
+        } catch (err) {
+          console.error(err);
+          showToast('❌ Error updating minimum stock', '#b3261e');
+        }
+      });
+    }
+
+// --- Drawer image (JPEG only) ---
     const IMG_VER_KEY = `imgVer_${drawerCode}`;
     const getImgVersion = () => { const v = parseInt(localStorage.getItem(IMG_VER_KEY) || "1", 10); return isNaN(v) ? 1 : v; };
     const bumpImgVersion = () => { const v = getImgVersion() + 1; localStorage.setItem(IMG_VER_KEY, String(v)); return v; };
