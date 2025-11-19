@@ -92,6 +92,21 @@
       margin-bottom:20px;
     }
 
+    /* Collapsed / empty behaviour */
+    .drawer-block.collapsed .drawer-body{
+      display:none;
+    }
+    .drawer-toggle{
+      border:none;background:transparent;padding:4px 6px;
+      border-radius:999px;cursor:pointer;font-size:14px;
+    }
+    .drawer-block.empty .drawer-title-small{
+      color:var(--muted);font-style:italic;
+    }
+    .drawer-block.empty [data-role="product-code-label"]{
+      color:var(--muted);
+    }
+
     .drawer-header{
       display:flex;align-items:center;justify-content:space-between;
       gap:10px;flex-wrap:wrap;
@@ -108,7 +123,7 @@
     }
 
     .drawer-header-actions{
-      display:flex;gap:8px;flex-wrap:wrap;
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center;
     }
 
     .btn{
@@ -303,7 +318,6 @@
 
       <div class="variant-controls" data-variant-base="B1">
         <button class="btn" data-role="add-variant">➕ Add variant</button>
-        <button class="btn secondary" data-role="remove-variant">➖ Remove last</button>
         <div class="note" data-role="variant-list">Variants: loading…</div>
       </div>
 
@@ -317,7 +331,6 @@
 
       <div class="variant-controls" data-variant-base="B2">
         <button class="btn" data-role="add-variant">➕ Add variant</button>
-        <button class="btn secondary" data-role="remove-variant">➖ Remove last</button>
         <div class="note" data-role="variant-list">Variants: loading…</div>
       </div>
 
@@ -330,7 +343,6 @@
 
       <div class="variant-controls" data-variant-base="B3">
         <button class="btn" data-role="add-variant">➕ Add variant</button>
-        <button class="btn secondary" data-role="remove-variant">➖ Remove last</button>
         <div class="note" data-role="variant-list">Variants: loading…</div>
       </div>
 
@@ -343,7 +355,6 @@
 
       <div class="variant-controls" data-variant-base="B4">
         <button class="btn" data-role="add-variant">➕ Add variant</button>
-        <button class="btn secondary" data-role="remove-variant">➖ Remove last</button>
         <div class="note" data-role="variant-list">Variants: loading…</div>
       </div>
 
@@ -580,7 +591,7 @@
     return lines.join("\n");
   }
 
-    // ===== EXISTING PRODUCTS HELPERS (like Rack A) =====
+  // ===== EXISTING PRODUCTS HELPERS (like Rack A) =====
   function normalizeName(s) {
     return String(s || "")
       .normalize("NFKC")
@@ -589,9 +600,9 @@
       .toLowerCase();
   }
 
-  // Llista única de productes per NOM, amb comptador
+  // Unique product names by NAME, with counter
   function uniqueProductNamesFromData(data) {
-    const map = new Map(); // key normalitzat -> { display, n }
+    const map = new Map(); // key normalised -> { display, n }
     for (const r of data || []) {
       const raw = (r.productName || "").trim();
       if (!raw) continue;
@@ -603,7 +614,7 @@
     return [...map.values()].sort((a, b) => b.n - a.n);
   }
 
-  // Donat un nom, tria el codi i la descripció més freqüents
+  // Given a name, pick most frequent code / description
   function canonicalByProductName(name) {
     const key = normalizeName(name);
     const rows = (window.ALL_DATA || []).filter(
@@ -688,23 +699,6 @@
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.ok) throw new Error(j.error || "Failed to create variant");
     return j.drawerCode; // e.g. B1_B
-  }
-
-  async function removeLastVariant(base) {
-    const variants = await loadVariants(base);
-    if (variants.length <= 1) throw new Error("Cannot remove A");
-
-    const last = variants[variants.length - 1];
-    const drawerCode = `${base}_${last}`;
-
-    const r = await fetch(RESET_DRAWER_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ drawerCode }),
-    });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j.ok) throw new Error(j.error || "Failed to reset drawer");
-    return drawerCode;
   }
 
   /* ==============================
@@ -856,7 +850,7 @@
       </p>
     `;
 
-    // Inserim just després del camp "Update mode"
+    // Insert just after "Update mode"
     bd.insertBefore(existingPickerWrap, modeFld.nextSibling);
 
     existingSelect = existingPickerWrap.querySelector("#fldExistingSelect");
@@ -885,7 +879,7 @@
       existingSelect.appendChild(opt);
     }
 
-    // intentem preseleccionar el nom actual del drawer
+    // Try to preselect current drawer name
     if (currentName) {
       const targetKey = normalizeName(currentName);
       for (const opt of existingSelect.options) {
@@ -904,7 +898,7 @@
     fldCode.value = row?.productCode || "";
     fldDesc.value = row?.description || "";
     fldMinStock.value = row?.minStock || "";
-    fldMode.value = "NEW"; // per defecte, NEW
+    fldMode.value = "NEW"; // default mode
 
     ensureExistingPicker();
     if (existingPickerWrap) existingPickerWrap.style.display = "none";
@@ -915,7 +909,7 @@
       editModal.setAttribute("open", "");
     }
 
-    // Si l’usuari canvia a EXISTING, mostrem el selector i el popul·lem
+    // If user switches to EXISTING, show selector
     fldMode.onchange = () => {
       const mode = (fldMode.value || "NEW").toUpperCase();
       if (mode === "EXISTING") {
@@ -974,7 +968,7 @@
       throw new Error(j.error || j.message || "Failed to update item info");
     }
 
-    // Worker may normalize / canonicalize the fields
+    // Worker may normalise the fields
     const updated = j.drawerUpdated || {};
     const finalName = updated.productName || name || "";
     const finalCode = updated.productCode || code || "";
@@ -1015,25 +1009,8 @@
         );
         return;
       }
-    } else {
-      // NEW / EXISTING
-      if (!name) {
-        showToast("Product name is required in NEW/EXISTING mode", "#b3261e");
-        return;
-      }
-    }
-
-        // Validation per mode
-    if (mode === "DESC_ONLY") {
-      if (!desc && minVal === null) {
-        showToast(
-          "For DESCRIPTION ONLY mode, please update description and/or minimum stock",
-          "#b3261e"
-        );
-        return;
-      }
     } else if (mode === "EXISTING") {
-      // Cal triar un producte existent de la llista
+      // Must choose an existing product
       ensureExistingPicker();
       if (!existingSelect) {
         showToast("Existing product picker not ready", "#b3261e");
@@ -1114,6 +1091,13 @@
           warn.dataset.minStock = String(minVal);
           warn.textContent = "LOW STOCK — minimum " + minVal;
         }
+
+        // If it was an empty drawer, mark it as non-empty and expand
+        block.classList.remove("empty");
+        block.dataset.empty = "0";
+        block.classList.remove("collapsed");
+        const toggle = block.querySelector('[data-role="toggle-body"]');
+        if (toggle) toggle.textContent = "▾";
       }
 
       const row = window.ALL_DATA.find(
@@ -1218,8 +1202,7 @@
     pdf.text(currentQrUrl, margin, 290);
     pdf.save(`${currentQrDrawer}_QR.pdf`);
   });
-
-  /* ==============================
+    /* ==============================
         STOCK + IMAGE + BLOCK
   =============================== */
   function buildDrawerHTML(drawerCode, row) {
@@ -1229,74 +1212,100 @@
     const qty  = parseInt(row?.stockQty || "0", 10);
     const min  = parseInt(row?.minStock || "10", 10);
 
+    const isEmpty =
+      !row ||
+      (String(name).trim() === "" &&
+        String(code).trim() === "" &&
+        String(desc).trim() === "" &&
+        (!row.stockQty || row.stockQty === "0"));
+
+    const headerLabel = isEmpty
+      ? "Empty drawer — click Add product"
+      : "Product name: " + name;
+
+    const codeLabel = isEmpty ? "—" : code;
+    const headerActions = isEmpty
+      ? `<button class="btn" data-role="add-product">➕ Add product</button>`
+      : `
+         <button class="btn secondary" data-role="edit-info">✏️ Edit</button>
+         <button class="btn ghost" data-role="qr">📎 QR</button>
+         <button class="btn ghost" data-role="clear-drawer">🗑️ Clear drawer</button>
+        `;
+
+    const collapsedClass = isEmpty ? " collapsed empty" : "";
+
     return `
-      <article class="drawer-block" data-drawer="${drawerCode}">
+      <article class="drawer-block${collapsedClass}" data-drawer="${drawerCode}" data-empty="${isEmpty ? "1" : "0"}">
         <div class="drawer-header">
           <div class="drawer-header-left">
             <span class="drawer-code-pill">${drawerCode}</span>
             <span class="drawer-title-small" data-role="product-name-label">
-              Product name: ${name}
+              ${headerLabel}
             </span>
           </div>
           <div class="drawer-header-actions">
-            <button class="btn secondary" data-role="edit-info">✏️ Edit</button>
-            <button class="btn ghost" data-role="qr">📎 QR</button>
+            ${headerActions}
+            <button class="drawer-toggle" type="button" data-role="toggle-body">
+              ${isEmpty ? "▸" : "▾"}
+            </button>
           </div>
         </div>
 
-        <div class="row" style="font-size:12px;color:var(--muted);">
-          <span data-role="product-code-label"><strong>Code:</strong> ${code}</span>
-        </div>
+        <div class="drawer-body">
+          <div class="row" style="font-size:12px;color:var(--muted);">
+            <span data-role="product-code-label"><strong>Code:</strong> ${codeLabel}</span>
+          </div>
 
-        <div class="cards">
-          <div class="card">
-            <h3>Drawer photo</h3>
-            <div class="card-inner">
-              <div class="imgwrap">
-                <img data-role="drawer-img"
-                     src="../images/${drawerCode}.jpg"
-                     alt="Drawer image ${drawerCode}"
-                     onerror="this.onerror=null; this.src='../../images/${drawerCode}.jpg';"/>
-              </div>
+          <div class="cards">
+            <div class="card">
+              <h3>Drawer photo</h3>
+              <div class="card-inner">
+                <div class="imgwrap">
+                  <img data-role="drawer-img"
+                       src="../images/${drawerCode}.jpg"
+                       alt="Drawer image ${drawerCode}"
+                       onerror="this.onerror=null; this.src='../../images/${drawerCode}.jpg';"/>
+                </div>
 
-              <div class="row" style="margin-top:8px;">
-                <button class="btn" data-role="upload-photo">🖼️ Update photo</button>
-                <button class="btn ghost" data-role="refresh-img">Refresh</button>
-                <span class="note">Saved automatically as <strong>${drawerCode}.jpg</strong></span>
+                <div class="row" style="margin-top:8px;">
+                  <button class="btn" data-role="upload-photo">🖼️ Update photo</button>
+                  <button class="btn ghost" data-role="refresh-img">Refresh</button>
+                  <span class="note">Saved automatically as <strong>${drawerCode}.jpg</strong></span>
+                </div>
+                <input type="file" accept="image/png,image/jpeg" data-role="file-input" style="display:none"/>
               </div>
-              <input type="file" accept="image/png,image/jpeg" data-role="file-input" style="display:none"/>
             </div>
           </div>
-        </div>
 
-        <div>
-          <h3 style="font-size:14px;margin-top:8px;">Description</h3>
-          <div class="description-box" data-role="description-text">${desc}</div>
-        </div>
-
-        <div class="stock-display" data-role="stock-display">📦 STOCK: ${qty}</div>
-
-        <div class="stock-ui">
-          <div class="row">
-            <span class="pill">Current: <strong data-role="curQty">${qty}</strong></span>
-            <span class="pill">Change: <strong data-role="delta">0</strong></span>
-            <span class="pill">New: <strong data-role="newQty">${qty}</strong></span>
+          <div>
+            <h3 style="font-size:14px;margin-top:8px;">Description</h3>
+            <div class="description-box" data-role="description-text">${desc}</div>
           </div>
 
-          <div class="row" style="margin-top:8px;">
-            <button type="button" class="btn" data-role="minus">−1</button>
-            <button type="button" class="btn" data-role="plus">+1</button>
-            <label style="font-size:12px;">
-              Exact:
-              <input type="number" min="0" step="1" data-role="exact"/>
-            </label>
+          <div class="stock-display" data-role="stock-display">📦 STOCK: ${qty}</div>
 
-            <button type="button" class="btn secondary" data-role="reset">Reset</button>
-            <button type="button" class="btn" data-role="save-stock">Save</button>
-          </div>
+          <div class="stock-ui">
+            <div class="row">
+              <span class="pill">Current: <strong data-role="curQty">${qty}</strong></span>
+              <span class="pill">Change: <strong data-role="delta">0</strong></span>
+              <span class="pill">New: <strong data-role="newQty">${qty}</strong></span>
+            </div>
 
-          <div class="warn" data-role="minWarn" data-min-stock="${min}">
-            LOW STOCK — minimum ${min}
+            <div class="row" style="margin-top:8px;">
+              <button type="button" class="btn" data-role="minus">−1</button>
+              <button type="button" class="btn" data-role="plus">+1</button>
+              <label style="font-size:12px;">
+                Exact:
+                <input type="number" min="0" step="1" data-role="exact"/>
+              </label>
+
+              <button type="button" class="btn secondary" data-role="reset">Reset</button>
+              <button type="button" class="btn" data-role="save-stock">Save</button>
+            </div>
+
+            <div class="warn" data-role="minWarn" data-min-stock="${min}">
+              LOW STOCK — minimum ${min}
+            </div>
           </div>
         </div>
       </article>
@@ -1441,13 +1450,118 @@
   }
 
   /* ==============================
+        DRAWER INTERACTIONS
+  =============================== */
+  function initDrawerInteractions(block, drawerCode, row) {
+    const toggleBtn = block.querySelector('[data-role="toggle-body"]');
+    const body      = block.querySelector(".drawer-body");
+    const addBtn    = block.querySelector('[data-role="add-product"]');
+    const clearBtn  = block.querySelector('[data-role="clear-drawer"]');
+
+    function setCollapsed(c) {
+      if (c) block.classList.add("collapsed");
+      else   block.classList.remove("collapsed");
+    }
+
+    if (toggleBtn && body) {
+      toggleBtn.addEventListener("click", () => {
+        const collapsed = !block.classList.contains("collapsed");
+        setCollapsed(collapsed);
+        toggleBtn.textContent = collapsed ? "▸" : "▾";
+      });
+    }
+
+    if (addBtn) {
+      addBtn.addEventListener("click", () => {
+        setCollapsed(false);
+        if (body) body.scrollIntoView({ behavior: "smooth", block: "center" });
+        openEditModalForDrawer(drawerCode, null);
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", async () => {
+        if (
+          !window.confirm(
+            `Clear ALL product data for ${drawerCode}? This will reset product, description, stock and min stock.`
+          )
+        ) {
+          return;
+        }
+        try {
+          const r = await fetch(RESET_DRAWER_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ drawerCode }),
+          });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok || !j.ok) {
+            throw new Error(j.error || "Failed to clear drawer");
+          }
+
+          // Update local cache
+          const rowLocal = window.ALL_DATA.find(
+            (rr) => (rr.drawerCode || "").trim() === drawerCode
+          );
+          if (rowLocal) {
+            rowLocal.productName = "";
+            rowLocal.productCode = "";
+            rowLocal.description = "";
+            rowLocal.stockQty = "0";
+            rowLocal.minStock = rowLocal.minStock || "10";
+          }
+
+          // Update UI
+          const nameLabel = block.querySelector(
+            '[data-role="product-name-label"]'
+          );
+          const codeLabel = block.querySelector(
+            '[data-role="product-code-label"]'
+          );
+          const descBox = block.querySelector(
+            '[data-role="description-text"]'
+          );
+          const curQtyEl = block.querySelector('[data-role="curQty"]');
+          const newQtyEl = block.querySelector('[data-role="newQty"]');
+          const stockDisplay = block.querySelector(
+            '[data-role="stock-display"]'
+          );
+          const warn = block.querySelector('[data-role="minWarn"]');
+
+          if (nameLabel)
+            nameLabel.textContent = "Empty drawer — click Add product";
+          if (codeLabel) codeLabel.innerHTML = "<strong>Code:</strong> —";
+          if (descBox) descBox.textContent = "";
+          if (curQtyEl) curQtyEl.textContent = "0";
+          if (newQtyEl) newQtyEl.textContent = "0";
+          if (stockDisplay) stockDisplay.textContent = "📦 STOCK: 0";
+          if (warn) {
+            warn.classList.remove("pulse");
+            warn.style.display = "none";
+          }
+
+          block.classList.add("empty");
+          block.dataset.empty = "1";
+          setCollapsed(true);
+          if (toggleBtn) toggleBtn.textContent = "▸";
+
+          showToast(`✔️ Cleared drawer ${drawerCode}`);
+          showPostSaveBanner(60);
+        } catch (e) {
+          console.error(e);
+          showToast("❌ Error clearing drawer", "#b3261e");
+        }
+      });
+    }
+  }
+
+  /* ==============================
         GROUP VARIANT UI
   =============================== */
   function initVariantUI() {
     document.querySelectorAll(".variant-controls").forEach((ctrl) => {
       const base = ctrl.getAttribute("data-variant-base");
       const addBtn = ctrl.querySelector('[data-role="add-variant"]');
-      const remBtn = ctrl.querySelector('[data-role="remove-variant"]');
       const listEl = ctrl.querySelector('[data-role="variant-list"]');
 
       async function refreshList() {
@@ -1470,25 +1584,6 @@
         } catch (e) {
           console.error(e);
           showToast("❌ Error adding variant", "#b3261e");
-        }
-      });
-
-      remBtn.addEventListener("click", async () => {
-        if (
-          !window.confirm(
-            "Remove the LAST variant? This will reset content and images for that drawer."
-          )
-        )
-          return;
-        try {
-          const rmCode = await removeLastVariant(base);
-          showToast(`✔️ Variant reset: ${rmCode}`);
-          showPostSaveBanner(60);
-          await renderGroup(base);
-          await refreshList();
-        } catch (e) {
-          console.error(e);
-          showToast("❌ Error removing variant", "#b3261e");
         }
       });
 
@@ -1527,6 +1622,7 @@
 
       initStockUI(block, dc);
       initImageHandlers(block, dc);
+      initDrawerInteractions(block, dc, row);
 
       const editBtn = block.querySelector('[data-role="edit-info"]');
       const qrBtn   = block.querySelector('[data-role="qr"]');
