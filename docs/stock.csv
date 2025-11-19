@@ -373,9 +373,12 @@ D2_4,21,--,--,--,10
 D2_5,21,--,--,--,10
 D2_6,21,--,--,--,10
 D2_7,21,--,--,--,10
-E1_1,21,--,--,--,10
-E1_2,21,--,--,--,10
-E1_3,21,--,--,--,10
+E1_1_I,21,--,--,--,10
+E1_1_II,21,--,--,--,10
+E1_2_I,21,--,--,--,10
+E1_2_II,21,--,--,--,10
+E1_3_I,21,--,--,--,10
+E1_3_II,21,--,--,--,10
 E2_0_I,21,C-LH4 Cable Roll - 100m,3.01-PGS-CCR-10,460117 C-LH-4 PGS Cable Roll - 100m,10
 E2_0_II,21,PK-PUC -- Mounting Insert for PK-CP245 Aluminium Bars,3.01-PGS-PMI-10,Steel bracket designed to fit inside PK-CP245 aluminium bars. The central keyhole slot allows for the insertion of a threaded rod or steel pin; enabling secure ceiling mounting. Ideal for structural support or suspended installations.,10
 E2_0_III,21,PK-C -- Galvanized Corner Bracket for C-Frame Structures,3.01-PGS-PGC-10,Steel corner bracket used to form 90-degree joints in C-shaped metal profiles or aluminium framing systems. Ideal for reinforcing structural corners or assembling support frames.,10
